@@ -1,0 +1,46 @@
+{
+  "name": "vscode-yaml-sort",
+  "displayName": "YAML Sort",
+  "description": "This VS Code extension exposes the possibility to sort and validate yaml files.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.33.0"
+  },
+  "publisher": "PascalReitermann93",
+  "icon": "images/icon.png",
+  "repository": "https://github.com/pascalre/vscode-yaml-sort",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.sortyaml",
+    "onCommand:extension.validateyaml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.sortyaml",
+        "title": "Sort YAML"
+      },
+      {
+        "command": "extension.validateyaml",
+        "title": "Validate YAML"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^3.3.1",
+    "vscode": "^1.1.28",
+    "tslint": "^5.12.1",
+    "@types/node": "^10.12.21",
+    "@types/mocha": "^2.2.42"
+  }
+}
