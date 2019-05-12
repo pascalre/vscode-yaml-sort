@@ -25,7 +25,11 @@ suite("Extension Tests", function () {
       assert.equal(validate_yaml(unsorted_yaml), true);
     });
 
-    test("Test 3: YAML is not valid.", function() {
+    test("Test 3: Validation checks indentation.", function() {
       assert.equal(validate_yaml("person:\nbob\n  age:23"), false);
+    });
+
+    test("Test 4: Validation checks duplicate keys.", function() {
+      assert.equal(validate_yaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false);
     });
 });
