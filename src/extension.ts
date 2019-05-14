@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   let activeEditor = vscode.window.activeTextEditor;
-  context.subscriptions.push(vscode.commands.registerCommand('extension.sortyaml', () => {
+  context.subscriptions.push(vscode.commands.registerCommand('vscode-yaml-sort.sortyaml', () => {
     if (activeEditor) {
       let newText = sort_yaml(activeEditor.document.getText())!;
       if (newText) {
@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
   }));
-  context.subscriptions.push(vscode.commands.registerCommand('extension.validateyaml', () => {
+  context.subscriptions.push(vscode.commands.registerCommand('vscode-yaml-sort.validateyaml', () => {
     if (activeEditor) {
       validate_yaml(activeEditor.document.getText())!;
     }

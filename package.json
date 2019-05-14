@@ -13,18 +13,18 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.sortyaml",
-    "onCommand:extension.validateyaml"
+    "onCommand:vscode-yaml-sort.sortyaml",
+    "onCommand:vscode-yaml-sort.validateyaml"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extension.sortyaml",
+        "command": "vscode-yaml-sort.sortyaml",
         "title": "Sort YAML"
       },
       {
-        "command": "extension.validateyaml",
+        "command": "vscode-yaml-sort.validateyaml",
         "title": "Validate YAML"
       }
     ]
