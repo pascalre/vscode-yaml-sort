@@ -4,7 +4,7 @@
   "description": "This VS Code extension exposes the possibility to sort and validate yaml files.",
   "version": "1.0.0",
   "engines": {
-    "vscode": "^1.33.0"
+    "vscode": "^1.10.0"
   },
   "publisher": "PascalReitermann93",
   "icon": "images/icon.png",
@@ -42,5 +42,8 @@
     "tslint": "^5.12.1",
     "@types/node": "^10.12.21",
     "@types/mocha": "^2.2.42"
+  },
+  "dependencies": {
+    "js-yaml": "^3.6.1"
   }
 }
