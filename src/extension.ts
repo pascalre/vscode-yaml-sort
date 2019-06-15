@@ -15,24 +15,26 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  let activeEditor = vscode.window.activeTextEditor;
   context.subscriptions.push(vscode.commands.registerCommand('vscode-yaml-sort.sortyaml', () => {
-    if (activeEditor) {
-      let newText = sort_yaml(activeEditor.document.getText())!;
-      if (newText) {
-        activeEditor.edit(builder => builder.replace(new vscode.Range(new vscode.Position(0,0), new vscode.Position(activeEditor!.document.lineCount+1,0)), newText));
-      }
-    }
+    sort_yaml_wrapper();
   }));
   context.subscriptions.push(vscode.commands.registerCommand('vscode-yaml-sort.validateyaml', () => {
-    if (activeEditor) {
-      validate_yaml(activeEditor.document.getText())!;
-    }
+    validate_yaml_wrapper();
   }));
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+
+export function sort_yaml_wrapper() {
+  let activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor) {
+    let newText = sort_yaml(activeEditor.document.getText())!;
+    if (newText) {
+      activeEditor.edit(builder => builder.replace(new vscode.Range(new vscode.Position(0,0), new vscode.Position(activeEditor!.document.lineCount+1,0)), newText));
+    }
+  }
+}
 
 export function sort_yaml(unsorted_yaml: string) {
   try {
@@ -45,6 +47,13 @@ export function sort_yaml(unsorted_yaml: string) {
   } catch (e) {
     vscode.window.showErrorMessage("Keys could not be resorted: " + e.message);
     return null;
+  }
+}
+
+export function validate_yaml_wrapper() {
+  let activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor) {
+    validate_yaml(activeEditor.document.getText())!;
   }
 }
 
