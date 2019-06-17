@@ -2,11 +2,19 @@
 
 This VS Code extension exposes the possibility to sort and validate yaml files.
 
-## Extension Commands
+## Configuration
 
 This extension contributes the following settings:
 
-* `Sort YAML`: sorts a given yaml in the current open editor tab
-* `Validate YAML`: validates a given yaml in the current open editor tab
+* `vscode-yaml-sort.lineWidth`: Line width for YAML files. Defaults to 500.
+
+## Commands
+
+This extension contributes the following commands:
+
+* `Sort YAML`: Sorts a given yaml in the current open editor tab
+* `Validate YAML`: Validates a given yaml in the current open editor tab
 
 **Enjoy!**
+
+If you like this extension, please feel free to rate it on the marketplace.
