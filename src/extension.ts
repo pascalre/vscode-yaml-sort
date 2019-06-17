@@ -1,7 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { print } from 'util';
 export const yaml_parser = require('js-yaml');
 
 // this method is called when your extension is activated
@@ -41,6 +40,7 @@ export function sort_yaml(unsorted_yaml: string) {
     var doc = yaml_parser.safeLoad(unsorted_yaml);
     let sorted_yaml = yaml_parser.safeDump(doc, {
       sortKeys: true,
+      lineWidth: vscode.workspace.getConfiguration().get('vscode-yaml-sort.lineWidth'),
     });
     vscode.window.showInformationMessage("Keys resorted successfully");
     return sorted_yaml;

@@ -32,4 +32,10 @@ suite("Extension Tests", function () {
     test("Test 4: Validation checks duplicate keys.", function() {
       assert.equal(validate_yaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false);
     });
+
+    let yaml_without_line_break_after_500_chars = "- lorem ipsum:\n    text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'";
+    let yaml_with_line_break_after_500_chars = "- lorem ipsum:\n    text: >-\n      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n      dolores et e\n";
+    test("Test 5: Maximum line with of 500.", function() {
+      assert.equal(sort_yaml(yaml_without_line_break_after_500_chars), yaml_with_line_break_after_500_chars);
+    });
 });
