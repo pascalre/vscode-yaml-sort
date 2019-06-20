@@ -13,8 +13,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vscode-yaml-sort.sortyaml",
-    "onCommand:vscode-yaml-sort.validateyaml"
+    "onCommand:vscode-yaml-sort.sortYaml",
+    "onCommand:vscode-yaml-sort.validateYaml"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -23,18 +23,20 @@
         "vscode-yaml-sort.lineWidth": {
             "type": "integer",
             "default": 500,
-            "description": "Line width for YAML files."
+            "description": "Maximum line width for YAML files."
         }
       }
     },
     "commands": [
       {
-        "command": "vscode-yaml-sort.sortyaml",
-        "title": "Sort YAML"
+        "command": "vscode-yaml-sort.sortYaml",
+        "title": "Sort YAML",
+        "when": "editorLangId == yaml"
       },
       {
-        "command": "vscode-yaml-sort.validateyaml",
-        "title": "Validate YAML"
+        "command": "vscode-yaml-sort.validateYaml",
+        "title": "Validate YAML",
+        "when": "editorLangId == yaml"
       }
     ]
   },
