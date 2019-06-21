@@ -24,6 +24,11 @@
             "type": "integer",
             "default": 500,
             "description": "Maximum line width for YAML files."
+        },
+        "vscode-yaml-sort.indent": {
+          "type": "integer",
+          "default": 2,
+          "description": "Indentation width in spaces."
         }
       }
     },

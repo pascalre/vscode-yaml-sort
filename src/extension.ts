@@ -35,15 +35,16 @@ export function sortYamlWrapper() {
   }
 }
 
-export function sortYaml(unsorted_yaml: string) {
+export function sortYaml(unsortedYaml: string) {
   try {
-    var doc = yaml_parser.safeLoad(unsorted_yaml);
-    let sorted_yaml = yaml_parser.safeDump(doc, {
+    var doc = yaml_parser.safeLoad(unsortedYaml);
+    let sortedYaml = yaml_parser.safeDump(doc, {
+      indent: vscode.workspace.getConfiguration().get('vscode-yaml-sort.indent'),
       sortKeys: true,
       lineWidth: vscode.workspace.getConfiguration().get('vscode-yaml-sort.lineWidth'),
     });
     vscode.window.showInformationMessage("Keys resorted successfully");
-    return sorted_yaml;
+    return sortedYaml;
   } catch (e) {
     vscode.window.showErrorMessage("Keys could not be resorted: " + e.message);
     return null;

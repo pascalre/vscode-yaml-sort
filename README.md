@@ -6,6 +6,7 @@ This VS Code extension exposes the possibility to sort and validate yaml files.
 
 This extension contributes the following settings:
 
+* `vscode-yaml-sort.indent`: Indentation width in spaces.
 * `vscode-yaml-sort.lineWidth`: Maximum line width for YAML files. Defaults to 500.
 
 ## Commands
