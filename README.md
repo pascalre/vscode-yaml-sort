@@ -15,6 +15,7 @@ This extension contributes the following commands:
 
 * `Sort YAML`: Sorts a given yaml in the current open editor tab
 * `Validate YAML`: Validates a given yaml in the current open editor tab
+* `Sort Kubernetes Configmap`: Sorts a given Kubernetes configmap ordering the top level keywords as following: apiVersion, kind, metadata, spec, data
 
 **Enjoy!**
 

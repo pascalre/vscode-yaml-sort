@@ -2,7 +2,7 @@
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
   "description": "This VS Code extension exposes the possibility to sort and validate yaml files.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "engines": {
     "vscode": "^1.10.0"
   },
@@ -14,7 +14,8 @@
   ],
   "activationEvents": [
     "onCommand:vscode-yaml-sort.sortYaml",
-    "onCommand:vscode-yaml-sort.validateYaml"
+    "onCommand:vscode-yaml-sort.validateYaml",
+    "onCommand:vscode-yaml-sort.sortConfigmap"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -41,6 +42,11 @@
       {
         "command": "vscode-yaml-sort.validateYaml",
         "title": "Validate YAML",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.sortConfigmap",
+        "title": "Sort Kubernetes Configmap",
         "when": "editorLangId == yaml"
       }
     ]

@@ -35,7 +35,15 @@ suite("Extension Tests", function () {
 
     let yamlWithoutLineBreakAfter500Chars = "- lorem ipsum:\n    text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'";
     let yamlWithLineBreakAfter500Chars = "- lorem ipsum:\n    text: >-\n      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n      dolores et e\n";
-    test("Test 5: Maximum line with of 500.", function() {
+    test("Test 5: Maximum line width of 500.", function() {
       assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars);
     });
+
+    let unsortedConfigMap = "data:\n  selector:\n    matchLabels:\n      tier: mysql\n      app: wordpress\n\napiVersion: v1\n\nkind: Deployment\nmetadata:\n  labels:\n    app: noc-configmap\n  name: noc-configmap\nspec:\n  selector:\n    matchLabels:\n      app: wordpress\n      tier: mysql\n";
+    let sortedConfigMap = "apiVersion: v1\nkind: Deployment\nmetadata: \n  labels:\n    app: noc-configmap\n  name: noc-configmap\nspec: \n  selector:\n    matchLabels:\n      app: wordpress\n      tier: mysql\ndata: \n  selector:\n    matchLabels:\n      app: wordpress\n      tier: mysql\n";
+    test("Test 6: Sort Configmap.", function() {
+      assert.equal(sortYaml(unsortedConfigMap, true), sortedConfigMap);
+    });
+
+
 });

@@ -20,29 +20,51 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand('vscode-yaml-sort.validateYaml', () => {
     validateYamlWrapper();
   }));
+  context.subscriptions.push(vscode.commands.registerCommand('vscode-yaml-sort.sortConfigmap', () => {
+    sortYamlWrapper(true);
+  }));
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
 
-export function sortYamlWrapper() {
+export function sortYamlWrapper(isConfigMap: boolean = false) {
   let activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
-    let newText = sortYaml(activeEditor.document.getText())!;
+    let newText = sortYaml(activeEditor.document.getText(), isConfigMap)!;
     if (newText) {
       activeEditor.edit(builder => builder.replace(new vscode.Range(new vscode.Position(0,0), new vscode.Position(activeEditor!.document.lineCount+1,0)), newText));
     }
   }
 }
 
-export function sortYaml(unsortedYaml: string) {
+export function sortYaml(unsortedYaml: string, isConfigMap: boolean = false) {
   try {
     var doc = yaml_parser.safeLoad(unsortedYaml);
-    let sortedYaml = yaml_parser.safeDump(doc, {
-      indent: vscode.workspace.getConfiguration().get('vscode-yaml-sort.indent'),
-      sortKeys: true,
-      lineWidth: vscode.workspace.getConfiguration().get('vscode-yaml-sort.lineWidth'),
-    });
+    var sortedYaml = '';
+
+    if (isConfigMap) {
+      ['apiVersion', 'kind', 'metadata', 'spec', 'data'].forEach(function(key) {
+        if (doc[key]) {
+          var sortedSubYaml = yaml_parser.safeDump(doc[key], {
+            sortKeys: true,
+            lineWidth: vscode.workspace.getConfiguration().get('vscode-yaml-sort.lineWidth'),
+          });
+          // when key cotains more than one line, we need some transformation: add a new line and indent each line 2 spaces
+          if (sortedSubYaml.includes(':')) {
+            sortedSubYaml = "\n  " + sortedSubYaml.split("\n").join("\n  ");
+            sortedSubYaml = sortedSubYaml.substring(0, sortedSubYaml.length-2);
+          }
+          sortedYaml += key + ": " + sortedSubYaml;
+        }
+      });  
+    } else {
+      sortedYaml = yaml_parser.safeDump(doc, {
+        indent: vscode.workspace.getConfiguration().get('vscode-yaml-sort.indent'),
+        sortKeys: true,
+        lineWidth: vscode.workspace.getConfiguration().get('vscode-yaml-sort.lineWidth'),
+      });  
+    }
     vscode.window.showInformationMessage("Keys resorted successfully");
     return sortedYaml;
   } catch (e) {
