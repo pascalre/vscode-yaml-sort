@@ -1,0 +1,12 @@
+language: node_js
+sudo: false
+node_js:
+  - node
+install:
+  - npm install
+  - npm install -g vsce
+os:
+  - osx
+script:
+  - vsce package
+  - npm run test

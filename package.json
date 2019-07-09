@@ -10,7 +10,7 @@
   "icon": "images/icon.png",
   "repository": "https://github.com/pascalre/vscode-yaml-sort",
   "categories": [
-    "Other"
+    "Formatters"
   ],
   "activationEvents": [
     "onCommand:vscode-yaml-sort.sortYaml",
