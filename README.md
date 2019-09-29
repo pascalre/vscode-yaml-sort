@@ -8,6 +8,7 @@ This extension contributes the following settings:
 
 * `vscode-yaml-sort.indent`: Indentation width in spaces.
 * `vscode-yaml-sort.lineWidth`: Maximum line width for YAML files. Defaults to 500.
+* `vscode-yaml-sort.useLeadingDashes`: Define if sorted YAML files should begin with leading dashes. Defaults to true.
 
 ## Commands
 

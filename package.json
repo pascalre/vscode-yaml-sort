@@ -30,6 +30,11 @@
           "type": "integer",
           "default": 2,
           "description": "Indentation width in spaces."
+        },
+          "vscode-yaml-sort.useLeadingDashes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Define if sorted YAML files should begin with leading dashes."
         }
       }
     },

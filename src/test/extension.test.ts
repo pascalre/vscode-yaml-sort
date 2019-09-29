@@ -5,7 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert";
-import { sortYaml, validateYaml } from "../extension";
+import { sortYaml, validateYaml, splitYaml } from "../extension";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -110,8 +110,49 @@ data:
       app: wordpress
       tier: mysql
 `;
-  test("Test 6: Sort Configmap.", () => {
+
+  test("Test 6: Sort configmap.", () => {
     assert.equal(sortYaml(unsortedConfigMap, true), sortedConfigMap);
+  });
+
+const singleYaml = `\
+- Orange
+- Apple
+`;
+const singleYamlWithLeadingDashes = `\
+---
+- Orange
+- Apple
+`;
+const multipleYaml = `\
+- Orange
+- Apple
+---
+- Orange
+- Apple
+`;
+const multipleYamlWithLeadingDashes = `\
+---
+- Orange
+- Apple
+---
+- Orange
+- Apple
+`;
+
+  test("Test 7.1: Split Yaml (single yaml).", () => {
+    assert.equal(splitYaml(singleYaml).toString, ["- Orange\n- Apple\n"].toString);
+  });
+  test("Test 7.2: Split Yaml (single yaml with leading dashes).", () => {
+    assert.equal(splitYaml(singleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n"].toString);
+  });
+
+  test("Test 7.3: Split Yaml (multiple yaml).", () => {
+    assert.equal(splitYaml(multipleYaml).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
+  });
+
+  test("Test 7.4: Split Yaml (multiple yaml with leading dashes).", () => {
+    assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
 });

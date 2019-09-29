@@ -24,12 +24,28 @@ export function activate(context: vscode.ExtensionContext) {
 export function sortYamlWrapper(isConfigMap: boolean = false) {
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
-    const newText = sortYaml(activeEditor.document.getText(), isConfigMap)!;
+
+    let newText = "";
+    splitYaml(activeEditor.document.getText()).forEach(function (unsortedYaml){
+      if (sortYaml(unsortedYaml, isConfigMap)) {
+        newText += "---\n" + sortYaml(unsortedYaml, isConfigMap)!;
+      }
+    });
+
+    if (!vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
+      // remove leading dashes
+      newText = newText.replace("---\n", "");
+    }
+
     if (newText) {
       activeEditor.edit((builder) => builder.replace(new vscode.Range(
         new vscode.Position(0, 0), new vscode.Position(activeEditor!.document.lineCount  + 1, 0)), newText));
     }
   }
+}
+
+export function splitYaml(unsplittedYaml: string) {
+  return unsplittedYaml.split("---\n").filter((obj) => obj);
 }
 
 export function sortYaml(unsortedYaml: string, isConfigMap: boolean = false) {
