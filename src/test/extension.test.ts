@@ -72,6 +72,7 @@ aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
     assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars);
   });
 
+/*
   const unsortedConfigMap = `\
 data:
   selector:
@@ -114,7 +115,7 @@ data:
   test("Test 6: Sort configmap.", () => {
     assert.equal(sortYaml(unsortedConfigMap, true), sortedConfigMap);
   });
-
+*/
 const singleYaml = `\
 - Orange
 - Apple

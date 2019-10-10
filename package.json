@@ -2,7 +2,7 @@
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
   "description": "This VS Code extension exposes the possibility to sort and validate yaml files.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "engines": {
     "vscode": "^1.10.0"
   },
@@ -15,7 +15,9 @@
   "activationEvents": [
     "onCommand:vscode-yaml-sort.sortYaml",
     "onCommand:vscode-yaml-sort.validateYaml",
-    "onCommand:vscode-yaml-sort.sortConfigmap"
+    "onCommand:vscode-yaml-sort.customSortYaml_1",
+    "onCommand:vscode-yaml-sort.customSortYaml_2",
+    "onCommand:vscode-yaml-sort.customSortYaml_3"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -35,6 +37,21 @@
           "type": "boolean",
           "default": true,
           "description": "Define if sorted YAML files should begin with leading dashes."
+        },
+          "vscode-yaml-sort.customSortKeywords_1": {
+          "type": ["string"],
+          "default": ["apiVersion", "kind", "metadata", "spec", "data"],
+          "description": "...."
+        },
+          "vscode-yaml-sort.customSortKeywords_2": {
+          "type": ["string"],
+          "default": [],
+          "description": "...."
+        },
+          "vscode-yaml-sort.customSortKeywords_3": {
+          "type": ["string"],
+          "default": [],
+          "description": "...."
         }
       }
     },
@@ -50,8 +67,18 @@
         "when": "editorLangId == yaml"
       },
       {
-        "command": "vscode-yaml-sort.sortConfigmap",
-        "title": "Sort Kubernetes Configmap",
+        "command": "vscode-yaml-sort.customSortYaml_1",
+        "title": "Custom sort 1",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.customSortYaml_2",
+        "title": "Custom sort 2",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.customSortYaml_3",
+        "title": "Custom sort 3",
         "when": "editorLangId == yaml"
       }
     ]
