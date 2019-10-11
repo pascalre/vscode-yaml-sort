@@ -83,16 +83,21 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
           });
           // when key cotains more than one line, we need some transformation:
           // add a new line and indent each line 2 spaces
+          let colon = ": ";
           if (sortedSubYaml.includes(":")) {
             sortedSubYaml = "\n  " + sortedSubYaml.split("\n").join("\n  ");
             sortedSubYaml = sortedSubYaml.substring(0, sortedSubYaml.length - 2);
+            colon = ":";
           }
-          sortedYaml += key + ": " + sortedSubYaml;
+          sortedYaml += key + colon + sortedSubYaml;
         }
         // delete key from yaml
         delete doc[key];
       });
     }
+
+    if (Object.getOwnPropertyNames(doc).length === 0) return sortedYaml;
+
     // either sort whole yaml or sort the rest of the yaml and add it to the sortedYaml
     sortedYaml += yamlParser.safeDump(doc, {
         indent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),

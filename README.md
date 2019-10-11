@@ -19,8 +19,7 @@ This extension contributes the following commands:
 
 * `Sort YAML`: Sorts a given yaml in the current open editor tab
 * `Validate YAML`: Validates a given yaml in the current open editor tab
-* `Sort Kubernetes Configmap`: Sorts a given Kubernetes configmap ordering the top level keywords as following: apiVersion, kind, metadata, spec, data
-* `Custom Sort 1`: This command will sort a given yaml. If some of the keys of customSortKeywords_1 will be found at the top level, these will be put at the beginning of the yaml file (in the given order). You can use this e. g. to sort Kubernetes configmaps.
+* `Custom Sort 1`: This command will sort a given yaml with custom order. If some of the keys of `customSortKeywords_1` will be found at the top level, these will be put at the beginning of the yaml file (in the given order). You can use this e. g. to sort Kubernetes configmaps.
 * `Custom Sort 2`: Same as `Custom Sort 1`.
 * `Custom Sort 3`: Same as `Custom Sort 1`.
 
