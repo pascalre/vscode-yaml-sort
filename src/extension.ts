@@ -34,22 +34,35 @@ export function splitYaml(unsplittedYaml: string) {
 export function sortYamlWrapper(customSort: number = 0) {
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
+    // Todo: set cursor at first position on this line
+    activeEditor.selection.start.line
 
+
+    let doc = activeEditor.document.getText(activeEditor.selection);
+    if (activeEditor.selection.isEmpty) {
+      doc = activeEditor.document.getText();
+    }
+
+    // sort yaml
     let newText = "";
-    splitYaml(activeEditor.document.getText()).forEach(function (unsortedYaml){
+    splitYaml(doc).forEach(function (unsortedYaml){
       if (sortYaml(unsortedYaml, customSort)) {
         newText += "---\n" + sortYaml(unsortedYaml, customSort)!;
       }
     });
 
-    if (!vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
-      // remove leading dashes
+    // remove leading dashes
+    if ((!vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) || !(activeEditor.selection.isEmpty)) {
       newText = newText.replace("---\n", "");
     }
 
+    // update yaml
     if (newText) {
-      activeEditor.edit((builder) => builder.replace(new vscode.Range(
-        new vscode.Position(0, 0), new vscode.Position(activeEditor!.document.lineCount  + 1, 0)), newText));
+      if (activeEditor.selection.isEmpty) {
+        activeEditor.edit((builder) => builder.replace(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(activeEditor!.document.lineCount  + 1, 0)), newText));
+      } else {
+        activeEditor.edit((builder) => builder.replace(activeEditor.selection, newText));
+      }
     }
   }
 }
