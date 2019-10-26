@@ -34,13 +34,20 @@ export function splitYaml(unsplittedYaml: string) {
 export function sortYamlWrapper(customSort: number = 0) {
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
-    // Todo: set cursor at first position on this line
-    activeEditor.selection.start.line
 
-
-    let doc = activeEditor.document.getText(activeEditor.selection);
-    if (activeEditor.selection.isEmpty) {
-      doc = activeEditor.document.getText();
+    let doc = activeEditor.document.getText();
+    let leadingSpaces = "";
+    if (!(activeEditor.selection.isEmpty)) {
+      activeEditor.selection = new vscode.Selection(activeEditor.selection.start.line, 0, activeEditor.selection.end.line, 2000)
+      doc = activeEditor.document.getText(activeEditor.selection);
+      if (doc.charAt(doc.length-1) == ':') {
+        vscode.window.showErrorMessage("YAML selection is invalid. Please check to ending of your selection.");
+        return false;
+      }
+      // get number of leading whitespaces
+      const numberOfLeadingSpaces = doc.search(/\S/);
+      // create string of whitespaces, to prepend this later
+      leadingSpaces = " ".repeat(numberOfLeadingSpaces);
     }
 
     // sort yaml
@@ -61,6 +68,8 @@ export function sortYamlWrapper(customSort: number = 0) {
       if (activeEditor.selection.isEmpty) {
         activeEditor.edit((builder) => builder.replace(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(activeEditor!.document.lineCount  + 1, 0)), newText));
       } else {
+        // prepend whitespaces
+        newText = newText.replace(/^/mg, leadingSpaces);
         activeEditor.edit((builder) => builder.replace(activeEditor.selection, newText));
       }
     }
@@ -109,7 +118,8 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
       });
     }
 
-    if (Object.getOwnPropertyNames(doc).length === 0) return sortedYaml;
+    // return, if no keywords are left and remove trailing line break
+    if (Object.getOwnPropertyNames(doc).length === 0) return sortedYaml.substr(0, sortedYaml.length-1);
 
     // either sort whole yaml or sort the rest of the yaml and add it to the sortedYaml
     sortedYaml += yamlParser.safeDump(doc, {
@@ -117,6 +127,8 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
         lineWidth: vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
         sortKeys: true,
     });
+    // remove trailing line break
+    sortedYaml = sortedYaml.substr(0, sortedYaml.length-1);
     vscode.window.showInformationMessage("Keys resorted successfully");
     return sortedYaml;
   } catch (e) {

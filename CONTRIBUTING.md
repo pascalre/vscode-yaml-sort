@@ -2,7 +2,8 @@
 
 This guide supports developers in contributing code.
 
-## Testing
+## Testing & Linting
+* `npm run test`: Run the unit tests.
 
 Run the following commands to run SonarScanner:
 * `docker pull sonarqube`: Pull sonarqube container.

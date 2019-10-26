@@ -1,9 +1,7 @@
 # YAML Sort
-
 This VS Code extension exposes the possibility to sort and validate yaml files.
 
 ## Configuration
-
 This extension contributes the following settings:
 
 * `vscode-yaml-sort.indent`: Indentation width in spaces.
@@ -14,7 +12,6 @@ This extension contributes the following settings:
 * `vscode-yaml-sort.customSortKeywords_3`: List of keywords for `Custom Sort 3`.
 
 ## Commands
-
 This extension contributes the following commands:
 
 * `Sort YAML`: Sorts a given yaml in the current open editor tab
@@ -23,7 +20,14 @@ This extension contributes the following commands:
 * `Custom Sort 2`: Same as `Custom Sort 1`.
 * `Custom Sort 3`: Same as `Custom Sort 1`.
 
-## New stuff in this version
+## Changelog
+### 2.1.0
+This version adds the possibility to sort only a selection.
+
+### 2.0.1
+This version fixes the data type of `customSortKeywords`.
+
+### 2.0.0
 The command `Sort Kubernetes Configmap` is no longer supported. You can use `Custom Sort 1` instead with the defaults of `vscode-yaml-sort.customSortKeywords_1`.
 
 **Enjoy!**

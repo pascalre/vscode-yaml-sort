@@ -20,8 +20,7 @@ persons:
     age: 21
 animals:
   kitty:
-    age: 3
-`;
+    age: 3`;
   const sortedYaml = `\
 animals:
   kitty:
@@ -32,8 +31,7 @@ persons:
     place: Germany
   bob:
     age: 23
-    place: Germany
-`;
+    place: Germany`;
   test("Test 1: YAML should be sorted.", () => {
       assert.equal(sortYaml(unsortedYaml), sortedYaml);
   });
@@ -56,8 +54,7 @@ persons:
 labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea \
 rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
-aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'
-`;
+aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'`;
   const yamlWithLineBreakAfter500Chars = `\
 - lorem ipsum:
     text: >-
@@ -66,8 +63,7 @@ labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam 
 ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-      dolores et e
-`;
+      dolores et e`;
   test("Test 5: Maximum line width of 500.", () => {
     assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars);
   });
@@ -116,44 +112,52 @@ data:
     assert.equal(sortYaml(unsortedConfigMap, true), sortedConfigMap);
   });
 */
-const singleYaml = `\
+  const singleYaml = `\
 - Orange
-- Apple
-`;
-const singleYamlWithLeadingDashes = `\
+- Apple`;
+  const singleYamlWithLeadingDashes = `\
 ---
 - Orange
-- Apple
-`;
-const multipleYaml = `\
+- Apple`;
+  const multipleYaml = `\
 - Orange
 - Apple
 ---
 - Orange
-- Apple
-`;
-const multipleYamlWithLeadingDashes = `\
+- Apple`;
+  const multipleYamlWithLeadingDashes = `\
 ---
 - Orange
 - Apple
 ---
 - Orange
-- Apple
-`;
+- Apple`;
 
-  test("Test 7.1: Split Yaml (single yaml).", () => {
+  test("Test 6.1: Split Yaml (single yaml).", () => {
     assert.equal(splitYaml(singleYaml).toString, ["- Orange\n- Apple\n"].toString);
   });
-  test("Test 7.2: Split Yaml (single yaml with leading dashes).", () => {
+  test("Test 6.2: Split Yaml (single yaml with leading dashes).", () => {
     assert.equal(splitYaml(singleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n"].toString);
   });
 
-  test("Test 7.3: Split Yaml (multiple yaml).", () => {
+  test("Test 6.3: Split Yaml (multiple yaml).", () => {
     assert.equal(splitYaml(multipleYaml).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
-  test("Test 7.4: Split Yaml (multiple yaml with leading dashes).", () => {
+  test("Test 6.4: Split Yaml (multiple yaml with leading dashes).", () => {
     assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
+  });
+
+  const yaml = `\
+data: data
+spec: spec`;
+
+  const customSortedYaml = `\
+spec: spec
+data: data`;
+
+  test("Test 7: Custom sort.", () => {
+    assert.equal(sortYaml(yaml, 1), customSortedYaml);
   });
 
 });
