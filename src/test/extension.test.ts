@@ -5,7 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert";
-import { sortYaml, validateYaml, splitYaml } from "../extension";
+import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords } from "../extension";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -148,16 +148,42 @@ data:
     assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
-  const yaml = `\
+
+  test("Test 7: Custom sort.", () => {
+    const yaml = `\
 data: data
 spec: spec`;
 
-  const customSortedYaml = `\
+    const customSortedYaml = `\
 spec: spec
 data: data`;
-
-  test("Test 7: Custom sort.", () => {
     assert.equal(sortYaml(yaml, 1), customSortedYaml);
+  });
+
+  test("Test 8: removeTrailingCharacters", () => {
+    const string = "text";
+    const string2 = "text\n";
+    assert.equal(removeTrailingCharacters(string, 1), "tex");
+    assert.equal(removeTrailingCharacters(string2, 1), "text");
+    assert.equal(removeTrailingCharacters(string2, 0), string2);
+    assert.equal(removeTrailingCharacters(string, string.length), "");
+    assert.throws(() => removeTrailingCharacters(string, -1), new Error("The count parameter is not in a valid range"));
+    assert.throws(() => removeTrailingCharacters(string, string.length+1), new Error("The count parameter is not in a valid range"));
+  });
+
+  test("Test 9: prependWhitespacesOnEachLine", () => {
+    const string = "text";
+    assert.equal(prependWhitespacesOnEachLine(string, 2), "  text");
+    assert.equal(prependWhitespacesOnEachLine(string, 0), "text");
+
+    const string2 = "text\n";
+    assert.equal(prependWhitespacesOnEachLine(string2, 2), "  text\n  ");
+    assert.throws(() => prependWhitespacesOnEachLine(string2, -1), new Error("The count parameter is not a positive number"));
+  })
+
+  test("Test 10: getCustomSortKeywords", () => {
+    //assert.equal(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"]);
+    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"));
   });
 
 });

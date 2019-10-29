@@ -33,17 +33,21 @@ export function splitYaml(unsplittedYaml: string) {
 }
 
 export function removeTrailingCharacters(text: string, count: number = 1) {
+  if (count < 0 || count > text.length)
+    throw new Error("The count parameter is not in a valid range");
+
   return text.substr(0, text.length - count);
 }
 
 export function prependWhitespacesOnEachLine(text: string, count: number) {
+  if (count < 0)
+    throw new Error("The count parameter is not a positive number");
+
   let spaces = " ".repeat(count);
   return text.replace(/^/mg, spaces);
-  // also possible
-  // return text.split("\n").join("\n" + spaces);
 }
 
-export function getCustomSortKeywords(number: number = 0) {
+export function getCustomSortKeywords(number: number) {
   // Maybe more beautiful
   // if ([1, 2, 3].includes(number)) return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_" + number) as [string];
   // return [];
@@ -55,7 +59,7 @@ export function getCustomSortKeywords(number: number = 0) {
       return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_2") as [string];
     case 3:
       return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_3") as [string];
-    default: return [];
+    default: throw new Error("The count parameter is not in a valid range");
   }
 }
 
