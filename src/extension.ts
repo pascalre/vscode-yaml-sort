@@ -27,8 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
   }));
 }
 
-// This function splits a string containing multiple yamls (seperated by ---\n).
 export function splitYaml(unsplittedYaml: string) {
+  // This function splits a string containing multiple yamls (seperated by ---\n).
   return unsplittedYaml.split("---\n").filter((obj) => obj);
 }
 
@@ -47,10 +47,27 @@ export function prependWhitespacesOnEachLine(text: string, count: number) {
   return text.replace(/^/mg, spaces);
 }
 
+export function isSelectionInvalid(text: string) {
+  // remove trailing whitespaces, to check for things like 'text:  '
+  text = text.trim();
+  const notValidEndingCharacters = [':', '|', '>'];
+  if (notValidEndingCharacters.includes(text.charAt(text.length-1)))
+    return true;
+  return false;
+}
+
+export function dumpYaml(text: string) {
+  return yamlParser.safeDump(text, {
+    indent:    vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),
+    lineWidth: vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
+    sortKeys:  true,
+  }) as string;
+}
+
 export function getCustomSortKeywords(number: number) {
-  // Maybe more beautiful
+  // Maybe more beautiful:
   // if ([1, 2, 3].includes(number)) return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_" + number) as [string];
-  // return [];
+  // throw new Error("The count parameter is not in a valid range");
 
   switch (number) {
     case 1:
@@ -66,16 +83,21 @@ export function getCustomSortKeywords(number: number) {
 export function sortYamlWrapper(customSort: number = 0) {
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
+    let rangeToBeReplaced = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(activeEditor!.document.lineCount + 1, 0));
     let doc = activeEditor.document.getText();
     let numberOfLeadingSpaces = 0;
-    if (!(activeEditor.selection.isEmpty)) {
-      activeEditor.selection = new vscode.Selection(activeEditor.selection.start.line, 0, activeEditor.selection.end.line, 2000)
-      doc = activeEditor.document.getText(activeEditor.selection);
-      if (doc.charAt(doc.length-1) == ':') {
-        vscode.window.showErrorMessage("YAML selection is invalid. Please check to ending of your selection.");
+
+    if (!activeEditor.selection.isEmpty) {
+      // ensure that selection covers whole start and end line
+      rangeToBeReplaced = new vscode.Selection(activeEditor.selection.start.line, 0, activeEditor.selection.end.line, activeEditor.document.lineAt(activeEditor.selection.end.line).range.end.character);
+      doc = activeEditor.document.getText(rangeToBeReplaced);
+
+      // check if selection to sort is valid, maybe the user missed a trailing line
+      if (isSelectionInvalid(doc)) {
+        vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.");
         return false;
       }
-      // get number of leading whitespaces
+      // get number of leading whitespaces, these whitespaces will be prepend to the document after sorting
       numberOfLeadingSpaces = doc.search(/\S/);
     }
 
@@ -88,18 +110,16 @@ export function sortYamlWrapper(customSort: number = 0) {
     });
 
     // remove leading dashes
-    if ((!vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) || !(activeEditor.selection.isEmpty)) {
+    if (!activeEditor.selection.isEmpty || !vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
       newText = newText.replace("---\n", "");
     }
 
-    // update yaml
-    if (activeEditor.selection.isEmpty) {
-      activeEditor.edit((builder) => builder.replace(new vscode.Range(new vscode.Position(0, 0), new vscode.Position(activeEditor!.document.lineCount + 1, 0)), newText));
-    } else {
-      // prepend whitespaces
+    if (!activeEditor.selection.isEmpty) {
       newText = prependWhitespacesOnEachLine(newText, numberOfLeadingSpaces);
-      activeEditor.edit((builder) => builder.replace(activeEditor.selection, newText));
     }
+
+    // update yaml
+    activeEditor.edit((builder) => builder.replace(rangeToBeReplaced, newText));
   }
 }
 
@@ -113,18 +133,16 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
 
       keywords.forEach((key) => {
         if (doc[key]) {
-          let sortedSubYaml = yamlParser.safeDump(doc[key], {
-            lineWidth: vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
-            sortKeys:  true,
-          });
-          // when key cotains more than one line, we need some transformation:
-          // add a new line and indent each line 2 spaces
-          let colon = ": ";
-          if (sortedSubYaml.includes(":")) {
-            sortedSubYaml = "\n" + prependWhitespacesOnEachLine(sortedSubYaml, 2);
-            colon = ":";
+          let sortedSubYaml = dumpYaml(doc[key]);
+          if (sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) {
+              // when key cotains more than one line, we need some transformation:
+              // add a new line and indent each line some spaces
+              sortedSubYaml = prependWhitespacesOnEachLine(sortedSubYaml, vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number);
+              sortedSubYaml = removeTrailingCharacters(sortedSubYaml, vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number);
+              sortedYaml += key + ":\n" + sortedSubYaml;
+          } else {
+            sortedYaml += key + ": " + sortedSubYaml;
           }
-          sortedYaml += key + colon + sortedSubYaml;
         }
         // delete key from yaml
         delete doc[key];
@@ -135,11 +153,7 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
     if (Object.getOwnPropertyNames(doc).length === 0) return removeTrailingCharacters(sortedYaml);
 
     // either sort whole yaml or sort the rest of the yaml and add it to the sortedYaml
-    sortedYaml += yamlParser.safeDump(doc, {
-        indent:    vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),
-        lineWidth: vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
-        sortKeys:  true,
-    });
+    sortedYaml += dumpYaml(doc);
 
     vscode.window.showInformationMessage("Keys resorted successfully");
     return removeTrailingCharacters(sortedYaml);

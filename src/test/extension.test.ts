@@ -5,7 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert";
-import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords } from "../extension";
+import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords, isSelectionInvalid } from "../extension";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -182,8 +182,14 @@ data: data`;
   })
 
   test("Test 10: getCustomSortKeywords", () => {
-    //assert.equal(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"]);
+    assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"]);
     assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"));
+  });
+
+  test("Test 11: isSelectionInvalid", () =>  {
+    assert.equal(isSelectionInvalid("text"), false);
+    assert.equal(isSelectionInvalid("text:"), true);
+    assert.equal(isSelectionInvalid("text: "), true);
   });
 
 });
