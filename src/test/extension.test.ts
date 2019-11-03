@@ -17,7 +17,8 @@ persons:
     age: 23
 animals:
   kitty:
-    age: 3`;
+    age: 3
+`;
   const sortedYaml = `\
 animals:
   kitty:
@@ -46,7 +47,8 @@ persons:
 labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea \
 rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
-aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'`;
+aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'
+`;
 
     const yamlWithLineBreakAfter500Chars = `\
 - lorem ipsum:
@@ -100,11 +102,13 @@ aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
   test("Test 4: Custom sort.", () => {
     const yaml = `
 data: data
-spec: spec`;
+spec: spec
+`;
 
     const customSortedYaml = `\
 spec: spec
-data: data`;
+data: data
+`;
     assert.equal(sortYaml(yaml, 1), customSortedYaml);
   });
 
