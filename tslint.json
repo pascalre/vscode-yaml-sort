@@ -13,7 +13,8 @@
       true,
       "always"
     ],
-    "triple-equals": true
+    "triple-equals": true,
+    "require-jsdoc": true
   },
   "defaultSeverity": "warning"
 }

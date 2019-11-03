@@ -1,8 +1,8 @@
 {
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
-  "description": "This VS Code extension exposes the possibility to sort and validate yaml files.",
-  "version": "2.1.0",
+  "description": "This VS Code extension exposes the possibility to sort, format and validate yaml files.",
+  "version": "2.2.0",
   "engines": {
     "vscode": "^1.10.0"
   },
@@ -15,6 +15,7 @@
   "activationEvents": [
     "onCommand:vscode-yaml-sort.sortYaml",
     "onCommand:vscode-yaml-sort.validateYaml",
+    "onCommand:vscode-yaml-sort.formatYaml",
     "onCommand:vscode-yaml-sort.customSortYaml_1",
     "onCommand:vscode-yaml-sort.customSortYaml_2",
     "onCommand:vscode-yaml-sort.customSortYaml_3"
@@ -33,10 +34,20 @@
           "default": 2,
           "description": "Indentation width in spaces."
         },
+        "vscode-yaml-sort.noArrayIndent": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, will not add an indentation level to array elements."
+        },
         "vscode-yaml-sort.useLeadingDashes": {
           "type": "boolean",
           "default": true,
           "description": "Define if sorted YAML files should begin with leading dashes."
+        },
+        "vscode-yaml-sort.useQuotesForSpecialKeywords": {
+          "type": "boolean",
+          "default": true,
+          "description": "hen false, will not add Quotes for special keywords e.g. '1.4.2': will result in 1.4.2: or 'puppet::key': will result in puppet::key:"
         },
         "vscode-yaml-sort.customSortKeywords_1": {
           "type": "array",
@@ -82,6 +93,11 @@
         "when": "editorLangId == yaml"
       },
       {
+        "command": "vscode-yaml-sort.formatYaml",
+        "title": "Format YAML",
+        "when": "editorLangId == yaml"
+      },
+      {
         "command": "vscode-yaml-sort.customSortYaml_1",
         "title": "Custom sort 1",
         "when": "editorLangId == yaml"
@@ -109,6 +125,7 @@
     "@types/mocha": "^2.2.42",
     "@types/node": "^10.12.21",
     "gulp": "^4.0.2",
+    "jsdoc": "^3.6.3",
     "tslint": "^5.12.1",
     "typescript": "^3.3.1",
     "vscode": "^1.1.28"

@@ -5,7 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert";
-import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords, isSelectionInvalid } from "../extension";
+import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords, isSelectionInvalid, removeQuotesFromKeys } from "../extension";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -13,11 +13,8 @@ suite("Extension Tests", () => {
   const unsortedYaml = `\
 persons:
   bob:
+    place: Germany
     age: 23
-    place: Germany
-  alice:
-    place: Germany
-    age: 21
 animals:
   kitty:
     age: 3`;
@@ -26,9 +23,6 @@ animals:
   kitty:
     age: 3
 persons:
-  alice:
-    age: 21
-    place: Germany
   bob:
     age: 23
     place: Germany`;
@@ -36,26 +30,25 @@ persons:
       assert.equal(sortYaml(unsortedYaml), sortedYaml);
   });
 
-  test("Test 2: YAML is valid.", () => {
+  test("Test 2: validateYaml.", () => {
     assert.equal(validateYaml(unsortedYaml), true);
-  });
-
-  test("Test 3: Validation checks indentation.", () => {
+    assert.equal(validateYaml("network: ethernets:"), false);
+    // Validation checks indentation
     assert.equal(validateYaml("person:\nbob\n  age:23"), false);
-  });
-
-  test("Test 4: Validation checks duplicate keys.", () => {
+    // Test 4: Validation checks duplicate keys
     assert.equal(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false);
   });
 
-  const yamlWithoutLineBreakAfter500Chars = `\
+  test("Test 5: Maximum line width of 500.", () => {
+    const yamlWithoutLineBreakAfter500Chars = `\
 - lorem ipsum:
     text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut \
 labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea \
 rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'`;
-  const yamlWithLineBreakAfter500Chars = `\
+
+    const yamlWithLineBreakAfter500Chars = `\
 - lorem ipsum:
     text: >-
       Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut \
@@ -64,54 +57,9 @@ ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dol
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
       dolores et e`;
-  test("Test 5: Maximum line width of 500.", () => {
     assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars);
   });
 
-/*
-  const unsortedConfigMap = `\
-data:
-  selector:
-    matchLabels:
-      tier: mysql
-      app: wordpress
-
-apiVersion: v1
-
-kind: Deployment
-metadata:
-  labels:
-    app: noc-configmap
-  name: noc-configmap
-spec:
-  selector:
-    matchLabels:
-      app: wordpress
-      tier: mysql
-`;
-  const sortedConfigMap = `\
-apiVersion: v1
-kind: Deployment
-metadata: 
-  labels:
-    app: noc-configmap
-  name: noc-configmap
-spec: 
-  selector:
-    matchLabels:
-      app: wordpress
-      tier: mysql
-data: 
-  selector:
-    matchLabels:
-      app: wordpress
-      tier: mysql
-`;
-
-  test("Test 6: Sort configmap.", () => {
-    assert.equal(sortYaml(unsortedConfigMap, true), sortedConfigMap);
-  });
-*/
   const singleYaml = `\
 - Orange
 - Apple`;
@@ -133,24 +81,24 @@ data:
 - Orange
 - Apple`;
 
-  test("Test 6.1: Split Yaml (single yaml).", () => {
+  test("Test 3.1: Split Yaml (single yaml).", () => {
     assert.equal(splitYaml(singleYaml).toString, ["- Orange\n- Apple\n"].toString);
   });
-  test("Test 6.2: Split Yaml (single yaml with leading dashes).", () => {
+  test("Test 3.2: Split Yaml (single yaml with leading dashes).", () => {
     assert.equal(splitYaml(singleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n"].toString);
   });
 
-  test("Test 6.3: Split Yaml (multiple yaml).", () => {
+  test("Test 3.3: Split Yaml (multiple yaml).", () => {
     assert.equal(splitYaml(multipleYaml).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
-  test("Test 6.4: Split Yaml (multiple yaml with leading dashes).", () => {
+  test("Test 3.4: Split Yaml (multiple yaml with leading dashes).", () => {
     assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
 
-  test("Test 7: Custom sort.", () => {
-    const yaml = `\
+  test("Test 4: Custom sort.", () => {
+    const yaml = `
 data: data
 spec: spec`;
 
@@ -160,7 +108,7 @@ data: data`;
     assert.equal(sortYaml(yaml, 1), customSortedYaml);
   });
 
-  test("Test 8: removeTrailingCharacters", () => {
+  test("Test 5: removeTrailingCharacters", () => {
     const string = "text";
     const string2 = "text\n";
     assert.equal(removeTrailingCharacters(string, 1), "tex");
@@ -171,7 +119,7 @@ data: data`;
     assert.throws(() => removeTrailingCharacters(string, string.length+1), new Error("The count parameter is not in a valid range"));
   });
 
-  test("Test 9: prependWhitespacesOnEachLine", () => {
+  test("Test 6: prependWhitespacesOnEachLine", () => {
     const string = "text";
     assert.equal(prependWhitespacesOnEachLine(string, 2), "  text");
     assert.equal(prependWhitespacesOnEachLine(string, 0), "text");
@@ -181,15 +129,20 @@ data: data`;
     assert.throws(() => prependWhitespacesOnEachLine(string2, -1), new Error("The count parameter is not a positive number"));
   })
 
-  test("Test 10: getCustomSortKeywords", () => {
+  test("Test 7: getCustomSortKeywords", () => {
     assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"]);
     assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"));
   });
 
-  test("Test 11: isSelectionInvalid", () =>  {
+  test("Test 8: isSelectionInvalid", () => {
     assert.equal(isSelectionInvalid("text"), false);
     assert.equal(isSelectionInvalid("text:"), true);
     assert.equal(isSelectionInvalid("text: "), true);
+  });
+
+  test("Test 9: removeQuotesFromKeys", () => {
+    assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1");
+    assert.equal(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2");
   });
 
 });
