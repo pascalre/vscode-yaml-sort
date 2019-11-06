@@ -47,7 +47,7 @@
         "vscode-yaml-sort.useQuotesForSpecialKeywords": {
           "type": "boolean",
           "default": true,
-          "description": "When false, will not add quotes for special keywords e.g. 'puppet::key': will result in puppet::key:. Defaults to true."
+          "description": "When false, will not add quotes for keywords with special characters e.g. 'text::text': will result in text::text:. Defaults to true."
         },
         "vscode-yaml-sort.customSortKeywords_1": {
           "type": "array",
