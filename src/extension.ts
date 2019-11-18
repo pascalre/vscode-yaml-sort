@@ -32,11 +32,23 @@ export function activate(context: vscode.ExtensionContext) {
 
 /**
  * Splits a string, which contains multiple yaml documents.
- * @param {string} unsplittedYaml String which contains multiple yaml documents.
+ * @param {string} multipleYamls String which contains multiple yaml documents.
  * @returns {[string]} Array of yaml documents.
  */
-export function splitYaml(unsplittedYaml: string) {
-  return unsplittedYaml.split("---\n").filter((obj) => obj) as [string];
+export function splitYaml(multipleYamls: string) {
+  return multipleYamls.split(/^---.*/).filter((obj) => obj) as [string];
+}
+
+/**
+ * Returns all delimiters with comments
+ * @param {string} multipleYamls String which contains multiple yaml documents.
+ * @returns {[string]} Array of yaml delimiters.
+ */
+export function getDelimiters(multipleYamls: string) {
+  const delimiters = multipleYamls.match(/---.*/g);
+  if (delimiters)
+    return delimiters
+  return ""
 }
 
 /**
@@ -162,7 +174,7 @@ export function sortYamlWrapper(customSort: number = 0) {
 
   // sort yaml
   let newText = "";
-  splitYaml(doc).forEach(function (unsortedYaml){
+  splitYaml(doc).forEach(function (unsortedYaml) {
     if (sortYaml(unsortedYaml, customSort)) {
       newText += "---\n" + sortYaml(unsortedYaml, customSort)!;
     }

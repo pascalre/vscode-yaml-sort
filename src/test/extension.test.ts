@@ -5,7 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert";
-import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords, isSelectionInvalid, removeQuotesFromKeys } from "../extension";
+import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords, isSelectionInvalid, removeQuotesFromKeys, getDelimiters } from "../extension";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -82,22 +82,32 @@ aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
 ---
 - Orange
 - Apple`;
+const multipleYamlWithComments = `\
+--- # comment 1
+- Orange
+- Apple
+--- text
+- Orange
+- Apple`;
 
-  test("Test 3.1: Split Yaml (single yaml).", () => {
+  test("Test 3.1: Split Yaml: single yaml", () => {
     assert.equal(splitYaml(singleYaml).toString, ["- Orange\n- Apple\n"].toString);
   });
-  test("Test 3.2: Split Yaml (single yaml with leading dashes).", () => {
+  test("Test 3.2: Split Yaml: single yaml with leading dashes", () => {
     assert.equal(splitYaml(singleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n"].toString);
   });
 
-  test("Test 3.3: Split Yaml (multiple yaml).", () => {
+  test("Test 3.3: Split Yaml: multiple yaml", () => {
     assert.equal(splitYaml(multipleYaml).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
-  test("Test 3.4: Split Yaml (multiple yaml with leading dashes).", () => {
+  test("Test 3.4: Split Yaml: multiple yaml with leading dashes", () => {
     assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
   });
 
+  test("Test 3.5: Split Yaml: multiple yaml with text behind delimiter", () => {
+    assert.equal(splitYaml(multipleYamlWithComments).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
+  });
 
   test("Test 4: Custom sort.", () => {
     const yaml = `
@@ -148,5 +158,23 @@ data: data
     assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1");
     assert.equal(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2");
   });
+
+  test("Test 10: getDelimiters", () => {
+    const yaml = `
+yaml: data
+spec: spec
+`;
+    assert.equal(getDelimiters(yaml), "");
+
+    const yaml2 = `
+--- text
+yaml: data
+---  #comment
+spec: spec
+`;
+    assert.equal(getDelimiters(yaml2).toString, ["--- text", "---  #comment"].toString);
+  });
+
+  // Todo: implement tests for selection sort
 
 });
