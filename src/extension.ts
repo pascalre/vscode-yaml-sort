@@ -40,15 +40,33 @@ export function splitYaml(multipleYamls: string) {
 }
 
 /**
- * Returns all delimiters with comments
- * @param {string} multipleYamls String which contains multiple yaml documents.
- * @returns {[string]} Array of yaml delimiters.
- */
-export function getDelimiters(multipleYamls: string) {
-  const delimiters = multipleYamls.match(/---.*/g);
-  if (delimiters)
-    return delimiters
-  return ""
+  * Returns all delimiters with comments
+  * @param {string} multipleYamls String which contains multiple yaml documents.
+  * @param {boolean} isSelectionEmpty Specify if the text is an selection
+  * @returns {[string]} Array of yaml delimiters.
+  */
+ export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean) {
+  // remove empty lines
+  multipleYamls = multipleYamls.replace(/^\n/g, "")
+  let delimiters = multipleYamls.match(/^---.*/gm)
+  if (!delimiters)
+    return [""]
+
+  // append line break to every delimiter
+  delimiters = delimiters.map(delimiter => delimiter + "\n")!
+
+  if (isSelectionEmpty) {
+    if (!vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") && multipleYamls.startsWith("---")) {
+      delimiters.shift()
+      return delimiters
+    }
+
+    if (vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") && !multipleYamls.startsWith("---")) {
+      delimiters.unshift("---\n")
+      return delimiters
+    }
+  }
+  return delimiters
 }
 
 /**
@@ -173,17 +191,19 @@ export function sortYamlWrapper(customSort: number = 0) {
     return false;
 
   // sort yaml
+  let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty)
+
   let newText = "";
   splitYaml(doc).forEach(function (unsortedYaml) {
     if (sortYaml(unsortedYaml, customSort)) {
-      newText += "---\n" + sortYaml(unsortedYaml, customSort)!;
+      newText += delimiters.shift() + sortYaml(unsortedYaml, customSort)!;
     }
   });
 
   // remove leading dashes
-  if (!activeEditor.selection.isEmpty || !vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
+  /*if (!activeEditor.selection.isEmpty || !vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
     newText = newText.replace("---\n", "");
-  }
+  }*/
 
   if (!activeEditor.selection.isEmpty) {
     newText = prependWhitespacesOnEachLine(newText, numberOfLeadingSpaces);

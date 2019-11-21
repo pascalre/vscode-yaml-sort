@@ -164,7 +164,7 @@ data: data
 yaml: data
 spec: spec
 `;
-    assert.equal(getDelimiters(yaml), "");
+    assert.equal(getDelimiters(yaml, false), "");
 
     const yaml2 = `
 --- text
@@ -172,8 +172,32 @@ yaml: data
 ---  #comment
 spec: spec
 `;
-    assert.equal(getDelimiters(yaml2).toString, ["--- text", "---  #comment"].toString);
-  });
+
+    const delimiters = getDelimiters(yaml2, false)
+    assert.equal(delimiters.length, 2)
+    assert.equal(delimiters.shift(), "--- text\n")
+    assert.equal(delimiters.pop(), "---  #comment\n")
+
+    const yaml3 = `
+
+--- text
+yaml: data
+---  #comment
+spec: spec---
+
+`
+    const delimiters2 = getDelimiters(yaml3, false)
+    assert.equal(delimiters2.length, 2)
+    assert.equal(delimiters2.shift(), "--- text\n")
+    assert.equal(delimiters2.pop(), "---  #comment\n")
+
+    const yaml4 = `
+bla
+--- text
+test: bla
+`
+    assert.equal(getDelimiters(yaml4, false), "--- text\n")
+  })
 
   // Todo: implement tests for selection sort
 
