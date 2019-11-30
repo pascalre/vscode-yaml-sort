@@ -5,7 +5,16 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert";
-import { sortYaml, validateYaml, splitYaml, removeTrailingCharacters, prependWhitespacesOnEachLine, getCustomSortKeywords, isSelectionInvalid, removeQuotesFromKeys, getDelimiters } from "../extension";
+import {
+  getCustomSortKeywords,
+  getDelimiters,
+  isSelectionInvalid,
+  prependWhitespacesOnEachLine,
+  removeQuotesFromKeys,
+  removeTrailingCharacters,
+  sortYaml,
+  splitYaml,
+  validateYaml} from "../extension";
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -82,7 +91,7 @@ aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
 ---
 - Orange
 - Apple`;
-const multipleYamlWithComments = `\
+  const multipleYamlWithComments = `\
 --- # comment 1
 - Orange
 - Apple
@@ -102,11 +111,12 @@ const multipleYamlWithComments = `\
   });
 
   test("Test 3.4: Split Yaml: multiple yaml with leading dashes", () => {
-    assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
+    assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString,
+      ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString)
   });
 
   test("Test 3.5: Split Yaml: multiple yaml with text behind delimiter", () => {
-    assert.equal(splitYaml(multipleYamlWithComments).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
+    assert.equal(splitYaml(multipleYamlWithComments).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString)
   });
 
   test("Test 4: Custom sort.", () => {
@@ -123,55 +133,57 @@ data: data
   });
 
   test("Test 5: removeTrailingCharacters", () => {
-    const string = "text";
-    const string2 = "text\n";
-    assert.equal(removeTrailingCharacters(string, 1), "tex");
-    assert.equal(removeTrailingCharacters(string2, 1), "text");
-    assert.equal(removeTrailingCharacters(string2, 0), string2);
-    assert.equal(removeTrailingCharacters(string, string.length), "");
-    assert.throws(() => removeTrailingCharacters(string, -1), new Error("The count parameter is not in a valid range"));
-    assert.throws(() => removeTrailingCharacters(string, string.length+1), new Error("The count parameter is not in a valid range"));
+    const text = "text";
+    const text2 = "text\n";
+    assert.equal(removeTrailingCharacters(text, 1), "tex");
+    assert.equal(removeTrailingCharacters(text2, 1), "text");
+    assert.equal(removeTrailingCharacters(text2, 0), text2);
+    assert.equal(removeTrailingCharacters(text, text.length), "");
+    assert.throws(() => removeTrailingCharacters(text, -1), new Error("The count parameter is not in a valid range"));
+    assert.throws(() => removeTrailingCharacters(text, text.length + 1),
+      new Error("The count parameter is not in a valid range"));
   });
 
   test("Test 6: prependWhitespacesOnEachLine", () => {
-    const string = "text";
-    assert.equal(prependWhitespacesOnEachLine(string, 2), "  text");
-    assert.equal(prependWhitespacesOnEachLine(string, 0), "text");
+    let text = "text";
+    assert.equal(prependWhitespacesOnEachLine(text, 2), "  text")
+    assert.equal(prependWhitespacesOnEachLine(text, 0), "text")
 
-    const string2 = "text\n";
-    assert.equal(prependWhitespacesOnEachLine(string2, 2), "  text\n  ");
-    assert.throws(() => prependWhitespacesOnEachLine(string2, -1), new Error("The count parameter is not a positive number"));
+    text = "text\n";
+    assert.equal(prependWhitespacesOnEachLine(text, 2), "  text\n  ")
+    assert.throws(() => prependWhitespacesOnEachLine(text, -1),
+      new Error("The count parameter is not a positive number"))
   })
 
   test("Test 7: getCustomSortKeywords", () => {
-    assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"]);
-    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"));
-  });
+    assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
+  })
 
   test("Test 8: isSelectionInvalid", () => {
-    assert.equal(isSelectionInvalid("text"), false);
-    assert.equal(isSelectionInvalid("text:"), true);
-    assert.equal(isSelectionInvalid("text: "), true);
-  });
+    assert.equal(isSelectionInvalid("text"), false)
+    assert.equal(isSelectionInvalid("text:"), true)
+    assert.equal(isSelectionInvalid("text: "), true)
+  })
 
   test("Test 9: removeQuotesFromKeys", () => {
-    assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1");
-    assert.equal(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2");
-  });
+    assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1")
+    assert.equal(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2")
+  })
 
   test("Test 10: getDelimiters", () => {
     const yaml = `
 yaml: data
 spec: spec
-`;
-    assert.equal(getDelimiters(yaml, false), "");
+`
+    assert.equal(getDelimiters(yaml, false), "")
 
     const yaml2 = `
 --- text
 yaml: data
 ---  #comment
 spec: spec
-`;
+`
 
     const delimiters = getDelimiters(yaml2, false)
     assert.equal(delimiters.length, 2)
@@ -198,7 +210,5 @@ test: bla
 `
     assert.equal(getDelimiters(yaml4, false), "--- text\n")
   })
-
-  // Todo: implement tests for selection sort
 
 });

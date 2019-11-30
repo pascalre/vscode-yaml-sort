@@ -1,7 +1,6 @@
 {
   "extends": [
-    "tslint:recommended",
-    "tslint-sonarts"
+    "tslint:recommended"
   ],
   "rules": {
     "no-string-throw": true,
