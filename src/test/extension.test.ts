@@ -4,7 +4,7 @@
 //
 
 // The module "assert" provides assertion methods from node
-import * as assert from "assert";
+import * as assert from "assert"
 import {
   getCustomSortKeywords,
   getDelimiters,
@@ -14,7 +14,7 @@ import {
   removeTrailingCharacters,
   sortYaml,
   splitYaml,
-  validateYaml} from "../extension";
+  validateYaml} from "../extension"
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {
@@ -27,7 +27,7 @@ persons:
 animals:
   kitty:
     age: 3
-`;
+`
   const sortedYaml = `\
 animals:
   kitty:
@@ -35,19 +35,19 @@ animals:
 persons:
   bob:
     age: 23
-    place: Germany`;
+    place: Germany`
   test("Test 1: YAML should be sorted.", () => {
-      assert.equal(sortYaml(unsortedYaml), sortedYaml);
-  });
+      assert.equal(sortYaml(unsortedYaml), sortedYaml)
+  })
 
   test("Test 2: validateYaml.", () => {
-    assert.equal(validateYaml(unsortedYaml), true);
-    assert.equal(validateYaml("network: ethernets:"), false);
+    assert.equal(validateYaml(unsortedYaml), true)
+    assert.equal(validateYaml("network: ethernets:"), false)
     // Validation checks indentation
-    assert.equal(validateYaml("person:\nbob\n  age:23"), false);
+    assert.equal(validateYaml("person:\nbob\n  age:23"), false)
     // Test 4: Validation checks duplicate keys
-    assert.equal(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false);
-  });
+    assert.equal(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false)
+  })
 
   test("Test 5: Maximum line width of 500.", () => {
     const yamlWithoutLineBreakAfter500Chars = `\
@@ -57,7 +57,7 @@ labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam 
 rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'
-`;
+`
 
     const yamlWithLineBreakAfter500Chars = `\
 - lorem ipsum:
@@ -67,89 +67,89 @@ labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam 
 ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-      dolores et e`;
-    assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars);
-  });
+      dolores et e`
+    assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars)
+  })
 
   const singleYaml = `\
 - Orange
-- Apple`;
+- Apple`
   const singleYamlWithLeadingDashes = `\
 ---
 - Orange
-- Apple`;
+- Apple`
   const multipleYaml = `\
 - Orange
 - Apple
 ---
 - Orange
-- Apple`;
+- Apple`
   const multipleYamlWithLeadingDashes = `\
 ---
 - Orange
 - Apple
 ---
 - Orange
-- Apple`;
+- Apple`
   const multipleYamlWithComments = `\
 --- # comment 1
 - Orange
 - Apple
 --- text
 - Orange
-- Apple`;
+- Apple`
 
   test("Test 3.1: Split Yaml: single yaml", () => {
-    assert.equal(splitYaml(singleYaml).toString, ["- Orange\n- Apple\n"].toString);
-  });
+    assert.equal(splitYaml(singleYaml).toString, ["- Orange\n- Apple\n"].toString)
+  })
   test("Test 3.2: Split Yaml: single yaml with leading dashes", () => {
-    assert.equal(splitYaml(singleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n"].toString);
-  });
+    assert.equal(splitYaml(singleYamlWithLeadingDashes).toString, ["- Orange\n- Apple\n"].toString)
+  })
 
   test("Test 3.3: Split Yaml: multiple yaml", () => {
-    assert.equal(splitYaml(multipleYaml).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString);
-  });
+    assert.equal(splitYaml(multipleYaml).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString)
+  })
 
   test("Test 3.4: Split Yaml: multiple yaml with leading dashes", () => {
     assert.equal(splitYaml(multipleYamlWithLeadingDashes).toString,
       ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString)
-  });
+  })
 
   test("Test 3.5: Split Yaml: multiple yaml with text behind delimiter", () => {
     assert.equal(splitYaml(multipleYamlWithComments).toString, ["- Orange\n- Apple\n", "- Orange\n- Apple\n"].toString)
-  });
+  })
 
   test("Test 4: Custom sort.", () => {
     const yaml = `
 data: data
 spec: spec
-`;
+`
 
     const customSortedYaml = `\
 spec: spec
 data: data
-`;
-    assert.equal(sortYaml(yaml, 1), customSortedYaml);
-  });
+`
+    assert.equal(sortYaml(yaml, 1), customSortedYaml)
+  })
 
   test("Test 5: removeTrailingCharacters", () => {
-    const text = "text";
-    const text2 = "text\n";
-    assert.equal(removeTrailingCharacters(text, 1), "tex");
-    assert.equal(removeTrailingCharacters(text2, 1), "text");
-    assert.equal(removeTrailingCharacters(text2, 0), text2);
-    assert.equal(removeTrailingCharacters(text, text.length), "");
-    assert.throws(() => removeTrailingCharacters(text, -1), new Error("The count parameter is not in a valid range"));
+    const text = "text"
+    const text2 = "text\n"
+    assert.equal(removeTrailingCharacters(text, 1), "tex")
+    assert.equal(removeTrailingCharacters(text2, 1), "text")
+    assert.equal(removeTrailingCharacters(text2, 0), text2)
+    assert.equal(removeTrailingCharacters(text, text.length), "")
+    assert.throws(() => removeTrailingCharacters(text, -1), new Error("The count parameter is not in a valid range"))
     assert.throws(() => removeTrailingCharacters(text, text.length + 1),
-      new Error("The count parameter is not in a valid range"));
-  });
+      new Error("The count parameter is not in a valid range"))
+  })
 
   test("Test 6: prependWhitespacesOnEachLine", () => {
-    let text = "text";
+    let text = "text"
     assert.equal(prependWhitespacesOnEachLine(text, 2), "  text")
     assert.equal(prependWhitespacesOnEachLine(text, 0), "text")
 
-    text = "text\n";
+    text = "text\n"
     assert.equal(prependWhitespacesOnEachLine(text, 2), "  text\n  ")
     assert.throws(() => prependWhitespacesOnEachLine(text, -1),
       new Error("The count parameter is not a positive number"))
@@ -211,4 +211,4 @@ test: bla
     assert.equal(getDelimiters(yaml4, false), "--- text\n")
   })
 
-});
+})

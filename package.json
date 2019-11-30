@@ -7,8 +7,8 @@
     "vscode": "^1.10.0"
   },
   "publisher": "PascalReitermann93",
-  "icon": "images/icon.png",
   "repository": "https://github.com/pascalre/vscode-yaml-sort",
+  "icon": "images/icon.png",
   "categories": [
     "Formatters"
   ],
