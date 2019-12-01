@@ -3,17 +3,36 @@
     "tslint:recommended"
   ],
   "rules": {
-    "no-string-throw": true,
-    "no-unused-expression": true,
-    "no-duplicate-variable": true,
-    "curly": true,
     "class-name": true,
+    "curly": true,
+    "no-all-duplicated-branches": true,
+    "no-array-delete": true,
+    "no-collection-size-mischeck": true,
+    "no-dead-store": true,
+    "no-duplicate-variable": true,
+    "no-duplicated-branches": true,
+    "no-empty-destructuring": true,
+    "no-empty-nested-blocks": false,
+    "no-identical-conditions": true,
+    "no-identical-expressions": true,
+    "no-ignored-return": true,
+    "no-inconsistent-return": false,
+    "no-misleading-array-reverse": true,
+    "no-misspelled-operator": false,
+    "no-multiline-string-literals": true,
+    "no-self-assignment": true,
+    "no-string-throw": true,
+    "no-unconditional-jump": true,
+    "no-unused-expression": true,
+    "no-use-of-empty-return-value": true,
+    "no-useless-increment": true,
+    "no-variable-usage-before-declaration": true,
+    "require-jsdoc": true,
     "semicolon": [
       true,
       "never"
     ],
-    "triple-equals": true,
-    "require-jsdoc": true
+    "triple-equals": true
   },
   "defaultSeverity": "warning"
 }
