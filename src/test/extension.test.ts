@@ -172,25 +172,25 @@ data: data
   })
 
   test("Test 10: getDelimiters", () => {
-    const yaml = `
+    let yaml = `
 yaml: data
 spec: spec
 `
     assert.equal(getDelimiters(yaml, false), "")
 
-    const yaml2 = `
+    yaml = `
 --- text
 yaml: data
 ---  #comment
 spec: spec
 `
 
-    const delimiters = getDelimiters(yaml2, false)
+    let delimiters = getDelimiters(yaml, false)
     assert.equal(delimiters.length, 2)
     assert.equal(delimiters.shift(), "--- text\n")
-    assert.equal(delimiters.pop(), "---  #comment\n")
+    assert.equal(delimiters.pop(), "\n---  #comment\n")
 
-    const yaml3 = `
+    yaml = `
 
 --- text
 yaml: data
@@ -198,17 +198,20 @@ yaml: data
 spec: spec---
 
 `
-    const delimiters2 = getDelimiters(yaml3, false)
-    assert.equal(delimiters2.length, 2)
-    assert.equal(delimiters2.shift(), "--- text\n")
-    assert.equal(delimiters2.pop(), "---  #comment\n")
+    delimiters = getDelimiters(yaml, false)
+    assert.equal(delimiters.length, 3)
+    assert.equal(delimiters.shift(), "")
+    assert.equal(delimiters.shift(), "--- text\n")
+    assert.equal(delimiters.pop(), "\n---  #comment\n")
 
-    const yaml4 = `
+    yaml = `
 bla
 --- text
 test: bla
 `
-    assert.equal(getDelimiters(yaml4, false), "--- text\n")
+    delimiters = getDelimiters(yaml, false)
+    assert.equal(delimiters.shift(), "")
+    assert.equal(delimiters.shift(), "--- text\n")
   })
 
 })

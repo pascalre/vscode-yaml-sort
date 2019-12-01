@@ -159,7 +159,7 @@ export function dumpYaml(text: string, sortKeys: boolean = true) {
     lineWidth:     vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
     noArrayIndent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent"),
     sortKeys,
-  }) as string
+  })
 
   // this is neccesary to avoid linebreaks in a selection sort
   yaml = removeTrailingCharacters(yaml, 1)
