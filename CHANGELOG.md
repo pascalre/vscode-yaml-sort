@@ -1,4 +1,7 @@
 # Changelog
+## 2.3.0
+* Support sorting files with delimiters with comment
+
 ## 2.2.0
 * New command `Format YAML`
 * New configuration `noArrayIndent`
