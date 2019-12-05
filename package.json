@@ -6,9 +6,10 @@
   "engines": {
     "vscode": "^1.10.0"
   },
+  "license": "MIT",
   "publisher": "PascalReitermann93",
   "repository": "https://github.com/pascalre/vscode-yaml-sort",
-  "icon": "images/icon.png",
+  "icon": "https://github.com/pascalre/vscode-yaml-sort/blob/master/images/icon.png",
   "categories": [
     "Formatters"
   ],
@@ -126,8 +127,10 @@
     "@types/node": "^10.17.5",
     "gulp": "^4.0.2",
     "jsdoc": "^3.6.3",
+    "mocha": "^6.2.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2",
+    "typescript-require": "^0.2.10",
     "vscode": "^1.1.36"
   },
   "dependencies": {

@@ -4,6 +4,7 @@ This guide supports developers in contributing code.
 
 ## Testing & Linting
 * `npm run test`: Run the unit tests.
+* `mocha src/test/lib.test.ts --require ts-node/register --ui tdd`
 
 Run the following commands to run SonarScanner:
 * `docker pull sonarqube`: Pull sonarqube container.
