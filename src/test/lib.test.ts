@@ -116,6 +116,6 @@ suite("Test splitYaml", () => {
   })
 })
 
-suite("Test removeLeadingLineBreakOfFirstElement", () =>{
+suite("Test removeLeadingLineBreakOfFirstElement", () => {
   // To be implemented
 })
