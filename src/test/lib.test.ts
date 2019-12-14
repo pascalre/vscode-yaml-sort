@@ -6,7 +6,10 @@
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
 import {
+  getDelimiters,
+  isSelectionInvalid,
   prependWhitespacesOnEachLine,
+  removeLeadingLineBreakOfFirstElement,
   removeQuotesFromKeys,
   removeTrailingCharacters,
   splitYaml,
@@ -36,7 +39,7 @@ suite("Test removeTrailingCharacters", () => {
   test("Test 2: Remove all characters", () => {
     assert.equal(removeTrailingCharacters(text, text.length), "")
   })
-  test("Test 3 Error on negative input value", () => {
+  test("Test 3: Error on negative input value", () => {
     assert.throws(() => removeTrailingCharacters(text, -1))
   })
   test("Test 4: Error on input value bigger than text length", () => {
@@ -96,26 +99,99 @@ suite("Test splitYaml", () => {
 --- text
 - Orange
 - Apple`
-
   test("Test 1: Split a single yaml", () => {
-    assert.equal(splitYaml(singleYaml), ["- Orange\n- Apple"])
+    assert.deepEqual(splitYaml(singleYaml), ["- Orange\n- Apple"])
   })
   test("Test 2: Split a single yaml with leading dashes", () => {
-    assert.equal(splitYaml(singleYamlWithLeadingDashes), ["- Orange\n- Apple\n"])
+    assert.deepEqual(splitYaml(singleYamlWithLeadingDashes), ["\n- Orange\n- Apple"])
   })
   test("Test 3: Split multiple yaml documents", () => {
-    assert.equal(splitYaml(multipleYaml), ["- Orange\n- Apple\n", "- Orange\n- Apple\n"])
+    assert.deepEqual(splitYaml(multipleYaml), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Test 4: Split multiple yaml documents with leading dashes", () => {
-    assert.equal(splitYaml(multipleYamlWithLeadingDashes),
-      ["- Orange\n- Apple\n", "- Orange\n- Apple\n"])
+    assert.deepEqual(splitYaml(multipleYamlWithLeadingDashes),
+      ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Test 5: Split multiple yaml documents with text behind delimiter", () => {
-   assert.equal(splitYaml(multipleYamlWithComments),
-    ["- Orange\n- Apple\n", "- Orange\n- Apple\n"])
+   assert.deepEqual(splitYaml(multipleYamlWithComments),
+    ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })
 
 suite("Test removeLeadingLineBreakOfFirstElement", () => {
-  // To be implemented
+  test("Test 1: Remove line breaks", () => {
+    const delimiters = ["\ntext", "\ntext"]
+    assert.deepEqual(removeLeadingLineBreakOfFirstElement(delimiters), ["text", "\ntext"])
+  })
+})
+
+suite("Test getDelimiters", () => {
+  let yaml = `
+yaml: data
+spec: spec
+`
+  test("Test 1: No delimiters", () => {
+    assert.equal(getDelimiters(yaml, true, false), "")
+  })
+  test("Test 2: Get each delimiter (empty selection, leading delimiter)", () => {
+    yaml = `
+--- text
+yaml: data
+---  #comment
+spec: spec
+`
+    const delimiters = getDelimiters(yaml, true, false)
+    assert.deepEqual(delimiters, ["", "\n---  #comment\n"])
+  })
+  test("Test 3: Get each delimiter (empty selection, leading linebreak)", () => {
+    yaml = `
+
+--- text
+yaml: data
+---  #comment
+spec: spec---
+
+`
+    const delimiters = getDelimiters(yaml, true, false)
+    assert.deepEqual(delimiters, ["", "\n---  #comment\n"])
+  })
+  test("Test 3: Get each delimiter (empty selection, leading text)", () => {
+    yaml = `
+bla
+--- text
+test: bla
+`
+    const delimiters = getDelimiters(yaml, true, false)
+    assert.deepEqual(delimiters, ["", "\n--- text\n"])
+  })
+  test("Test 4: Get each delimiter (with selection, leading delimiter)", () => {
+    yaml = `
+--- text
+test: bla
+`
+    const delimiters = getDelimiters(yaml, false, false)
+    assert.deepEqual(delimiters, ["--- text\n"])
+  })
+  test("Test 5: Get each delimiter (with selection, leading text)", () => {
+    yaml = `
+bla
+--- text
+test: bla
+`
+    const delimiters = getDelimiters(yaml, false, false)
+    assert.deepEqual(delimiters, ["", "\n--- text\n"])
+  })
+
+})
+
+suite("Test isSelectionInvalid", () => {
+  test("Test 1: Valid selection", () => {
+    assert.equal(isSelectionInvalid("text"), false)
+  })
+  test("Test 2: Selection is not valid with trailing colon", () => {
+    assert.equal(isSelectionInvalid("text:"), true)
+  })
+  test("Test 2: Selection is not valid with trailing colon and whitespaces", () => {
+    assert.equal(isSelectionInvalid("text: "), true)
+  })
 })

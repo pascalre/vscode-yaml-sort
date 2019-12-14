@@ -7,8 +7,6 @@
 import * as assert from "assert"
 import {
   getCustomSortKeywords,
-  getDelimiters,
-  isSelectionInvalid,
   sortYaml,
   validateYaml} from "../extension"
 
@@ -83,55 +81,6 @@ data: data
   test("Test 7: getCustomSortKeywords", () => {
     assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
     assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
-  })
-
-  test("Test 8: isSelectionInvalid", () => {
-    assert.equal(isSelectionInvalid("text"), false)
-    assert.equal(isSelectionInvalid("text:"), true)
-    assert.equal(isSelectionInvalid("text: "), true)
-  })
-
-  test("Test 10: getDelimiters", () => {
-    let yaml = `
-yaml: data
-spec: spec
-`
-    assert.equal(getDelimiters(yaml, false), "")
-
-    yaml = `
---- text
-yaml: data
----  #comment
-spec: spec
-`
-
-    let delimiters = getDelimiters(yaml, false)
-    assert.equal(delimiters.length, 2)
-    assert.equal(delimiters.shift(), "--- text\n")
-    assert.equal(delimiters.pop(), "\n---  #comment\n")
-
-    yaml = `
-
---- text
-yaml: data
----  #comment
-spec: spec---
-
-`
-    delimiters = getDelimiters(yaml, false)
-    assert.equal(delimiters.length, 3)
-    assert.equal(delimiters.shift(), "")
-    assert.equal(delimiters.shift(), "--- text\n")
-    assert.equal(delimiters.pop(), "\n---  #comment\n")
-
-    yaml = `
-bla
---- text
-test: bla
-`
-    delimiters = getDelimiters(yaml, false)
-    assert.equal(delimiters.shift(), "")
-    assert.equal(delimiters.shift(), "--- text\n")
   })
 
 })

@@ -3,6 +3,8 @@
 import * as yamlParser from "js-yaml"
 import * as vscode from "vscode"
 import {
+  getDelimiters,
+  isSelectionInvalid,
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
   removeQuotesFromKeys,
@@ -35,61 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_3", () => {
     sortYamlWrapper(3)
   }))
-}
-
-/**
- * Returns all delimiters with comments
- * @param {string} multipleYamls String which contains multiple yaml documents.
- * @param {boolean} isSelectionEmpty Specify if the text is an selection
- * @returns {[string]} Array of yaml delimiters.
- */
-
-export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean) {
-  const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")
-  // remove empty lines
-  multipleYamls = multipleYamls.replace(/^\n/g, "")
-  let delimiters = multipleYamls.match(/^---.*/gm)
-  if (!delimiters) {
-    return [""]
-  }
-
-  // append line break to every delimiter
-  // delimiters = delimiters.map(delimiter => delimiter + "\n")!
-  // let firstElement = delimiters.shift()!;
-  delimiters = delimiters.map((delimiter) => "\n" + delimiter + "\n")!
-  // delimiters.unshift(firstElement)
-
-  if (isSelectionEmpty) {
-    if (!useLeadingDashes && multipleYamls.startsWith("---")) {
-      delimiters.shift()
-      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
-    } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
-      delimiters.unshift("---\n")
-    }
-  } else {
-    const firstDelimiter = delimiters.shift()!.replace(/^\n/, "")
-    delimiters.unshift(firstDelimiter)
-    if (!multipleYamls.startsWith("---")) {
-      delimiters.unshift("")
-    }
-  }
-  return delimiters
-}
-
-/**
- * Checks if a text ends with a character which suggests, that the selection is missing something.
- * @param {string} text Text which should represent a valid yaml selection to sort.
- * @returns {boolean} true, if selection is missing something
- */
-export function isSelectionInvalid(text: string) {
-  // remove trailing whitespaces, to check for things like 'text:  '
-  text = text.trim()
-  const notValidEndingCharacters = [":", "|", ">"]
-  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
-    vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.")
-    return true
-  }
-  return false
 }
 
 /**
@@ -160,6 +107,7 @@ export function sortYamlWrapper(customSort: number = 0) {
 
     // check if selection to sort is valid, maybe the user missed a trailing line
     if (isSelectionInvalid(doc)) {
+      vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.")
       return false
     }
 
@@ -167,7 +115,7 @@ export function sortYamlWrapper(customSort: number = 0) {
     numberOfLeadingSpaces = doc.search(/\S/)
   }
 
-  let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty)
+  let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty, vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean)
 
   // remove yaml metadata tags
   const matchMetadata = /^\%.*\n/gm
@@ -182,21 +130,12 @@ export function sortYamlWrapper(customSort: number = 0) {
   }
   doc = doc.replace(matchMetadata, "")
 
-//  if (!validateYaml(doc))
-//    return false;
-
   // sort yaml
   splitYaml(doc).forEach((unsortedYaml) => {
     if (sortYaml(unsortedYaml, customSort)) {
       newText += delimiters.shift() + sortYaml(unsortedYaml, customSort)!
     }
   })
-
-  // remove leading dashes
-  /*if (!activeEditor.selection.isEmpty ||
-    !vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
-    newText = newText.replace("---\n", "");
-  }*/
 
   if (!activeEditor.selection.isEmpty) {
     newText = prependWhitespacesOnEachLine(newText, numberOfLeadingSpaces)
@@ -285,7 +224,7 @@ export function formatYamlWrapper() {
 export function formatYaml(yaml: string, useLeadingDashes: boolean) {
   try {
     let doc = dumpYaml(yamlParser.safeLoad(yaml), false)
-    if (vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")) {
+    if (useLeadingDashes) {
       doc = "---\n" + doc
     }
     vscode.window.showInformationMessage("Yaml formatted successfully")

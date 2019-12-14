@@ -55,3 +55,62 @@ export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArra
 export function splitYaml(multipleYamls: string) {
   return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
 }
+
+/**
+ * Checks if a text ends with a character which suggests, that the selection is missing something.
+ * @param {string} text Text which should represent a valid yaml selection to sort.
+ * @returns {boolean} true, if selection is missing something
+ */
+export function isSelectionInvalid(text: string) {
+  // remove trailing whitespaces, to check for things like 'text:  '
+  text = text.trim()
+  const notValidEndingCharacters = [":", "|", ">"]
+  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Returns all delimiters with comments.
+ * @param {string} multipleYamls String which contains multiple yaml documents.
+ * @param {boolean} isSelectionEmpty Specify if the text is an selection
+ * @param {boolean} useLeadingDashes Specify if the documents should have a leading delimiter.
+ *                                   If set to false, it will add an empty array element at the beginning of the output.
+ * @returns {[string]} Array of yaml delimiters.
+ */
+export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean) {
+  // remove empty lines
+  multipleYamls = multipleYamls.trim()
+  multipleYamls = multipleYamls.replace(/^\n/, "")
+  let delimiters = multipleYamls.match(/^---.*/gm)
+  if (!delimiters) {
+    return [""]
+  }
+
+  // append line break to every delimiter
+  // delimiters = delimiters.map(delimiter => delimiter + "\n")!
+  // let firstElement = delimiters.shift()!;
+  delimiters = delimiters.map((delimiter) => "\n" + delimiter + "\n")!
+  // delimiters.unshift(firstElement)
+
+  if (isSelectionEmpty) {
+    if (!useLeadingDashes && multipleYamls.startsWith("---")) {
+      delimiters.shift()
+      // delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
+      delimiters.unshift("")
+    } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
+      delimiters.unshift("---\n")
+    } else {
+      delimiters.unshift("")
+    }
+  } else {
+    if (!multipleYamls.startsWith("---")) {
+      delimiters.unshift("")
+    } else {
+      const firstDelimiter = delimiters.shift()!.replace(/^\n/, "")
+      delimiters.unshift(firstDelimiter)
+    }
+  }
+  return delimiters
+}
