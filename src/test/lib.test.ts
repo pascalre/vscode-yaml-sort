@@ -17,64 +17,61 @@ import {
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Test removeQuotesFromKeys", () => {
-  test("Test 1: Remove quotes from single keyword", () => {
+  test("should return `key: 1` when `'key': 1` is passed to removeQuotesFromKeys()", () => {
     assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1")
   })
-  test("Test 2: Remove quotes from multiple keywords", () => {
+  test("should remove the quotes from multiple keywords", () => {
     assert.equal(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2")
   })
-  test("Test 3: Remove quotes from special keywords (with dot)", () => {
+  test("should remove the quotes from special keywords containing dots", () => {
     assert.equal(removeQuotesFromKeys("'1.2.3': 1\n'key2': 2"), "1.2.3: 1\nkey2: 2")
   })
-  test("Test 4: Remove quotes from special keywords (with colon)", () => {
+  test("should remove the quotes from special keywords containing colons", () => {
     assert.equal(removeQuotesFromKeys("'1:2:3': 1\n'key2': 2"), "1:2:3: 1\nkey2: 2")
   })
 })
 
 suite("Test removeTrailingCharacters", () => {
   const text = "text"
-  test("Test 1: Remove a single trailing character", () => {
+  test("should return `tex` when `text` and 1 are passed", () => {
     assert.equal(removeTrailingCharacters(text, 1), "tex")
   })
-  test("Test 2: Remove all characters", () => {
+  test("should return `` when `text` and 4 are passed", () => {
     assert.equal(removeTrailingCharacters(text, text.length), "")
   })
-  test("Test 3: Error on negative input value", () => {
+  test("should throw an error when a negative input is passed", () => {
     assert.throws(() => removeTrailingCharacters(text, -1))
   })
-  test("Test 4: Error on input value bigger than text length", () => {
+  test("should throw an error when the count parameter is bigger than the text lenght", () => {
     assert.throws(() => removeTrailingCharacters(text, text.length + 1))
   })
   const text2 = "text\n"
-  test("Test 5: Remove trailing line break", () => {
+  test("should return `text` when `text\\n` and 1 are passed", () => {
     assert.equal(removeTrailingCharacters(text2, 1), "text")
   })
-  test("Test 6: Remove no characters", () => {
+  test("should return `text\\n` when `text\\n` and 0 are passed", () => {
     assert.equal(removeTrailingCharacters(text2, 0), text2)
   })
 })
 
 suite("Test prependWhitespacesOnEachLine", () => {
   const text = "text"
-  test("Test 1: Prepend two whitespaces to a line", () => {
+  test("should return `  text` when `text` and 2 are passed", () => {
     assert.equal(prependWhitespacesOnEachLine(text, 2), "  text")
   })
-  test("Test 2: Prepend no whitespaces to a line", () => {
+  test("should return `text` when `text` and 0 are passed", () => {
     assert.equal(prependWhitespacesOnEachLine(text, 0), "text")
   })
-  test("Test 3: Error on negative input value", () => {
+  test("should throw an error when a negative input is passed", () => {
     assert.throws(() => prependWhitespacesOnEachLine(text, -1))
   })
   const text2 = "text\n"
-  test("Test 4: Prepend whitespaces to multiple lines", () => {
+  test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
     assert.equal(prependWhitespacesOnEachLine(text2, 2), "  text\n  ")
   })
 })
 
 suite("Test splitYaml", () => {
-  const singleYaml = `\
-- Orange
-- Apple`
   const singleYamlWithLeadingDashes = `\
 ---
 - Orange
@@ -99,13 +96,16 @@ suite("Test splitYaml", () => {
 --- text
 - Orange
 - Apple`
-  test("Test 1: Split a single yaml", () => {
+  test("should return the input string, when the input does not contain `---`", () => {
+    const singleYaml = `\
+- Orange
+- Apple`
     assert.deepEqual(splitYaml(singleYaml), ["- Orange\n- Apple"])
   })
-  test("Test 2: Split a single yaml with leading dashes", () => {
+  test("should return the input document without the delimiters", () => {
     assert.deepEqual(splitYaml(singleYamlWithLeadingDashes), ["\n- Orange\n- Apple"])
   })
-  test("Test 3: Split multiple yaml documents", () => {
+  test("should return an array with the yaml documents", () => {
     assert.deepEqual(splitYaml(multipleYaml), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Test 4: Split multiple yaml documents with leading dashes", () => {
@@ -119,7 +119,7 @@ suite("Test splitYaml", () => {
 })
 
 suite("Test removeLeadingLineBreakOfFirstElement", () => {
-  test("Test 1: Remove line breaks", () => {
+  test("should remove only the first line break of an string array", () => {
     const delimiters = ["\ntext", "\ntext"]
     assert.deepEqual(removeLeadingLineBreakOfFirstElement(delimiters), ["text", "\ntext"])
   })
@@ -130,10 +130,10 @@ suite("Test getDelimiters", () => {
 yaml: data
 spec: spec
 `
-  test("Test 1: No delimiters", () => {
+  test("should return `` when the input string does not contain a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
     assert.equal(getDelimiters(yaml, true, false), "")
   })
-  test("Test 2: Get each delimiter (empty selection, leading delimiter)", () => {
+  test("should return all delimiters except the first (return an empty string instead) when the input document starts with a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
     yaml = `
 --- text
 yaml: data
@@ -185,13 +185,13 @@ test: bla
 })
 
 suite("Test isSelectionInvalid", () => {
-  test("Test 1: Valid selection", () => {
+  test("should return `true` when `text` is passed", () => {
     assert.equal(isSelectionInvalid("text"), false)
   })
-  test("Test 2: Selection is not valid with trailing colon", () => {
+  test("should return `false` when a string with trailing colon is passed", () => {
     assert.equal(isSelectionInvalid("text:"), true)
   })
-  test("Test 2: Selection is not valid with trailing colon and whitespaces", () => {
+  test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
     assert.equal(isSelectionInvalid("text: "), true)
   })
 })

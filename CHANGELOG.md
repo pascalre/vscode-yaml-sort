@@ -1,4 +1,7 @@
 # Changelog
+## 2.3.1
+* Refactored code and add more test cases
+
 ## 2.3.0
 * (refs [#6](https://github.com/pascalre/vscode-yaml-sort/issues/6)) Support sorting files with delimiters with comment
 
@@ -12,7 +15,7 @@
 This version adds the possibility to sort only a selection.
 
 ## 2.0.1
-This version fixes the data type of `customSortKeywords`.
+(refs [#8](https://github.com/pascalre/vscode-yaml-sort/issues/8)) This version fixes the data type of `customSortKeywords`.
 
 ## 2.0.0
 (refs [#8](https://github.com/pascalre/vscode-yaml-sort/issues/8)) The command `Sort Kubernetes Configmap` is no longer supported. You can use `Custom Sort 1` instead with the defaults of `vscode-yaml-sort.customSortKeywords_1`.
