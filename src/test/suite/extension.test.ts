@@ -8,7 +8,7 @@ import * as assert from "assert"
 import {
   getCustomSortKeywords,
   sortYaml,
-  validateYaml} from "../extension"
+  validateYaml} from "../../extension"
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", () => {

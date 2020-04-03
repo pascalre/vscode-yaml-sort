@@ -1,6 +1,9 @@
 # Changelog
-## 2.3.1
+## 2.3.2
 * Refactored code and add more test cases
+
+## 2.3.1
+* Fix [CVE-2020-7598](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7598)
 
 ## 2.3.0
 * (refs [#6](https://github.com/pascalre/vscode-yaml-sort/issues/6)) Support sorting files with delimiters with comment

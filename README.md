@@ -14,7 +14,7 @@ This extension contributes the following commands:
 ## Configuration
 This extension contributes the following settings:
 
-* `vscode-yaml-sort.indent`: Indentation width in spaces.
+* `vscode-yaml-sort.indent`: Indentation width in spaces. Defaults to 2.
 * `vscode-yaml-sort.lineWidth`: Maximum line width for YAML files. Defaults to 500.
 * `vscode-yaml-sort.noArrayIndent`: When true, will not add an indentation level to array elements. Defaults to false.
 * `vscode-yaml-sort.useLeadingDashes`: When true, sorted YAML files begin with leading dashes. Defaults to true.
