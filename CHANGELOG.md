@@ -1,4 +1,7 @@
 # Changelog
+## 2.3.1
+* Fix [CVE-2020-7598](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7598)
+
 ## 2.3.0
 * Support sorting files with delimiters with comment
 
