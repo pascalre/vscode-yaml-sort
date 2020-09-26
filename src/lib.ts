@@ -11,7 +11,7 @@ export function removeQuotesFromKeys(text: string) {
  * Removes a given count of characters from a string.
  * @param {string} text  String for processing.
  * @param {number} count The number of characters to remove from the end of the returned string.
- * @returns {string} Input text which removed trailing characters.
+ * @returns {string} Input text with removed trailing characters.
  */
 export function removeTrailingCharacters(text: string, count: number = 1) {
   if (count < 0 || count > text.length) {

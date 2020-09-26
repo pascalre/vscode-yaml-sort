@@ -1,6 +1,7 @@
 # Changelog
 ## 2.3.3
 * (refs [#9](https://github.com/pascalre/vscode-yaml-sort/issues/9)) Sorting tab indented yaml removes code
+* (refs [#13](https://github.com/pascalre/vscode-yaml-sort/issues/13)) sort drops value from key, when key in custom sort list
 
 ## 2.3.2
 * Refactored code and add more test cases

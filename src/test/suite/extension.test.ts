@@ -75,7 +75,21 @@ spec: spec
 spec: spec
 data: data
 `
+
+const yaml2 = `
+data: data
+spec:
+  - aa: b
+`
+
+    const customSortedYaml2 = `\
+spec:
+  - aa: b
+data: data
+`
+
     assert.equal(sortYaml(yaml, 1), customSortedYaml)
+    assert.equal(sortYaml(yaml2, 1), customSortedYaml2)
   })
 
   test("Test 7: getCustomSortKeywords", () => {
