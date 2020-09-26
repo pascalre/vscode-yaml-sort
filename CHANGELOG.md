@@ -1,10 +1,9 @@
 # Changelog
-## 2.3.3
-* (refs [#9](https://github.com/pascalre/vscode-yaml-sort/issues/9)) Sorting tab indented yaml removes code
-* (refs [#13](https://github.com/pascalre/vscode-yaml-sort/issues/13)) sort drops value from key, when key in custom sort list
-
 ## 2.3.2
-* Refactored code and add more test cases
+* (refs [#9](https://github.com/pascalre/vscode-yaml-sort/issues/9)) Sorting tab indented yaml removes code
+* (refs [#12](https://github.com/pascalre/vscode-yaml-sort/issues/12)) trying to sort a nested dictionary results in removing it completely
+* (refs [#13](https://github.com/pascalre/vscode-yaml-sort/issues/13)) sort drops value from key, when key in custom sort list
+* Refactor code and add more test cases
 
 ## 2.3.1
 * Fix [CVE-2020-7598](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7598)

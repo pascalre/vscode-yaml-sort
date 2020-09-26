@@ -91,6 +91,9 @@ export function sortYamlWrapper(customSort: number = 0) {
     new vscode.Position(0, 0),
     new vscode.Position(activeEditor.document.lineCount + 1, 0))
   let doc = activeEditor.document.getText()
+  if (!validateYaml(doc)) {
+    process.exit(1)
+  }
   let numberOfLeadingSpaces = 0
 
   if (!activeEditor.selection.isEmpty) {
