@@ -153,7 +153,7 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
   try {
     const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
-    const doc = yamlParser.safeLoad(unsortedYamlWithoutTabs)
+    const doc = yamlParser.safeLoad(unsortedYamlWithoutTabs)! as any
 
     let sortedYaml = ""
 
@@ -231,7 +231,7 @@ export function formatYamlWrapper() {
  */
 export function formatYaml(yaml: string, useLeadingDashes: boolean) {
   try {
-    let doc = dumpYaml(yamlParser.safeLoad(yaml), false)
+    let doc = dumpYaml(yamlParser.safeLoad(yaml) as any, false)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
