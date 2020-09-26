@@ -13,6 +13,7 @@ import {
   removeQuotesFromKeys,
   removeTrailingCharacters,
   splitYaml,
+  replaceTabsWithSpaces,
 } from "../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -108,11 +109,11 @@ suite("Test splitYaml", () => {
   test("should return an array with the yaml documents", () => {
     assert.deepEqual(splitYaml(multipleYaml), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
-  test("Test 4: Split multiple yaml documents with leading dashes", () => {
+  test("Split multiple yaml documents with leading dashes", () => {
     assert.deepEqual(splitYaml(multipleYamlWithLeadingDashes),
       ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
-  test("Test 5: Split multiple yaml documents with text behind delimiter", () => {
+  test("Split multiple yaml documents with text behind delimiter", () => {
    assert.deepEqual(splitYaml(multipleYamlWithComments),
     ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
@@ -143,7 +144,7 @@ spec: spec
     const delimiters = getDelimiters(yaml, true, false)
     assert.deepEqual(delimiters, ["", "\n---  #comment\n"])
   })
-  test("Test 3: Get each delimiter (empty selection, leading linebreak)", () => {
+  test("Get each delimiter (empty selection, leading linebreak)", () => {
     yaml = `
 
 --- text
@@ -155,7 +156,7 @@ spec: spec---
     const delimiters = getDelimiters(yaml, true, false)
     assert.deepEqual(delimiters, ["", "\n---  #comment\n"])
   })
-  test("Test 3: Get each delimiter (empty selection, leading text)", () => {
+  test("Get each delimiter (empty selection, leading text)", () => {
     yaml = `
 bla
 --- text
@@ -164,7 +165,7 @@ test: bla
     const delimiters = getDelimiters(yaml, true, false)
     assert.deepEqual(delimiters, ["", "\n--- text\n"])
   })
-  test("Test 4: Get each delimiter (with selection, leading delimiter)", () => {
+  test("Get each delimiter (with selection, leading delimiter)", () => {
     yaml = `
 --- text
 test: bla
@@ -172,7 +173,7 @@ test: bla
     const delimiters = getDelimiters(yaml, false, false)
     assert.deepEqual(delimiters, ["--- text\n"])
   })
-  test("Test 5: Get each delimiter (with selection, leading text)", () => {
+  test("Get each delimiter (with selection, leading text)", () => {
     yaml = `
 bla
 --- text
@@ -193,5 +194,23 @@ suite("Test isSelectionInvalid", () => {
   })
   test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
     assert.equal(isSelectionInvalid("text: "), true)
+  })
+})
+
+suite("Test replaceTabsWithSpaces", () => {
+    const text = `
+a-1:
+\tb:
+\t\td: g
+\tc:
+\t\td: g`
+    const textWithSpaces = `
+a-1:
+  b:
+    d: g
+  c:
+    d: g`
+  test("should replace all tabs with spaces", () => {
+    assert.equal(replaceTabsWithSpaces(text, 2), textWithSpaces)
   })
 })

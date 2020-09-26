@@ -114,3 +114,17 @@ export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, 
   }
   return delimiters
 }
+
+/**
+ * Replace all tabs in a given string with spaces
+ * @param {string} text Text to be processed
+ * @param {number} count Number of spaces to be added for a removed tab
+ */
+export function replaceTabsWithSpaces(text: string, count: number) {
+  if (count < 1) {
+    throw new Error("The count parameter has to be 1 or higher")
+  }
+
+  const spaces = " ".repeat(count)
+  return text.replace(/\t/mg, spaces)
+}

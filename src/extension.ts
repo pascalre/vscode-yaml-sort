@@ -8,6 +8,7 @@ import {
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
   removeQuotesFromKeys,
+  replaceTabsWithSpaces,
   removeTrailingCharacters,
   splitYaml,
 } from "./lib"
@@ -147,8 +148,10 @@ export function sortYamlWrapper(customSort: number = 0) {
 
 export function sortYaml(unsortedYaml: string, customSort: number = 0) {
   try {
-    const doc = yamlParser.safeLoad(unsortedYaml)
     const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
+    const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
+    const doc = yamlParser.safeLoad(unsortedYamlWithoutTabs)
+
     let sortedYaml = ""
 
     if (customSort > 0) {
