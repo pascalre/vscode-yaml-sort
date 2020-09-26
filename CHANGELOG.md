@@ -1,4 +1,8 @@
 # Changelog
+## 2.4.0
+* Fix [CVE-2020-8203](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8203)
+* Fix [CVE-2020-8244](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8244)
+
 ## 2.3.2
 * (refs [#9](https://github.com/pascalre/vscode-yaml-sort/issues/9)) Sorting tab indented yaml removes code
 * (refs [#12](https://github.com/pascalre/vscode-yaml-sort/issues/12)) trying to sort a nested dictionary results in removing it completely
