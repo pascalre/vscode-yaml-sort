@@ -70,26 +70,43 @@ aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
 data: data
 spec: spec
 `
-
     const customSortedYaml = `\
 spec: spec
 data: data
 `
+    assert.equal(sortYaml(yaml, 1), customSortedYaml)
 
 const yaml2 = `
 data: data
 spec:
   - aa: b
 `
-
     const customSortedYaml2 = `\
 spec:
   - aa: b
 data: data
 `
-
-    assert.equal(sortYaml(yaml, 1), customSortedYaml)
     assert.equal(sortYaml(yaml2, 1), customSortedYaml2)
+
+    const yaml3 = `
+data:
+  job: Developer
+  skills:
+    - pascal
+spec:
+  job: Boss
+  name: Stuart
+`
+    const customSortedYaml3 = `\
+spec:
+  job: Boss
+  name: Stuart
+data:
+  job: Developer
+  skills:
+    - pascal
+`
+    assert.equal(sortYaml(yaml3, 1), customSortedYaml3)
   })
 
   test("Test 7: getCustomSortKeywords", () => {

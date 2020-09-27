@@ -167,7 +167,7 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
               // when key cotains more than one line, we need some transformation:
               // add a new line and indent each line some spaces
               sortedSubYaml = prependWhitespacesOnEachLine(sortedSubYaml, indent)
-              if (sortedSubYaml.includes("\n")) {
+              if (sortedSubYaml.endsWith("\n")) {
                 sortedSubYaml = removeTrailingCharacters(sortedSubYaml, indent)
               }
               sortedYaml += key + ":\n" + sortedSubYaml + "\n"

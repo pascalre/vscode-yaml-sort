@@ -1,4 +1,8 @@
 # Changelog
+## 2.5.0
+* Update manual
+* Fix disappearing characters in custom sort
+
 ## 2.4.0
 * Fix [CVE-2020-8203](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8203)
 * Fix [CVE-2020-8244](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8244)
