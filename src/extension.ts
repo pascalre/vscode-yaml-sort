@@ -11,6 +11,7 @@ import {
   replaceTabsWithSpaces,
   removeTrailingCharacters,
   splitYaml,
+  addNewLineBeforeRootKeywords
 } from "./lib"
 
 // this method is called when your extension is activated
@@ -163,7 +164,7 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
       keywords.forEach((key) => {
         if (doc[key]) {
           let sortedSubYaml = dumpYaml(doc[key])
-          if (sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) {
+          if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
               // when key cotains more than one line, we need some transformation:
               // add a new line and indent each line some spaces
               sortedSubYaml = prependWhitespacesOnEachLine(sortedSubYaml, indent)
@@ -182,6 +183,10 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
 
     // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
     sortedYaml += dumpYaml(doc)
+
+    if (vscode.workspace.getConfiguration().get("vscode-yaml-sort.addNewLineAfterTopLevelKey")) {
+      sortedYaml = addNewLineBeforeRootKeywords(sortedYaml)
+    }
 
     vscode.window.showInformationMessage("Keys resorted successfully")
     return sortedYaml

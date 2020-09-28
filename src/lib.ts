@@ -128,3 +128,11 @@ export function replaceTabsWithSpaces(text: string, count: number) {
   const spaces = " ".repeat(count)
   return text.replace(/\t/mg, spaces)
 }
+
+/**
+ * Add a new line before each occurence of a top level keyword after a new line
+ * @param {string} text Text to be processed
+ */
+export function addNewLineBeforeRootKeywords(text: string) {
+  return text.replace(/\n[^\s]*:/g, "\n$&")
+}

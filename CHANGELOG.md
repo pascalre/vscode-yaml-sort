@@ -1,4 +1,7 @@
 # Changelog
+## 2.6.0
+* (refs [#11](https://github.com/pascalre/vscode-yaml-sort/issues/11)) support line breaks
+
 ## 2.5.0
 * Update manual
 * Fix disappearing characters in custom sort

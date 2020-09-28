@@ -5,15 +5,55 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
+import { workspace } from "vscode"
 import {
   getCustomSortKeywords,
   sortYaml,
   validateYaml} from "../../extension"
 
-// Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+suite("Test getCustomSortKeywords", () => {
+  test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
+    assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+  })
 
-  const unsortedYaml = `\
+  test("should fail when parameter is not in [1, 2, 3]", () => {
+    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(4), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(-1), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(1.5), new Error("The count parameter is not in a valid range"))
+  })
+})
+
+suite("Test validateYaml", () => {
+  test("should return `true` when passing a valid yaml", () => {
+    const actual = `\
+persons:
+  bob:
+    place: Germany
+    age: 23
+animals:
+  kitty:
+    age: 3`
+    assert.equal(validateYaml(actual), true)
+  })
+
+  test("should return `false` when passing an invalid yaml", () => {
+    assert.equal(validateYaml("network: ethernets:"), false)
+  })
+  test("should return `false` when yaml indentation is not correct", () => {
+    assert.equal(validateYaml("person:\nbob\n  age:23"), false)
+  })
+  test("should return `false` when yaml contains duplicate keys", () => {
+    assert.equal(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false)
+  })
+})
+
+suite("Test sortYaml", () => {
+  test("should sort a given yaml document", async () => {
+    const settings = workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("addNewLineAfterTopLevelKey", false, false)
+
+    const actual = `\
 persons:
   bob:
     place: Germany
@@ -22,7 +62,7 @@ animals:
   kitty:
     age: 3
 `
-  const sortedYaml = `\
+    const expected = `\
 animals:
   kitty:
     age: 3
@@ -30,21 +70,71 @@ persons:
   bob:
     age: 23
     place: Germany`
-  test("Test 1: YAML should be sorted.", () => {
-      assert.equal(sortYaml(unsortedYaml), sortedYaml)
+    assert.equal(sortYaml(actual), expected)
   })
 
-  test("Test 2: validateYaml.", () => {
-    assert.equal(validateYaml(unsortedYaml), true)
-    assert.equal(validateYaml("network: ethernets:"), false)
-    // Validation checks indentation
-    assert.equal(validateYaml("person:\nbob\n  age:23"), false)
-    // Test 4: Validation checks duplicate keys
-    assert.equal(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false)
+  test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
+    const settings = workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("addNewLineAfterTopLevelKey", false, false)
+    let actual = `
+data: data
+spec: spec
+`
+    let expected = `\
+spec: spec
+data: data
+`
+    assert.equal(sortYaml(actual, 1), expected)
+
+    actual = `
+data: data
+spec:
+  - aa: b
+`
+    expected = `\
+spec:
+  - aa: b
+data: data
+`
+    assert.equal(sortYaml(actual, 1), expected)
+
+    actual = `
+data:
+  job: Developer
+  skills:
+    - pascal
+spec:
+  job: Boss
+  name: Stuart
+`
+    expected = `\
+spec:
+  job: Boss
+  name: Stuart
+data:
+  job: Developer
+  skills:
+    - pascal
+`
+    assert.equal(sortYaml(actual, 1), expected)
+
+    actual = `
+data: data
+spec:
+  - a
+  - b
+`
+    expected = `\
+spec:
+  - a
+  - b
+data: data
+`
+    assert.equal(sortYaml(actual, 1), expected)
   })
 
-  test("Test 5: Maximum line width of 500.", () => {
-    const yamlWithoutLineBreakAfter500Chars = `\
+  test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
+    const actual = `\
 - lorem ipsum:
     text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut \
 labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea \
@@ -53,7 +143,7 @@ sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'
 `
 
-    const yamlWithLineBreakAfter500Chars = `\
+    const expected = `\
 - lorem ipsum:
     text: >-
       Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut \
@@ -62,56 +152,26 @@ ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dol
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
       dolores et e`
-    assert.equal(sortYaml(yamlWithoutLineBreakAfter500Chars), yamlWithLineBreakAfter500Chars)
+    assert.equal(sortYaml(actual), expected)
   })
 
-  test("Test 4: Custom sort.", () => {
-    const yaml = `
+  test("should add an empty line before `data`", async () => {
+    const actual = `
 data: data
-spec: spec
+spec:
+  - a
+  - b
 `
-    const customSortedYaml = `\
-spec: spec
-data: data
-`
-    assert.equal(sortYaml(yaml, 1), customSortedYaml)
+    const expected = `\
+spec:
+  - a
+  - b
 
-const yaml2 = `
-data: data
-spec:
-  - aa: b
-`
-    const customSortedYaml2 = `\
-spec:
-  - aa: b
 data: data
 `
-    assert.equal(sortYaml(yaml2, 1), customSortedYaml2)
-
-    const yaml3 = `
-data:
-  job: Developer
-  skills:
-    - pascal
-spec:
-  job: Boss
-  name: Stuart
-`
-    const customSortedYaml3 = `\
-spec:
-  job: Boss
-  name: Stuart
-data:
-  job: Developer
-  skills:
-    - pascal
-`
-    assert.equal(sortYaml(yaml3, 1), customSortedYaml3)
-  })
-
-  test("Test 7: getCustomSortKeywords", () => {
-    assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
-    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
+    const settings = workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("addNewLineAfterTopLevelKey", true, false)
+    assert.equal(sortYaml(actual, 1), expected)
   })
 
 })

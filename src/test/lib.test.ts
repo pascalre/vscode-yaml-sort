@@ -14,11 +14,12 @@ import {
   removeTrailingCharacters,
   splitYaml,
   replaceTabsWithSpaces,
+  addNewLineBeforeRootKeywords,
 } from "../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Test removeQuotesFromKeys", () => {
-  test("should return `key: 1` when `'key': 1` is passed to removeQuotesFromKeys()", () => {
+  test("should return `key: 1` when `'key': 1` is passed", () => {
     assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1")
   })
   test("should remove the quotes from multiple keywords", () => {
@@ -33,119 +34,120 @@ suite("Test removeQuotesFromKeys", () => {
 })
 
 suite("Test removeTrailingCharacters", () => {
-  const text = "text"
+  const actual = "text"
   test("should return `tex` when `text` and 1 are passed", () => {
-    assert.equal(removeTrailingCharacters(text, 1), "tex")
+    assert.equal(removeTrailingCharacters(actual, 1), "tex")
   })
   test("should return `` when `text` and 4 are passed", () => {
-    assert.equal(removeTrailingCharacters(text, text.length), "")
+    assert.equal(removeTrailingCharacters(actual, actual.length), "")
   })
   test("should throw an error when a negative input is passed", () => {
-    assert.throws(() => removeTrailingCharacters(text, -1))
+    assert.throws(() => removeTrailingCharacters(actual, -1))
   })
   test("should throw an error when the count parameter is bigger than the text lenght", () => {
-    assert.throws(() => removeTrailingCharacters(text, text.length + 1))
+    assert.throws(() => removeTrailingCharacters(actual, actual.length + 1))
   })
-  const text2 = "text\n"
+  const actual2 = "text\n"
   test("should return `text` when `text\\n` and 1 are passed", () => {
-    assert.equal(removeTrailingCharacters(text2, 1), "text")
+    assert.equal(removeTrailingCharacters(actual2, 1), "text")
   })
   test("should return `text\\n` when `text\\n` and 0 are passed", () => {
-    assert.equal(removeTrailingCharacters(text2, 0), text2)
+    assert.equal(removeTrailingCharacters(actual2, 0), actual2)
   })
 })
 
 suite("Test prependWhitespacesOnEachLine", () => {
-  const text = "text"
+  const actual = "text"
   test("should return `  text` when `text` and 2 are passed", () => {
-    assert.equal(prependWhitespacesOnEachLine(text, 2), "  text")
+    assert.equal(prependWhitespacesOnEachLine(actual, 2), "  text")
   })
   test("should return `text` when `text` and 0 are passed", () => {
-    assert.equal(prependWhitespacesOnEachLine(text, 0), "text")
+    assert.equal(prependWhitespacesOnEachLine(actual, 0), "text")
   })
   test("should throw an error when a negative input is passed", () => {
-    assert.throws(() => prependWhitespacesOnEachLine(text, -1))
+    assert.throws(() => prependWhitespacesOnEachLine(actual, -1))
   })
-  const text2 = "text\n"
+  const actual2 = "text\n"
   test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
-    assert.equal(prependWhitespacesOnEachLine(text2, 2), "  text\n  ")
+    assert.equal(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
   })
 })
 
 suite("Test splitYaml", () => {
-  const singleYamlWithLeadingDashes = `\
+  test("should return the input string, when the input does not contain `---`", () => {
+    const actual = `\
+- Orange
+- Apple`
+    assert.deepEqual(splitYaml(actual), ["- Orange\n- Apple"])
+  })
+  test("should return the input document without the delimiters", () => {
+    const actual = `\
 ---
 - Orange
 - Apple`
-  const multipleYaml = `\
+    assert.deepEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
+  })
+  test("should return an array with the yaml documents", () => {
+    const actual = `\
 - Orange
 - Apple
 ---
 - Orange
 - Apple`
-  const multipleYamlWithLeadingDashes = `\
+    assert.deepEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+  })
+  test("Split multiple yaml documents with leading dashes", () => {
+    const actual = `\
 ---
 - Orange
 - Apple
 ---
 - Orange
 - Apple`
-  const multipleYamlWithComments = `\
+
+    assert.deepEqual(splitYaml(actual),
+      ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+  })
+  test("Split multiple yaml documents with text behind delimiter", () => {
+    const actual = `\
 --- # comment 1
 - Orange
 - Apple
 --- text
 - Orange
 - Apple`
-  test("should return the input string, when the input does not contain `---`", () => {
-    const singleYaml = `\
-- Orange
-- Apple`
-    assert.deepEqual(splitYaml(singleYaml), ["- Orange\n- Apple"])
-  })
-  test("should return the input document without the delimiters", () => {
-    assert.deepEqual(splitYaml(singleYamlWithLeadingDashes), ["\n- Orange\n- Apple"])
-  })
-  test("should return an array with the yaml documents", () => {
-    assert.deepEqual(splitYaml(multipleYaml), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
-  })
-  test("Split multiple yaml documents with leading dashes", () => {
-    assert.deepEqual(splitYaml(multipleYamlWithLeadingDashes),
-      ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
-  })
-  test("Split multiple yaml documents with text behind delimiter", () => {
-   assert.deepEqual(splitYaml(multipleYamlWithComments),
+   assert.deepEqual(splitYaml(actual),
     ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })
 
 suite("Test removeLeadingLineBreakOfFirstElement", () => {
   test("should remove only the first line break of an string array", () => {
-    const delimiters = ["\ntext", "\ntext"]
-    assert.deepEqual(removeLeadingLineBreakOfFirstElement(delimiters), ["text", "\ntext"])
+    const actual = ["\ntext", "\ntext"]
+    assert.deepEqual(removeLeadingLineBreakOfFirstElement(actual), ["text", "\ntext"])
   })
 })
 
 suite("Test getDelimiters", () => {
-  let yaml = `
+  let doc = `
 yaml: data
 spec: spec
 `
   test("should return `` when the input string does not contain a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
-    assert.equal(getDelimiters(yaml, true, false), "")
+    assert.equal(getDelimiters(doc, true, false), "")
   })
   test("should return all delimiters except the first (return an empty string instead) when the input document starts with a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
-    yaml = `
+    doc = `
 --- text
 yaml: data
 ---  #comment
 spec: spec
 `
-    const delimiters = getDelimiters(yaml, true, false)
-    assert.deepEqual(delimiters, ["", "\n---  #comment\n"])
+    const actual = getDelimiters(doc, true, false)
+    assert.deepEqual(actual, ["", "\n---  #comment\n"])
   })
   test("Get each delimiter (empty selection, leading linebreak)", () => {
-    yaml = `
+    doc = `
 
 --- text
 yaml: data
@@ -153,34 +155,34 @@ yaml: data
 spec: spec---
 
 `
-    const delimiters = getDelimiters(yaml, true, false)
-    assert.deepEqual(delimiters, ["", "\n---  #comment\n"])
+    const actual = getDelimiters(doc, true, false)
+    assert.deepEqual(actual, ["", "\n---  #comment\n"])
   })
   test("Get each delimiter (empty selection, leading text)", () => {
-    yaml = `
+    doc = `
 bla
 --- text
 test: bla
 `
-    const delimiters = getDelimiters(yaml, true, false)
-    assert.deepEqual(delimiters, ["", "\n--- text\n"])
+    const actual = getDelimiters(doc, true, false)
+    assert.deepEqual(actual, ["", "\n--- text\n"])
   })
   test("Get each delimiter (with selection, leading delimiter)", () => {
-    yaml = `
+    doc = `
 --- text
 test: bla
 `
-    const delimiters = getDelimiters(yaml, false, false)
-    assert.deepEqual(delimiters, ["--- text\n"])
+    const actual = getDelimiters(doc, false, false)
+    assert.deepEqual(actual, ["--- text\n"])
   })
   test("Get each delimiter (with selection, leading text)", () => {
-    yaml = `
+    doc = `
 bla
 --- text
 test: bla
 `
-    const delimiters = getDelimiters(yaml, false, false)
-    assert.deepEqual(delimiters, ["", "\n--- text\n"])
+    const actual = getDelimiters(doc, false, false)
+    assert.deepEqual(actual, ["", "\n--- text\n"])
   })
 
 })
@@ -198,19 +200,34 @@ suite("Test isSelectionInvalid", () => {
 })
 
 suite("Test replaceTabsWithSpaces", () => {
-    const text = `
+    const actual = `
 a-1:
 \tb:
 \t\td: g
 \tc:
 \t\td: g`
-    const textWithSpaces = `
+    const expected = `
 a-1:
   b:
     d: g
   c:
     d: g`
   test("should replace all tabs with spaces", () => {
-    assert.equal(replaceTabsWithSpaces(text, 2), textWithSpaces)
+    assert.equal(replaceTabsWithSpaces(actual, 2), expected)
+  })
+})
+
+suite("Test addNewLineBeforeRootKeywords", () => {
+  test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
+    const actual = `data:
+  key: value
+spec: value
+`
+    const expected = `data:
+  key: value
+
+spec: value
+`
+    assert.strictEqual(addNewLineBeforeRootKeywords(actual), expected)
   })
 })

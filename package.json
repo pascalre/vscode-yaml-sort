@@ -2,7 +2,7 @@
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
   "description": "This VS Code extension exposes the possibility to sort, format and validate yaml files.",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "engines": {
     "vscode": "^1.49.0"
   },
@@ -82,6 +82,11 @@
           },
           "default": [],
           "description": "List of keywords for Custom Sort 3."
+        },
+        "vscode-yaml-sort.addNewLineAfterTopLevelKey": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, will add a new line after each top level keyword."
         }
       }
     },

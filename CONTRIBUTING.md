@@ -14,3 +14,8 @@ Run the following commands to run SonarScanner:
 ## Packaging
 Run the following command to pack code to a vsix package:
 * `vsce package`
+
+### Before release
+* update version
+* update CHANGELOG.md
+* update README.md
