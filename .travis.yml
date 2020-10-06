@@ -4,6 +4,7 @@ node_js:
   - node
 install:
   - npm install
+  - npm install -g yarn
   - npm install -g vsce
 os:
   - osx

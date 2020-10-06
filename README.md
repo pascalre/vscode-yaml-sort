@@ -33,10 +33,11 @@ This extension contributes the following settings:
 | `vscode-yaml-sort.useQuotesForSpecialKeywords` | When false, will not add quotes for keywords with special characters e.g. 'text::text': will result in text::text: | `true`  |
 
 ## Known problems
+[![GitHub issues open](https://img.shields.io/github/issues/pascalre/vscode-yaml-sort.svg)](https://github.com/pascalre/vscode-yaml-sort/issues)
+
 Check open issues on [GitHub](https://github.com/pascalre/vscode-yaml-sort/issues).
 
 Be careful with anchors and references, these don't work very well in this extension.
-
 
 **Enjoy!**
 

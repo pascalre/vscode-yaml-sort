@@ -14,32 +14,32 @@ import {
   removeTrailingCharacters,
   splitYaml,
   replaceTabsWithSpaces,
-  addNewLineBeforeRootKeywords,
+  addNewLineBeforeRootKeywords
 } from "../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Test removeQuotesFromKeys", () => {
   test("should return `key: 1` when `'key': 1` is passed", () => {
-    assert.equal(removeQuotesFromKeys("'key': 1"), "key: 1")
+    assert.strictEqual(removeQuotesFromKeys("'key': 1"), "key: 1")
   })
   test("should remove the quotes from multiple keywords", () => {
-    assert.equal(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2")
+    assert.strictEqual(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2")
   })
   test("should remove the quotes from special keywords containing dots", () => {
-    assert.equal(removeQuotesFromKeys("'1.2.3': 1\n'key2': 2"), "1.2.3: 1\nkey2: 2")
+    assert.strictEqual(removeQuotesFromKeys("'1.2.3': 1\n'key2': 2"), "1.2.3: 1\nkey2: 2")
   })
   test("should remove the quotes from special keywords containing colons", () => {
-    assert.equal(removeQuotesFromKeys("'1:2:3': 1\n'key2': 2"), "1:2:3: 1\nkey2: 2")
+    assert.strictEqual(removeQuotesFromKeys("'1:2:3': 1\n'key2': 2"), "1:2:3: 1\nkey2: 2")
   })
 })
 
 suite("Test removeTrailingCharacters", () => {
   const actual = "text"
   test("should return `tex` when `text` and 1 are passed", () => {
-    assert.equal(removeTrailingCharacters(actual, 1), "tex")
+    assert.strictEqual(removeTrailingCharacters(actual, 1), "tex")
   })
   test("should return `` when `text` and 4 are passed", () => {
-    assert.equal(removeTrailingCharacters(actual, actual.length), "")
+    assert.strictEqual(removeTrailingCharacters(actual, actual.length), "")
   })
   test("should throw an error when a negative input is passed", () => {
     assert.throws(() => removeTrailingCharacters(actual, -1))
@@ -49,27 +49,27 @@ suite("Test removeTrailingCharacters", () => {
   })
   const actual2 = "text\n"
   test("should return `text` when `text\\n` and 1 are passed", () => {
-    assert.equal(removeTrailingCharacters(actual2, 1), "text")
+    assert.strictEqual(removeTrailingCharacters(actual2, 1), "text")
   })
   test("should return `text\\n` when `text\\n` and 0 are passed", () => {
-    assert.equal(removeTrailingCharacters(actual2, 0), actual2)
+    assert.strictEqual(removeTrailingCharacters(actual2, 0), actual2)
   })
 })
 
 suite("Test prependWhitespacesOnEachLine", () => {
   const actual = "text"
   test("should return `  text` when `text` and 2 are passed", () => {
-    assert.equal(prependWhitespacesOnEachLine(actual, 2), "  text")
+    assert.strictEqual(prependWhitespacesOnEachLine(actual, 2), "  text")
   })
   test("should return `text` when `text` and 0 are passed", () => {
-    assert.equal(prependWhitespacesOnEachLine(actual, 0), "text")
+    assert.strictEqual(prependWhitespacesOnEachLine(actual, 0), "text")
   })
   test("should throw an error when a negative input is passed", () => {
     assert.throws(() => prependWhitespacesOnEachLine(actual, -1))
   })
   const actual2 = "text\n"
   test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
-    assert.equal(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
+    assert.strictEqual(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
   })
 })
 
@@ -78,14 +78,14 @@ suite("Test splitYaml", () => {
     const actual = `\
 - Orange
 - Apple`
-    assert.deepEqual(splitYaml(actual), ["- Orange\n- Apple"])
+    assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple"])
   })
   test("should return the input document without the delimiters", () => {
     const actual = `\
 ---
 - Orange
 - Apple`
-    assert.deepEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
+    assert.deepStrictEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
   })
   test("should return an array with the yaml documents", () => {
     const actual = `\
@@ -94,7 +94,7 @@ suite("Test splitYaml", () => {
 ---
 - Orange
 - Apple`
-    assert.deepEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+    assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Split multiple yaml documents with leading dashes", () => {
     const actual = `\
@@ -105,7 +105,7 @@ suite("Test splitYaml", () => {
 - Orange
 - Apple`
 
-    assert.deepEqual(splitYaml(actual),
+    assert.deepStrictEqual(splitYaml(actual),
       ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Split multiple yaml documents with text behind delimiter", () => {
@@ -116,7 +116,7 @@ suite("Test splitYaml", () => {
 --- text
 - Orange
 - Apple`
-   assert.deepEqual(splitYaml(actual),
+   assert.deepStrictEqual(splitYaml(actual),
     ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })
@@ -124,7 +124,7 @@ suite("Test splitYaml", () => {
 suite("Test removeLeadingLineBreakOfFirstElement", () => {
   test("should remove only the first line break of an string array", () => {
     const actual = ["\ntext", "\ntext"]
-    assert.deepEqual(removeLeadingLineBreakOfFirstElement(actual), ["text", "\ntext"])
+    assert.deepStrictEqual(removeLeadingLineBreakOfFirstElement(actual), ["text", "\ntext"])
   })
 })
 
@@ -144,7 +144,7 @@ yaml: data
 spec: spec
 `
     const actual = getDelimiters(doc, true, false)
-    assert.deepEqual(actual, ["", "\n---  #comment\n"])
+    assert.deepStrictEqual(actual, ["", "\n---  #comment\n"])
   })
   test("Get each delimiter (empty selection, leading linebreak)", () => {
     doc = `
@@ -156,7 +156,7 @@ spec: spec---
 
 `
     const actual = getDelimiters(doc, true, false)
-    assert.deepEqual(actual, ["", "\n---  #comment\n"])
+    assert.deepStrictEqual(actual, ["", "\n---  #comment\n"])
   })
   test("Get each delimiter (empty selection, leading text)", () => {
     doc = `
@@ -165,7 +165,7 @@ bla
 test: bla
 `
     const actual = getDelimiters(doc, true, false)
-    assert.deepEqual(actual, ["", "\n--- text\n"])
+    assert.deepStrictEqual(actual, ["", "\n--- text\n"])
   })
   test("Get each delimiter (with selection, leading delimiter)", () => {
     doc = `
@@ -189,13 +189,13 @@ test: bla
 
 suite("Test isSelectionInvalid", () => {
   test("should return `true` when `text` is passed", () => {
-    assert.equal(isSelectionInvalid("text"), false)
+    assert.strictEqual(isSelectionInvalid("text"), false)
   })
   test("should return `false` when a string with trailing colon is passed", () => {
-    assert.equal(isSelectionInvalid("text:"), true)
+    assert.strictEqual(isSelectionInvalid("text:"), true)
   })
   test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
-    assert.equal(isSelectionInvalid("text: "), true)
+    assert.strictEqual(isSelectionInvalid("text: "), true)
   })
 })
 
@@ -213,7 +213,7 @@ a-1:
   c:
     d: g`
   test("should replace all tabs with spaces", () => {
-    assert.equal(replaceTabsWithSpaces(actual, 2), expected)
+    assert.strictEqual(replaceTabsWithSpaces(actual, 2), expected)
   })
 })
 

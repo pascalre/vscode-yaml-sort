@@ -88,6 +88,7 @@ export function getCustomSortKeywords(count: number) {
 
 export function sortYamlWrapper(customSort: number = 0) {
   const activeEditor = vscode.window.activeTextEditor!
+  const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
   let rangeToBeReplaced = new vscode.Range(
     new vscode.Position(0, 0),
     new vscode.Position(activeEditor.document.lineCount + 1, 0))
@@ -120,7 +121,7 @@ export function sortYamlWrapper(customSort: number = 0) {
     numberOfLeadingSpaces = doc.search(/\S/)
   }
 
-  let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty, vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean)
+  let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty, useLeadingDashes)
 
   // remove yaml metadata tags
   const matchMetadata = /^\%.*\n/gm
@@ -144,6 +145,8 @@ export function sortYamlWrapper(customSort: number = 0) {
 
   if (!activeEditor.selection.isEmpty) {
     newText = prependWhitespacesOnEachLine(newText, numberOfLeadingSpaces)
+  } else if (useLeadingDashes) {
+    newText = "---\n" + newText
   }
 
   // update yaml
@@ -153,8 +156,9 @@ export function sortYamlWrapper(customSort: number = 0) {
 export function sortYaml(unsortedYaml: string, customSort: number = 0) {
   try {
     const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
+    const sortLists = vscode.workspace.getConfiguration().get("vscode-yaml-sort.sortLists") as boolean
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
-    const doc = yamlParser.safeLoad(unsortedYamlWithoutTabs)! as any
+    let doc = yamlParser.safeLoad(unsortedYamlWithoutTabs) as any
 
     let sortedYaml = ""
 
