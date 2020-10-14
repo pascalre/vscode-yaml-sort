@@ -47,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
  * @param {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string} Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean = true) {
+export function dumpYaml(text: string, sortKeys: boolean = true, customSort: number = 0) {
   if (Object.keys(text).length === 0) {
     return ""
   }
@@ -56,7 +56,23 @@ export function dumpYaml(text: string, sortKeys: boolean = true) {
     indent:        vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),
     lineWidth:     vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
     noArrayIndent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent"),
-    sortKeys,
+    sortKeys:      (!(customSort > 0 && vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursive")) ? sortKeys : (a: any, b: any) => {
+      const sortOrder = getCustomSortKeywords(customSort)
+
+      const indexA = sortOrder.indexOf(a)
+      const indexB = sortOrder.indexOf(b)
+
+      if (indexA > -1 && indexB > -1) {
+        return indexA > indexB ? 1 : indexA < indexB ? -1 : 0
+      }
+      if (indexA !== -1 && indexB === -1) {
+        return -1
+      }
+      if (indexA === -1 && indexB !== -1) {
+        return 1
+      }
+      return a > b ? 1 : a < b ? -1 : 0
+    })
   })
 
   // this is neccesary to avoid linebreaks in a selection sort
@@ -156,13 +172,13 @@ export function sortYamlWrapper(customSort: number = 0) {
 export function sortYaml(unsortedYaml: string, customSort: number = 0) {
   try {
     const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
-    const sortLists = vscode.workspace.getConfiguration().get("vscode-yaml-sort.sortLists") as boolean
+    const useCustomSortRecursive = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursive") as boolean
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
-    let doc = yamlParser.safeLoad(unsortedYamlWithoutTabs) as any
+    const doc = yamlParser.safeLoad(unsortedYamlWithoutTabs) as any
 
     let sortedYaml = ""
 
-    if (customSort > 0) {
+    if (customSort > 0 && !useCustomSortRecursive) {
       const keywords = getCustomSortKeywords(customSort)
 
       keywords.forEach((key) => {
@@ -186,7 +202,7 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
     }
 
     // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-    sortedYaml += dumpYaml(doc)
+    sortedYaml += dumpYaml(doc, true, customSort)
 
     if (vscode.workspace.getConfiguration().get("vscode-yaml-sort.addNewLineAfterTopLevelKey")) {
       sortedYaml = addNewLineBeforeRootKeywords(sortedYaml)
