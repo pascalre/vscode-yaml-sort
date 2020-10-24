@@ -1,4 +1,8 @@
 # Changelog
+## 2.7.1 - October 24, 2020
+* (refs [#10](https://github.com/pascalre/vscode-yaml-sort/issues/10)) Use custom sort recursively on the whole file
+* Fix wrong name of new configuration
+
 ## 2.7.0 - October 14, 2020
 * (refs [#10](https://github.com/pascalre/vscode-yaml-sort/issues/10)) Use custom sort recursively on the whole file
 * New configuration `vscode-yaml-sort.useCustomSortRecursively` will use the custom sort keywords recursively on a file, when using custom sort

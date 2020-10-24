@@ -56,7 +56,7 @@ export function dumpYaml(text: string, sortKeys: boolean = true, customSort: num
     indent:        vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),
     lineWidth:     vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
     noArrayIndent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent"),
-    sortKeys:      (!(customSort > 0 && vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursive")) ? sortKeys : (a: any, b: any) => {
+    sortKeys:      (!(customSort > 0 && vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")) ? sortKeys : (a: any, b: any) => {
       const sortOrder = getCustomSortKeywords(customSort)
 
       const indexA = sortOrder.indexOf(a)
@@ -110,7 +110,7 @@ export function sortYamlWrapper(customSort: number = 0) {
     new vscode.Position(activeEditor.document.lineCount + 1, 0))
   let doc = activeEditor.document.getText()
   if (!validateYaml(doc)) {
-    process.exit(1)
+    return -1
   }
   let numberOfLeadingSpaces = 0
 
@@ -172,13 +172,13 @@ export function sortYamlWrapper(customSort: number = 0) {
 export function sortYaml(unsortedYaml: string, customSort: number = 0) {
   try {
     const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
-    const useCustomSortRecursive = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursive") as boolean
+    const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
     const doc = yamlParser.safeLoad(unsortedYamlWithoutTabs) as any
 
     let sortedYaml = ""
 
-    if (customSort > 0 && !useCustomSortRecursive) {
+    if (customSort > 0 && !useCustomSortRecursively) {
       const keywords = getCustomSortKeywords(customSort)
 
       keywords.forEach((key) => {
