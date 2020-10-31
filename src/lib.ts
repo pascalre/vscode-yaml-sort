@@ -1,3 +1,5 @@
+import { validateYaml } from "./extension"
+
 /**
  * Removes single quotes from special keywords
  * e.g. '1.4.2': will result in 1.4.2: or 'puppet::key': will result in puppet::key:
@@ -68,7 +70,7 @@ export function isSelectionInvalid(text: string) {
   if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
     return true
   }
-  return false
+  return !validateYaml(text)
 }
 
 /**

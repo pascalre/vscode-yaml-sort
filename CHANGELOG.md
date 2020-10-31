@@ -1,4 +1,7 @@
 # Changelog
+## 2.7.2 - October 31, 2020
+* (ref [#16](https://github.com/pascalre/vscode-yaml-sort/issues/16)) Unable to sort a multi document yaml file
+
 ## 2.7.1 - October 24, 2020
 * (refs [#10](https://github.com/pascalre/vscode-yaml-sort/issues/10)) Use custom sort recursively on the whole file
 * Fix wrong name of new configuration

@@ -37,6 +37,19 @@ animals:
     assert.equal(validateYaml(actual), true)
   })
 
+  test("should return `true` when passing two seperated valid yaml", () => {
+    const actual = `\
+persons:
+  bob:
+    place: Germany
+    age: 23
+---
+animals:
+  kitty:
+    age: 3`
+    assert.equal(validateYaml(actual), true)
+  })
+
   test("should return `false` when passing an invalid yaml", () => {
     assert.equal(validateYaml("network: ethernets:"), false)
   })
