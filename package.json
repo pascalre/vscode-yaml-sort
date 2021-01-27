@@ -28,35 +28,10 @@
   "contributes": {
     "configuration": {
       "properties": {
-        "vscode-yaml-sort.lineWidth": {
-          "type": "integer",
-          "default": 500,
-          "description": "Maximum line width for YAML files."
-        },
-        "vscode-yaml-sort.indent": {
-          "type": "integer",
-          "default": 2,
-          "description": "Indentation width in spaces."
-        },
-        "vscode-yaml-sort.noArrayIndent": {
+        "vscode-yaml-sort.addNewLineAfterTopLevelKey": {
           "type": "boolean",
           "default": false,
-          "description": "When true, will not add an indentation level to array elements."
-        },
-        "vscode-yaml-sort.useCustomSortRecursively": {
-          "type": "boolean",
-          "default": false,
-          "description": "When true, will use the custom sort keywords recursively on a file, when using custom sort"
-        },
-        "vscode-yaml-sort.useLeadingDashes": {
-          "type": "boolean",
-          "default": true,
-          "description": "Define if sorted YAML files should begin with leading dashes."
-        },
-        "vscode-yaml-sort.useQuotesForSpecialKeywords": {
-          "type": "boolean",
-          "default": true,
-          "description": "When false, will not add quotes for keywords with special characters e.g. 'text::text': will result in text::text:. Defaults to true."
+          "description": "When true, will add a new line after each top level keyword."
         },
         "vscode-yaml-sort.customSortKeywords_1": {
           "type": "array",
@@ -88,29 +63,50 @@
           "default": [],
           "description": "List of keywords for Custom Sort 3."
         },
-        "vscode-yaml-sort.addNewLineAfterTopLevelKey": {
+        "vscode-yaml-sort.forceQuotes": {
           "type": "boolean",
           "default": false,
-          "description": "When true, will add a new line after each top level keyword."
+          "description": "When true, all non-key strings will be quoted even if they normally don't need to."
+        },
+        "vscode-yaml-sort.indent": {
+          "type": "integer",
+          "default": 2,
+          "description": "Indentation width in spaces."
+        },
+        "vscode-yaml-sort.lineWidth": {
+          "type": "integer",
+          "default": 500,
+          "description": "Maximum line width for YAML files."
+        },
+        "vscode-yaml-sort.noArrayIndent": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, will not add an indentation level to array elements."
+        },
+        "vscode-yaml-sort.quotingType": {
+          "type": "string",
+          "default": "'",
+          "enum": ["'", "\""],
+          "description": "Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters."
+        },
+        "vscode-yaml-sort.useCustomSortRecursively": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, will use the custom sort keywords recursively on a file, when using custom sort"
+        },
+        "vscode-yaml-sort.useLeadingDashes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Define if sorted YAML files should begin with leading dashes."
+        },
+        "vscode-yaml-sort.useQuotesForSpecialKeywords": {
+          "type": "boolean",
+          "default": true,
+          "description": "When false, will not add quotes for keywords with special characters e.g. 'text::text': will result in text::text:. Defaults to true."
         }
       }
     },
     "commands": [
-      {
-        "command": "vscode-yaml-sort.sortYaml",
-        "title": "Sort YAML",
-        "when": "editorLangId == yaml"
-      },
-      {
-        "command": "vscode-yaml-sort.validateYaml",
-        "title": "Validate YAML",
-        "when": "editorLangId == yaml"
-      },
-      {
-        "command": "vscode-yaml-sort.formatYaml",
-        "title": "Format YAML",
-        "when": "editorLangId == yaml"
-      },
       {
         "command": "vscode-yaml-sort.customSortYaml_1",
         "title": "Custom sort 1",
@@ -124,6 +120,21 @@
       {
         "command": "vscode-yaml-sort.customSortYaml_3",
         "title": "Custom sort 3",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.formatYaml",
+        "title": "Format YAML",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.sortYaml",
+        "title": "Sort YAML",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.validateYaml",
+        "title": "Validate YAML",
         "when": "editorLangId == yaml"
       }
     ]

@@ -1,4 +1,9 @@
 # Changelog
+## 2.8.0
+* (refs [#17](https://github.com/pascalre/vscode-yaml-sort/issues/17)) Force quotes on strings when sorting
+* New configuration `forceQuotes` makes it possible to force quotation of keywords.
+* New configuration `quotingType` allows the user to choose between `'` or `"` as quoting type.
+
 ## 2.7.3 - Januar 27, 2021
 * Fix [CVE-2020-7788](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7788)
 * Use dependency `js-yaml` in version 4.0.0

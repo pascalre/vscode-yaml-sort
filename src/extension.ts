@@ -54,8 +54,10 @@ export function dumpYaml(text: string, sortKeys: boolean = true, customSort: num
 
   let yaml = yamlParser.dump(text, {
     indent:        vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),
+    forceQuotes:   vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes"),
     lineWidth:     vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
     noArrayIndent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent"),
+    quotingType:   vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType"),
     sortKeys:      (!(customSort > 0 && vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")) ? sortKeys : (a: any, b: any) => {
       const sortOrder = getCustomSortKeywords(customSort)
 
@@ -104,12 +106,18 @@ export function getCustomSortKeywords(count: number) {
 
 export function sortYamlWrapper(customSort: number = 0) {
   const useLeadingDashes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
+  const quotingType           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as string
   const activeEditor          = vscode.window.activeTextEditor!
   let   doc                   = activeEditor.document.getText()
   let   numberOfLeadingSpaces = 0
   let   rangeToBeReplaced     = new vscode.Range(
     new vscode.Position(0, 0),
     new vscode.Position(activeEditor.document.lineCount + 1, 0))
+
+  if (!["'", "\""].includes(quotingType)) {
+    vscode.window.showErrorMessage("Quoting type is an invalid value. Please check your settings.")
+    return false
+  }
 
   if (!activeEditor.selection.isEmpty) {
     let endLine = activeEditor.selection.end.line
