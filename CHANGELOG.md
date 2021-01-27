@@ -1,4 +1,8 @@
 # Changelog
+## 2.7.3 - Januar 27, 2021
+* Fix [CVE-2020-7788](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7788)
+* Use dependency `js-yaml` in version 4.0.0
+
 ## 2.7.2 - October 31, 2020
 * (ref [#16](https://github.com/pascalre/vscode-yaml-sort/issues/16)) Unable to sort a multi document yaml file
 

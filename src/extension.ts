@@ -52,7 +52,7 @@ export function dumpYaml(text: string, sortKeys: boolean = true, customSort: num
     return ""
   }
 
-  let yaml = yamlParser.safeDump(text, {
+  let yaml = yamlParser.dump(text, {
     indent:        vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent"),
     lineWidth:     vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
     noArrayIndent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent"),
@@ -186,7 +186,7 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
     const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
     const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     const unsortedYamlWithoutTabs  = replaceTabsWithSpaces(unsortedYaml, indent)
-    const doc                      = yamlParser.safeLoad(unsortedYamlWithoutTabs)                                         as any
+    const doc                      = yamlParser.load(unsortedYamlWithoutTabs)                                         as any
     let sortedYaml                 = ""
 
     if (customSort > 0 && !useCustomSortRecursively) {
@@ -240,7 +240,7 @@ export function validateYaml(text: string) {
 
   try {
     splitYaml(text).forEach((yaml) => {
-      yamlParser.safeLoad(yaml)
+      yamlParser.load(yaml)
     })
     vscode.window.showInformationMessage("YAML is valid.")
     return true
@@ -269,7 +269,7 @@ export function formatYamlWrapper() {
  */
 export function formatYaml(yaml: string, useLeadingDashes: boolean) {
   try {
-    let doc = dumpYaml(yamlParser.safeLoad(yaml) as any, false)
+    let doc = dumpYaml(yamlParser.load(yaml) as any, false)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
