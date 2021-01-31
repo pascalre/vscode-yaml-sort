@@ -22,7 +22,7 @@ This extension contributes the following settings:
 
 | Setting                                        | Description                                                                                                          | Default |
 |------------------------------------------------|--------------------------------------------------------------------------------------------------------------------- | ------- |
-| `vscode-yaml-sort.addNewLineAfterTopLevelKey`  | When `true`, will add a new line after each top level keyword                                                        | `false` |
+| `vscode-yaml-sort.emptyLinesUntilLevel`        | When bigger than `0`, will add a new line before each keyword on level n.                                            | `0`     |
 | `vscode-yaml-sort.customSortKeywords_1`        | List of keywords for `Custom Sort 1`                                                                                 | `["apiVersion", "kind", "metadata", "spec", "data"]`                       |
 | `vscode-yaml-sort.customSortKeywords_2`        | List of keywords for `Custom Sort 2`                                                                                 | -       |
 | `vscode-yaml-sort.customSortKeywords_3`        | List of keywords for `Custom Sort 3`                                                                                 | -       |

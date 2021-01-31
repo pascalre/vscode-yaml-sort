@@ -11,7 +11,7 @@ import {
   replaceTabsWithSpaces,
   removeTrailingCharacters,
   splitYaml,
-  addNewLineBeforeRootKeywords
+  addNewLineBeforeKeywordsUpToLevelN
 } from "./lib"
 
 // this method is called when your extension is activated
@@ -191,11 +191,12 @@ export function sortYamlWrapper(customSort: number = 0) {
 
 export function sortYaml(unsortedYaml: string, customSort: number = 0) {
   try {
+    const emptyLinesUntilLevel     = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel")     as number
     const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
     const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     const unsortedYamlWithoutTabs  = replaceTabsWithSpaces(unsortedYaml, indent)
-    const doc                      = yamlParser.load(unsortedYamlWithoutTabs)                                         as any
-    let sortedYaml                 = ""
+    const doc                      = yamlParser.load(unsortedYamlWithoutTabs)                                             as any
+    let   sortedYaml               = ""
 
     if (customSort > 0 && !useCustomSortRecursively) {
       const keywords = getCustomSortKeywords(customSort)
@@ -223,8 +224,8 @@ export function sortYaml(unsortedYaml: string, customSort: number = 0) {
     // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
     sortedYaml += dumpYaml(doc, true, customSort)
 
-    if (vscode.workspace.getConfiguration().get("vscode-yaml-sort.addNewLineAfterTopLevelKey")) {
-      sortedYaml = addNewLineBeforeRootKeywords(sortedYaml)
+    if (emptyLinesUntilLevel > 0) {
+      sortedYaml = addNewLineBeforeKeywordsUpToLevelN(emptyLinesUntilLevel, indent, sortedYaml)
     }
 
     return sortedYaml

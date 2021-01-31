@@ -1,4 +1,9 @@
 # Changelog
+## 3.0.0 - Januar 31, 2021
+* (refs [#21](https://github.com/pascalre/vscode-yaml-sort/issues/21)) Add new line after 2nd/Nth level key
+* The configuration `addNewLineAfterTopLevelKey` is no longer supported
+* New configuraion `emptyLinesUntilLevel` with the defaults of `0` replaces `addNewLineAfterTopLevelKey`.
+
 ## 2.8.0 - Januar 27, 2021
 * (refs [#17](https://github.com/pascalre/vscode-yaml-sort/issues/17)) Force quotes on strings when sorting
 * New configuration `forceQuotes` makes it possible to force quotation of keywords.

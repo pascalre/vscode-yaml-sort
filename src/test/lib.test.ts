@@ -14,7 +14,8 @@ import {
   removeTrailingCharacters,
   splitYaml,
   replaceTabsWithSpaces,
-  addNewLineBeforeRootKeywords
+  addNewLineBeforeRootKeywords,
+  addNewLineBeforeKeywordsUpToLevelN
 } from "../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -229,5 +230,31 @@ spec: value
 spec: value
 `
     assert.strictEqual(addNewLineBeforeRootKeywords(actual), expected)
+  })
+})
+
+suite("Test addNewLineForKeywordsUntilLevel", () => {
+  test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
+    var actual = `data:
+  key:
+    key: value
+spec: value
+`
+    var expected = `data:
+  key:
+    key: value
+
+spec: value
+`
+    assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(1, 2, actual), expected)
+
+    var expected = `data:
+
+  key:
+    key: value
+
+spec: value
+`
+    assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
   })
 })
