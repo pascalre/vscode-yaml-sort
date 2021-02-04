@@ -15,7 +15,8 @@ import {
   splitYaml,
   replaceTabsWithSpaces,
   addNewLineBeforeRootKeywords,
-  addNewLineBeforeKeywordsUpToLevelN
+  addNewLineBeforeKeywordsUpToLevelN,
+  getYamlFilesInDirectory
 } from "../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -257,4 +258,16 @@ spec: value
 `
     assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
   })
+})
+
+suite("Test getYamlFilesInDirectory", () => {
+  test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
+    var expected = [
+      "./src/test/files/getYamlFilesInDirectory/file.yaml",
+      "./src/test/files/getYamlFilesInDirectory/file.yml",
+      "./src/test/files/getYamlFilesInDirectory/file2.yaml",
+      "./src/test/files/getYamlFilesInDirectory/folder1/file.yaml" ]
+    assert.deepStrictEqual(getYamlFilesInDirectory("./src/test/files/getYamlFilesInDirectory"), expected)
+  })
+
 })

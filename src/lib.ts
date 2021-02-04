@@ -1,4 +1,14 @@
 import { validateYaml } from "./extension"
+import { glob } from "glob"
+
+/**
+ * Returns all files in a directory and its subdirectories with extension .yml or .yaml
+ * @param   {vscode.Uri} uri Base URI
+ * @returns {[string]} List of Yaml files
+ */
+export function getYamlFilesInDirectory(uri: string) {
+  return glob.sync(uri + "/**/**.y?(a)ml")
+}
 
 /**
  * Removes single quotes from special keywords

@@ -1,4 +1,8 @@
 # Changelog
+## 3.1.0 - February 4, 2021
+* (refs [#2](https://github.com/pascalre/vscode-yaml-sort/issues/2)) Sort all files in directory
+* New command `sortYamlFilesInDirectory` allows to sort all yaml files in a directory.
+
 ## 3.0.0 - Januar 31, 2021
 * (refs [#21](https://github.com/pascalre/vscode-yaml-sort/issues/21)) Add new line after 2nd/Nth level key
 * The configuration `addNewLineAfterTopLevelKey` is no longer supported
@@ -42,13 +46,13 @@
 * (refs [#13](https://github.com/pascalre/vscode-yaml-sort/issues/13)) Sort drops value from key, when key in custom sort list
 * Refactor code and add more test cases
 
-## 2.3.1 - April 04, 2020
+## 2.3.1 - April 4, 2020
 * Fix [CVE-2020-7598](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7598)
 
-## 2.3.0 - December 01, 2019
+## 2.3.0 - December 1, 2019
 * (refs [#6](https://github.com/pascalre/vscode-yaml-sort/issues/6)) Support sorting files with delimiters with comment
 
-## 2.2.0 - November 03, 2019
+## 2.2.0 - November 3, 2019
 * New command `Format YAML` allows to format yaml without sorting.
 * New configuration `noArrayIndent`
 * New configuration `useQuotesForSpecialKeywords`
@@ -79,5 +83,5 @@
 ## 1.0.1 - June 15, 2019
 * (refs [#1](https://github.com/pascalre/vscode-yaml-sort/issues/1)) Sort happens only once in editor life
 
-## 1.0.0 - May 09, 2019
+## 1.0.0 - May 9, 2019
 * Initial Release

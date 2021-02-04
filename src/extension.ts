@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as yamlParser from "js-yaml"
 import * as vscode from "vscode"
+
 import {
   getDelimiters,
   isSelectionInvalid,
@@ -11,7 +12,8 @@ import {
   replaceTabsWithSpaces,
   removeTrailingCharacters,
   splitYaml,
-  addNewLineBeforeKeywordsUpToLevelN
+  addNewLineBeforeKeywordsUpToLevelN,
+  getYamlFilesInDirectory
 } from "./lib"
 
 // this method is called when your extension is activated
@@ -38,6 +40,9 @@ export function activate(context: vscode.ExtensionContext) {
   }))
   context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_3", () => {
     sortYamlWrapper(3)
+  }))
+  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: vscode.Uri) => {
+    sortYamlFiles(uri)
   }))
 }
 
@@ -288,4 +293,24 @@ export function formatYaml(yaml: string, useLeadingDashes: boolean) {
     vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
     return null
   }
+}
+
+/**
+ * Sorts all yaml files in a directory
+ * @param {vscode.Uri} uri Base URI
+ */
+var fs = require('fs')
+export function sortYamlFiles(uri: vscode.Uri) {
+  const files = getYamlFilesInDirectory(uri.fsPath)
+  files.forEach((file: string) => {
+    let yaml = fs.readFileSync(file, 'utf-8').toString()
+    if (sortYaml(yaml))
+      yaml = sortYaml(yaml)
+    else
+      vscode.window.showErrorMessage("File " + file + " could not be sorted")
+    fs.writeFileSync(file, yaml, (err: any) => {
+      if (err) throw err
+        vscode.window.showErrorMessage("File " + file + " could not be sorted")
+    })      
+  })
 }
