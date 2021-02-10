@@ -5,7 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
-import { workspace } from "vscode"
+// import { workspace } from "vscode"
 import {
   getCustomSortKeywords,
   sortYaml,

@@ -3,7 +3,8 @@
 This guide supports developers in contributing code.
 
 ## Testing & Linting
-* `npm run test`: Run the unit tests.
+* `npm run test`: Run the unit tests
+* `npm run lint`: Run the eslint
 * `mocha src/test/lib.test.ts --require ts-node/register --ui tdd`
 
 Run the following commands to run SonarScanner:
@@ -16,6 +17,6 @@ Run the following command to pack code to a vsix package:
 * `vsce package`
 
 ### Before release
-* update version
-* update CHANGELOG.md
-* update README.md
+* Bump version
+* Update CHANGELOG.md
+* Update README.md

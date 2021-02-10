@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as yamlParser from "js-yaml"
 import * as vscode from "vscode"
+import * as fs from "fs"
 
 import {
   getDelimiters,
@@ -52,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string}  Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean = true, customSort: number = 0) {
+export function dumpYaml(text: string, sortKeys = true, customSort = 0): string {
   if (Object.keys(text).length === 0) {
     return ""
   }
@@ -97,7 +98,7 @@ export function dumpYaml(text: string, sortKeys: boolean = true, customSort: num
  * @param   {number}   count Number of the keyword list.
  * @returns {[string]} Array of custom sort keywords.
  */
-export function getCustomSortKeywords(count: number) {
+export function getCustomSortKeywords(count: number): [string] {
   switch (count) {
     case 1:
       return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_1") as [string]
@@ -109,7 +110,7 @@ export function getCustomSortKeywords(count: number) {
   }
 }
 
-export function sortYamlWrapper(customSort: number = 0) {
+export function sortYamlWrapper(customSort = 0): boolean {
   const useLeadingDashes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
   const quotingType           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as string
   const activeEditor          = vscode.window.activeTextEditor!
@@ -144,16 +145,16 @@ export function sortYamlWrapper(customSort: number = 0) {
     }
   } else {
     if (!validateYaml(doc)) {
-      return -1
+      return false
     }
   }
 
   let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty, useLeadingDashes)
 
   // remove yaml metadata tags
-  const matchMetadata = /^\%.*\n/gm
+  const matchMetadata = /^%.*\n/gm
   // set metadata tags, if there is no metadata tag it should be an emtpy array
-  const metadata = doc.match(matchMetadata) ? doc.match(matchMetadata)! : [""]
+  // const metadata = doc.match(matchMetadata) ? doc.match(matchMetadata)! : [""]
   let newText = ""
   if (doc.match(matchMetadata)) {
     // metadata = doc.match(matchMetadata)!
@@ -192,9 +193,10 @@ export function sortYamlWrapper(customSort: number = 0) {
     activeEditor.edit((builder) => builder.replace(rangeToBeReplaced, newText))
     vscode.window.showInformationMessage("Keys resorted successfully")
   }
+  return true
 }
 
-export function sortYaml(unsortedYaml: string, customSort: number = 0) {
+export function sortYaml(unsortedYaml: string, customSort = 0): string|null {
   try {
     const emptyLinesUntilLevel     = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel")     as number
     const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
@@ -250,7 +252,7 @@ export function validateYamlWrapper() {
  * @param   {string} yaml Yaml to be validated.
  * @returns {boolean} True, if yaml is valid.
  */
-export function validateYaml(text: string) {
+export function validateYaml(text: string): boolean {
 
   try {
     splitYaml(text).forEach((yaml) => {
@@ -281,7 +283,7 @@ export function formatYamlWrapper() {
  * @param   {string} yaml Yaml to be formatted.
  * @returns {string} Formatted yaml.
  */
-export function formatYaml(yaml: string, useLeadingDashes: boolean) {
+export function formatYaml(yaml: string, useLeadingDashes: boolean): string|null {
   try {
     let doc = dumpYaml(yamlParser.load(yaml) as any, false)
     if (useLeadingDashes) {
@@ -299,18 +301,18 @@ export function formatYaml(yaml: string, useLeadingDashes: boolean) {
  * Sorts all yaml files in a directory
  * @param {vscode.Uri} uri Base URI
  */
-var fs = require('fs')
 export function sortYamlFiles(uri: vscode.Uri) {
   const files = getYamlFilesInDirectory(uri.fsPath)
   files.forEach((file: string) => {
     let yaml = fs.readFileSync(file, 'utf-8').toString()
     if (sortYaml(yaml))
-      yaml = sortYaml(yaml)
+      yaml = sortYaml(yaml)!
     else
       vscode.window.showErrorMessage("File " + file + " could not be sorted")
-    fs.writeFileSync(file, yaml, (err: any) => {
-      if (err) throw err
-        vscode.window.showErrorMessage("File " + file + " could not be sorted")
-    })      
+    try {
+      fs.writeFileSync(file, yaml)
+    } catch(e) {
+      vscode.window.showErrorMessage("File " + file + " could not be sorted")
+    }      
   })
 }

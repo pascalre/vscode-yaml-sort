@@ -236,12 +236,12 @@ spec: value
 
 suite("Test addNewLineForKeywordsUntilLevel", () => {
   test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
-    var actual = `data:
+    const actual = `data:
   key:
     key: value
 spec: value
 `
-    var expected = `data:
+    let expected = `data:
   key:
     key: value
 
@@ -249,7 +249,7 @@ spec: value
 `
     assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(1, 2, actual), expected)
 
-    var expected = `data:
+    expected = `data:
 
   key:
     key: value
@@ -262,7 +262,7 @@ spec: value
 
 suite("Test getYamlFilesInDirectory", () => {
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
-    var expected = [
+    const expected = [
       "./src/test/files/getYamlFilesInDirectory/file.yaml",
       "./src/test/files/getYamlFilesInDirectory/file.yml",
       "./src/test/files/getYamlFilesInDirectory/file2.yaml",
