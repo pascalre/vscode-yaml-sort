@@ -11,3 +11,5 @@ os:
 script:
   - vsce package
   - npm run test
+after_success:
+  - npm run coverage

@@ -4,3 +4,4 @@ out/
 .scannerwork/
 .vscode-test/
 .DS_Store
+coverage/

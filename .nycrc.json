@@ -1,0 +1,17 @@
+{
+    "cache": true,
+    "extensions": [
+        ".ts"
+    ],
+    "report-dir": "./coverage",
+    "reporter": [
+        "html",
+        "text-lcov",
+        "text-summary",
+        "lcov"
+    ],
+    "temp-directory": "./coverage/.nyc_output",
+    "exclude": [
+        ".vscode-test/**/*.js"
+    ]
+}
