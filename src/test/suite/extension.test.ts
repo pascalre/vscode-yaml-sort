@@ -5,15 +5,25 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
+import * as fs from "fs"
+import { Uri } from "vscode"
 // import { workspace } from "vscode"
 import {
   getCustomSortKeywords,
   sortYaml,
-  validateYaml} from "../../extension"
+  validateYaml,
+  sortYamlFiles,
+  formatYaml} from "../../extension"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
     assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+  })
+  test("should return values of `vscode-yaml-sort.customSortKeywords_2`", () => {
+    assert.deepEqual(getCustomSortKeywords(2), [])
+  })
+  test("should return values of `vscode-yaml-sort.customSortKeywords_3`", () => {
+    assert.deepEqual(getCustomSortKeywords(3), [])
   })
 
   test("should fail when parameter is not in [1, 2, 3]", () => {
@@ -61,6 +71,55 @@ animals:
   })
 })
 
+suite("Test sortYamlFiles", () => {
+  test("should sort all yaml files in directory", () => {
+    const uri = Uri.parse("src/test/files/getYamlFilesInDirectory/folder1")
+    sortYamlFiles(uri)
+    let sortedFile = fs.readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", 'utf-8').toString()
+    assert.strictEqual(sortedFile, "key: value\nakey: value")
+    sortedFile = fs.readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", 'utf-8').toString()
+    assert.strictEqual(sortedFile, "key: value\nakey: value")
+  })
+})
+
+suite("Test formatYaml", () => {
+  test("should sort all yaml files in directory", () => {
+    const actual = `\
+persons:
+  bob:
+    place: 'Germany'
+    age: 23
+'animals':
+  kitty:
+    age: 3
+`
+    let expected = `\
+persons:
+  bob:
+    place: Germany
+    age: 23
+animals:
+  kitty:
+    age: 3`
+    assert.strictEqual(formatYaml(actual, false), expected)
+    expected = `\
+---
+persons:
+  bob:
+    place: Germany
+    age: 23
+animals:
+  kitty:
+    age: 3`
+    assert.strictEqual(formatYaml(actual, true), expected)
+  })
+
+  test("should return `null` on invalid yaml", () => {
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true), null)
+  })
+
+})
+
 suite("Test sortYaml", () => {
   test("should sort a given yaml document", async () => {
 
@@ -74,6 +133,9 @@ persons:
   bob:
     place: Germany
     age: 23
+  key: >
+      This is a very long sentence
+      that spans several lines in the YAML
 animals:
   kitty:
     age: 3
@@ -85,7 +147,9 @@ animals:
 persons:
   bob:
     age: 23
-    place: Germany`
+    place: Germany
+  key: |
+    This is a very long sentence that spans several lines in the YAML`
     assert.equal(sortYaml(actual), expected)
   })
 

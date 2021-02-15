@@ -262,11 +262,14 @@ spec: value
 
 suite("Test getYamlFilesInDirectory", () => {
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
-    const expected = [
-      "./src/test/files/getYamlFilesInDirectory/file.yaml",
-      "./src/test/files/getYamlFilesInDirectory/file.yml",
-      "./src/test/files/getYamlFilesInDirectory/file2.yaml",
-      "./src/test/files/getYamlFilesInDirectory/folder1/file.yaml" ]
+    const expected =   [
+      './src/test/files/getYamlFilesInDirectory/file.yaml',
+      './src/test/files/getYamlFilesInDirectory/file.yml',
+      './src/test/files/getYamlFilesInDirectory/file2.yaml',
+      './src/test/files/getYamlFilesInDirectory/folder1/file.yaml',
+      './src/test/files/getYamlFilesInDirectory/folder1/file2.yaml',
+      './src/test/files/getYamlFilesInDirectory/folder2/file.yaml'
+    ]
     assert.deepStrictEqual(getYamlFilesInDirectory("./src/test/files/getYamlFilesInDirectory"), expected)
   })
 

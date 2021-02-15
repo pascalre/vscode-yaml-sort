@@ -49,9 +49,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 /**
  * Dumps a yaml with the user specific settings.
- * @param   {number}  text     Yaml document which should be dumped.
+ * @param   {string}  text     Yaml document which should be dumped.
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
- * @returns {string}  Clean yaml document.
+ * @returns {string}           Clean yaml document.
  */
 export function dumpYaml(text: string, sortKeys = true, customSort = 0): string {
   if (Object.keys(text).length === 0) {
@@ -64,7 +64,7 @@ export function dumpYaml(text: string, sortKeys = true, customSort = 0): string 
     lineWidth:     vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth"),
     noArrayIndent: vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent"),
     quotingType:   vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType"),
-    sortKeys:      (!(customSort > 0 && vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")) ? sortKeys : (a: any, b: any) => {
+    sortKeys:      (!(customSort > 0 && vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")) ? sortKeys : (a: string, b: string) => {
       const sortOrder = getCustomSortKeywords(customSort)
 
       const indexA = sortOrder.indexOf(a)
@@ -111,89 +111,89 @@ export function getCustomSortKeywords(count: number): [string] {
 }
 
 export function sortYamlWrapper(customSort = 0): boolean {
-  const useLeadingDashes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
-  const quotingType           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as string
-  const activeEditor          = vscode.window.activeTextEditor!
-  let   doc                   = activeEditor.document.getText()
-  let   numberOfLeadingSpaces = 0
-  let   rangeToBeReplaced     = new vscode.Range(
-    new vscode.Position(0, 0),
-    new vscode.Position(activeEditor.document.lineCount + 1, 0))
+  if (vscode.window.activeTextEditor) {
+    const useLeadingDashes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
+    const quotingType           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as string
+    const activeEditor          = vscode.window.activeTextEditor
+    let   doc                   = activeEditor.document.getText()
+    let   numberOfLeadingSpaces = 0
+    let   rangeToBeReplaced     = new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(activeEditor.document.lineCount + 1, 0))
 
-  if (!["'", "\""].includes(quotingType)) {
-    vscode.window.showErrorMessage("Quoting type is an invalid value. Please check your settings.")
-    return false
-  }
-
-  if (!activeEditor.selection.isEmpty) {
-    let endLine = activeEditor.selection.end.line
-    // if the selection ends on the first character on a new line, we will ignore this line
-    if (activeEditor.selection.end.character === 0) {
-      endLine--
-    }
-
-    // ensure that selection covers whole start and end line
-    rangeToBeReplaced = new vscode.Selection(
-      activeEditor.selection.start.line, 0,
-      endLine, activeEditor.document.lineAt(endLine).range.end.character)
-    doc = activeEditor.document.getText(rangeToBeReplaced)
-
-    // check if selection to sort is valid, maybe the user missed a trailing line
-    if (isSelectionInvalid(doc)) {
-      vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.")
+    if (!["'", "\""].includes(quotingType)) {
+      vscode.window.showErrorMessage("Quoting type is an invalid value. Please check your settings.")
       return false
     }
-  } else {
-    if (!validateYaml(doc)) {
-      return false
-    }
-  }
 
-  let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty, useLeadingDashes)
-
-  // remove yaml metadata tags
-  const matchMetadata = /^%.*\n/gm
-  // set metadata tags, if there is no metadata tag it should be an emtpy array
-  // const metadata = doc.match(matchMetadata) ? doc.match(matchMetadata)! : [""]
-  let newText = ""
-  if (doc.match(matchMetadata)) {
-    // metadata = doc.match(matchMetadata)!
-    // newText = metadata.join("") + delimiters.shift();
-    delimiters.shift()
-    delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
-  }
-  doc = doc.replace(matchMetadata, "")
-  doc = doc.replace(/^\n/, "")
-
-  // sort yaml
-  let validYaml = true
-  splitYaml(doc).forEach((unsortedYaml) => {
-    if (sortYaml(unsortedYaml, customSort)) {
-      let sortedYaml = sortYaml(unsortedYaml, customSort)!
-      if (!activeEditor.selection.isEmpty) {
-        // get number of leading whitespaces, these whitespaces will be used for indentation
-        if (!unsortedYaml.startsWith(" ")) {
-          numberOfLeadingSpaces = 0
-        } else {
-          numberOfLeadingSpaces = unsortedYaml.search(/\S/)
-        }
-        sortedYaml = prependWhitespacesOnEachLine(sortedYaml, numberOfLeadingSpaces)
+    if (!activeEditor.selection.isEmpty) {
+      let endLine = activeEditor.selection.end.line
+      // if the selection ends on the first character on a new line, we will ignore this line
+      if (activeEditor.selection.end.character === 0) {
+        endLine--
       }
-      newText += delimiters.shift() + sortedYaml
-    } else {
-      validYaml = false
-    }
-  })
-  if (activeEditor.selection.isEmpty && useLeadingDashes) {
-    newText = "---\n" + newText
-  }
 
-  if (validYaml) {
-    // update yaml
-    activeEditor.edit((builder) => builder.replace(rangeToBeReplaced, newText))
-    vscode.window.showInformationMessage("Keys resorted successfully")
+      // ensure that selection covers whole start and end line
+      rangeToBeReplaced = new vscode.Selection(
+        activeEditor.selection.start.line, 0,
+        endLine, activeEditor.document.lineAt(endLine).range.end.character)
+      doc = activeEditor.document.getText(rangeToBeReplaced)
+
+      // check if selection to sort is valid, maybe the user missed a trailing line
+      if (isSelectionInvalid(doc)) {
+        vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.")
+        return false
+      }
+    } else {
+      if (!validateYaml(doc)) {
+        return false
+      }
+    }
+
+    let delimiters = getDelimiters(doc, activeEditor.selection.isEmpty, useLeadingDashes)
+
+    // remove yaml metadata tags
+    const matchMetadata = /^%.*\n/gm
+    // set metadata tags, if there is no metadata tag it should be an emtpy array
+    let newText = ""
+    if (doc.match(matchMetadata)) {
+      delimiters.shift()
+      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
+    }
+    doc = doc.replace(matchMetadata, "")
+    doc = doc.replace(/^\n/, "")
+
+    // sort yaml
+    let validYaml = true
+    splitYaml(doc).forEach((unsortedYaml) => {
+      let sortedYaml = sortYaml(unsortedYaml, customSort)
+      if (sortedYaml) {
+        if (!activeEditor.selection.isEmpty) {
+          // get number of leading whitespaces, these whitespaces will be used for indentation
+          if (!unsortedYaml.startsWith(" ")) {
+            numberOfLeadingSpaces = 0
+          } else {
+            numberOfLeadingSpaces = unsortedYaml.search(/\S/)
+          }
+          sortedYaml = prependWhitespacesOnEachLine(sortedYaml, numberOfLeadingSpaces)
+        }
+        newText += delimiters.shift() + sortedYaml
+      } else {
+        validYaml = false
+      }
+    })
+    if (activeEditor.selection.isEmpty && useLeadingDashes) {
+      newText = "---\n" + newText
+    }
+
+    if (validYaml) {
+      // update yaml
+      activeEditor.edit((builder) => builder.replace(rangeToBeReplaced, newText))
+      vscode.window.showInformationMessage("Keys resorted successfully")
+    }
+    return true
   }
-  return true
+  return false
 }
 
 export function sortYaml(unsortedYaml: string, customSort = 0): string|null {
@@ -208,7 +208,7 @@ export function sortYaml(unsortedYaml: string, customSort = 0): string|null {
     if (customSort > 0 && !useCustomSortRecursively) {
       const keywords = getCustomSortKeywords(customSort)
 
-      keywords.forEach((key) => {
+      keywords.forEach(key => {
         if (doc[key]) {
           let sortedSubYaml = dumpYaml(doc[key])
           if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
@@ -242,14 +242,17 @@ export function sortYaml(unsortedYaml: string, customSort = 0): string|null {
   }
 }
 
-export function validateYamlWrapper() {
-  const activeEditor = vscode.window.activeTextEditor!
-  validateYaml(activeEditor.document.getText())!
+export function validateYamlWrapper(): boolean {
+  if (vscode.window.activeTextEditor) {
+    validateYaml(vscode.window.activeTextEditor.document.getText())
+    return true
+  }
+  return false
 }
 
 /**
  * Validates a given yaml document.
- * @param   {string} yaml Yaml to be validated.
+ * @param   {string}  yaml Yaml to be validated.
  * @returns {boolean} True, if yaml is valid.
  */
 export function validateYaml(text: string): boolean {
@@ -266,16 +269,20 @@ export function validateYaml(text: string): boolean {
   }
 }
 
-export function formatYamlWrapper() {
-  const activeEditor  = vscode.window.activeTextEditor!
-  const formattedYaml = formatYaml(activeEditor.document.getText(), vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")! as boolean)
-  if (formattedYaml) {
-    activeEditor.edit((builder) => builder.replace(
-      new vscode.Range(
-        new vscode.Position(0, 0),
-        new vscode.Position(activeEditor.document.lineCount + 1, 0)),
-      formattedYaml))
+export function formatYamlWrapper(): boolean {
+  const activeEditor  = vscode.window.activeTextEditor
+  if (activeEditor) {
+    const formattedYaml = formatYaml(activeEditor.document.getText(), vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean)
+    if (formattedYaml) {
+      activeEditor.edit((builder) => builder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        formattedYaml))
+      return true
+    }
   }
+  return false
 }
 
 /**
@@ -285,7 +292,7 @@ export function formatYamlWrapper() {
  */
 export function formatYaml(yaml: string, useLeadingDashes: boolean): string|null {
   try {
-    let doc = dumpYaml(yamlParser.load(yaml) as any, false)
+    let doc = dumpYaml(yamlParser.load(yaml) as string, false)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
@@ -301,18 +308,22 @@ export function formatYaml(yaml: string, useLeadingDashes: boolean): string|null
  * Sorts all yaml files in a directory
  * @param {vscode.Uri} uri Base URI
  */
-export function sortYamlFiles(uri: vscode.Uri) {
+export function sortYamlFiles(uri: vscode.Uri): boolean {
   const files = getYamlFilesInDirectory(uri.fsPath)
   files.forEach((file: string) => {
-    let yaml = fs.readFileSync(file, 'utf-8').toString()
-    if (sortYaml(yaml))
-      yaml = sortYaml(yaml)!
-    else
+    const yaml = fs.readFileSync(file, 'utf-8').toString()
+    const sortedYaml = sortYaml(yaml)
+    if (sortedYaml) {
+      try {
+        fs.writeFileSync(file, yaml)
+      } catch(e) {
+        vscode.window.showErrorMessage("File " + file + " could not be sorted")
+        return false
+      }        
+    } else {
       vscode.window.showErrorMessage("File " + file + " could not be sorted")
-    try {
-      fs.writeFileSync(file, yaml)
-    } catch(e) {
-      vscode.window.showErrorMessage("File " + file + " could not be sorted")
-    }      
+      return false
+    }
   })
+  return true
 }
