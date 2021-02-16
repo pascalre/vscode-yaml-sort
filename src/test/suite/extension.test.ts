@@ -7,6 +7,7 @@
 import * as assert from "assert"
 import * as fs from "fs"
 import { Uri } from "vscode"
+
 // import { workspace } from "vscode"
 import {
   getCustomSortKeywords,
@@ -82,6 +83,24 @@ suite("Test sortYamlFiles", () => {
   })
 })
 
+suite("Test dumpYaml", () => {
+  test("should recursively use customSort", () => {
+    const actual = `\
+data:
+  apiVersion: value
+  data: value
+  kind: value
+kind: value`
+    const expected = `\
+kind: value
+data:
+  apiVersion: value
+  kind: value
+  data: value`
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", false), expected)
+  })
+})
+
 suite("Test formatYaml", () => {
   test("should sort all yaml files in directory", () => {
     const actual = `\
@@ -101,7 +120,7 @@ persons:
 animals:
   kitty:
     age: 3`
-    assert.strictEqual(formatYaml(actual, false), expected)
+    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'", false), expected)
     expected = `\
 ---
 persons:
@@ -111,11 +130,11 @@ persons:
 animals:
   kitty:
     age: 3`
-    assert.strictEqual(formatYaml(actual, true), expected)
+    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'", false), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true), null)
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'", false), null)
   })
 
 })
@@ -150,7 +169,7 @@ persons:
     place: Germany
   key: |
     This is a very long sentence that spans several lines in the YAML`
-    assert.equal(sortYaml(actual), expected)
+    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", false), expected)
   })
 
   test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
@@ -166,7 +185,7 @@ spec: spec
 spec: spec
 data: data
 `
-    assert.equal(sortYaml(actual, 1), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
 
     actual = `
 data: data
@@ -178,7 +197,7 @@ spec:
   - aa: b
 data: data
 `
-    assert.equal(sortYaml(actual, 1), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
 
     actual = `
 data:
@@ -198,7 +217,7 @@ data:
   skills:
     - pascal
 `
-    assert.equal(sortYaml(actual, 1), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
 
     actual = `
 data: data
@@ -212,7 +231,7 @@ spec:
   - b
 data: data
 `
-    assert.equal(sortYaml(actual, 1), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
   })
 
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
@@ -234,28 +253,22 @@ ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dol
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
       dolores et e`
-    assert.equal(sortYaml(actual), expected)
+    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", false), expected)
   })
 
-  /* currently not supported with travis ci
-  test("should add an empty line before `data`", async () => {
+  test("should add an empty line before `spec`", () => {
     const actual = `
-data: data
-spec:
+spec: value
+data:
   - a
-  - b
-`
+  - b`
     const expected = `\
-spec:
+data:
   - a
   - b
 
-data: data
-`
-    const settings = workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("addNewLineAfterTopLevelKey", true, false)
-    assert.equal(sortYaml(actual, 1), expected)
+spec: value`
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", false), expected)
   })
-  */
 
 })
