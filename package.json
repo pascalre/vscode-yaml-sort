@@ -102,11 +102,6 @@
           "type": "boolean",
           "default": true,
           "description": "Define if sorted YAML files should begin with leading dashes."
-        },
-        "vscode-yaml-sort.useQuotesForSpecialKeywords": {
-          "type": "boolean",
-          "default": true,
-          "description": "When false, will not add quotes for keywords with special characters e.g. 'text::text': will result in text::text:. Defaults to true."
         }
       }
     },

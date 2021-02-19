@@ -14,7 +14,8 @@ import {
   sortYaml,
   validateYaml,
   sortYamlFiles,
-  formatYaml} from "../../extension"
+  formatYaml,
+  dumpYaml} from "../../extension"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -86,8 +87,11 @@ suite("Test sortYamlFiles", () => {
 suite("Test dumpYaml", () => {
   test("should recursively use customSort", () => {
     const actual = `\
+keyword: value
+keyword2: value
 data:
   apiVersion: value
+  keyword: value
   data: value
   kind: value
 kind: value`
@@ -96,8 +100,11 @@ kind: value
 data:
   apiVersion: value
   kind: value
-  data: value`
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", false), expected)
+  data: value
+  keyword: value
+keyword: value
+keyword2: value`
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'"), expected)
   })
 })
 
@@ -120,7 +127,7 @@ persons:
 animals:
   kitty:
     age: 3`
-    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'", false), expected)
+    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'"), expected)
     expected = `\
 ---
 persons:
@@ -130,11 +137,11 @@ persons:
 animals:
   kitty:
     age: 3`
-    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'", false), expected)
+    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'"), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'", false), null)
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'"), null)
   })
 
 })
@@ -169,7 +176,7 @@ persons:
     place: Germany
   key: |
     This is a very long sentence that spans several lines in the YAML`
-    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", false), expected)
+    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
   })
 
   test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
@@ -185,7 +192,7 @@ spec: spec
 spec: spec
 data: data
 `
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
 
     actual = `
 data: data
@@ -197,7 +204,7 @@ spec:
   - aa: b
 data: data
 `
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
 
     actual = `
 data:
@@ -217,7 +224,7 @@ data:
   skills:
     - pascal
 `
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
 
     actual = `
 data: data
@@ -231,7 +238,7 @@ spec:
   - b
 data: data
 `
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", false), expected)
+    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
   })
 
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
@@ -253,7 +260,7 @@ ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dol
 sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
 aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
       dolores et e`
-    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", false), expected)
+    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
   })
 
   test("should add an empty line before `spec`", () => {
@@ -268,7 +275,7 @@ data:
   - b
 
 spec: value`
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", false), expected)
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'"), expected)
   })
 
 })

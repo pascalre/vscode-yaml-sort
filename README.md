@@ -37,7 +37,6 @@ This extension contributes the following settings:
 | `vscode-yaml-sort.quotingType`                 | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.   | `'` |
 | `vscode-yaml-sort.useCustomSortRecursively`    | When `true`, will use the custom sort keywords recursively on a file, when using custom sort                         | `false` |
 | `vscode-yaml-sort.useLeadingDashes`            | When `true`, sorted YAML files begin with leading dashes                                                             | `true`  |
-| `vscode-yaml-sort.useQuotesForSpecialKeywords` | When `false`, will not add quotes for keywords with special characters e.g. 'text::text': will result in text::text: | `true`  |
 
 ## Enjoy!
 

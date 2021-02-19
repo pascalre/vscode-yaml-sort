@@ -53,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string}           Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, useQuotesForSpecialKeywords: boolean): string {
+export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean): string {
   if (Object.keys(text).length === 0) {
     return ""
   }
@@ -85,11 +85,7 @@ export function dumpYaml(text: string, sortKeys: boolean, customSort: number, in
   // this is neccesary to avoid linebreaks in a selection sort
   yaml = removeTrailingCharacters(yaml, 1)
 
-  if (useQuotesForSpecialKeywords) {
-    return yaml
-  } else {
-    return removeQuotesFromKeys(yaml)
-  }
+  return yaml
 }
 
 /**
@@ -115,7 +111,6 @@ export function sortYamlWrapper(customSort = 0): boolean {
     const quotingType                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")                 as "'" | '"'
     const useCustomSortRecursively    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")    as boolean
     const useLeadingDashes            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")            as boolean
-    const useQuotesForSpecialKeywords = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useQuotesForSpecialKeywords") as boolean
     let   doc                         = activeEditor.document.getText()
     let   numberOfLeadingSpaces       = 0
     let   rangeToBeReplaced           = new vscode.Range(
@@ -166,7 +161,7 @@ export function sortYamlWrapper(customSort = 0): boolean {
     // sort yaml
     let validYaml = true
     splitYaml(doc).forEach((unsortedYaml) => {
-      let sortedYaml = sortYaml(unsortedYaml, customSort, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType, useQuotesForSpecialKeywords)
+      let sortedYaml = sortYaml(unsortedYaml, customSort, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType)
       if (sortedYaml) {
         if (!activeEditor.selection.isEmpty) {
           // get number of leading whitespaces, these whitespaces will be used for indentation
@@ -196,7 +191,7 @@ export function sortYamlWrapper(customSort = 0): boolean {
   return false
 }
 
-export function sortYaml(unsortedYaml: string, customSort = 0, emptyLinesUntilLevel: number, indent: number, useCustomSortRecursively: boolean, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useQuotesForSpecialKeywords: boolean): string|null {
+export function sortYaml(unsortedYaml: string, customSort = 0, emptyLinesUntilLevel: number, indent: number, useCustomSortRecursively: boolean, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"'): string|null {
   try {
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
     const doc                     = yamlParser.load(unsortedYamlWithoutTabs) as any
@@ -207,7 +202,7 @@ export function sortYaml(unsortedYaml: string, customSort = 0, emptyLinesUntilLe
 
       keywords.forEach(key => {
         if (doc[key]) {
-          let sortedSubYaml = dumpYaml(doc[key], true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, useQuotesForSpecialKeywords)
+          let sortedSubYaml = dumpYaml(doc[key], true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively)
           if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
               // when key cotains more than one line, we need some transformation:
               // add a new line and indent each line some spaces
@@ -226,7 +221,7 @@ export function sortYaml(unsortedYaml: string, customSort = 0, emptyLinesUntilLe
     }
 
     // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-    sortedYaml += dumpYaml(doc, true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, useQuotesForSpecialKeywords)
+    sortedYaml += dumpYaml(doc, true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively)
 
     if (emptyLinesUntilLevel > 0) {
       sortedYaml = addNewLineBeforeKeywordsUpToLevelN(emptyLinesUntilLevel, indent, sortedYaml)
@@ -274,10 +269,9 @@ export function formatYamlWrapper(): boolean {
   const noArrayIndent               = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")               as boolean
   const quotingType                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")                 as "'" | '"'
   const useLeadingDashes            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")            as boolean
-  const useQuotesForSpecialKeywords = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useQuotesForSpecialKeywords") as boolean
 
   if (activeEditor) {
-    const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useQuotesForSpecialKeywords)
+    const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, quotingType)
     if (formattedYaml) {
       activeEditor.edit((builder) => builder.replace(
         new vscode.Range(
@@ -295,9 +289,9 @@ export function formatYamlWrapper(): boolean {
  * @param   {string} yaml Yaml to be formatted.
  * @returns {string} Formatted yaml.
  */
-export function formatYaml(yaml: string, useLeadingDashes: boolean, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useQuotesForSpecialKeywords: boolean): string|null {
+export function formatYaml(yaml: string, useLeadingDashes: boolean, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"'): string|null {
   try {
-    let doc = dumpYaml(yamlParser.load(yaml) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, false, useQuotesForSpecialKeywords)
+    let doc = dumpYaml(yamlParser.load(yaml) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, false)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
@@ -321,12 +315,11 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
   const noArrayIndent               = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")               as boolean
   const quotingType                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")                 as "'" | '"'
   const useCustomSortRecursively    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")    as boolean
-  const useQuotesForSpecialKeywords = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useQuotesForSpecialKeywords") as boolean
 
   const files = getYamlFilesInDirectory(uri.fsPath)
   files.forEach((file: string) => {
     const yaml       = fs.readFileSync(file, 'utf-8').toString()
-    const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType, useQuotesForSpecialKeywords)
+    const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType)
     if (sortedYaml) {
       try {
         fs.writeFileSync(file, yaml)
