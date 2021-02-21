@@ -6,16 +6,20 @@
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
 import * as fs from "fs"
-import { Uri } from "vscode"
+import * as vscode from "vscode"
+import * as path from "path"
 
 // import { workspace } from "vscode"
 import {
   getCustomSortKeywords,
   sortYaml,
   validateYaml,
-  sortYamlFiles,
   formatYaml,
-  dumpYaml} from "../../extension"
+  formatYamlWrapper,
+  sortYamlFiles,
+  validateYamlWrapper,
+  sortYamlWrapper
+} from "../../extension"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -74,13 +78,22 @@ animals:
 })
 
 suite("Test sortYamlFiles", () => {
-  test("should sort all yaml files in directory", () => {
-    const uri = Uri.parse("src/test/files/getYamlFilesInDirectory/folder1")
-    sortYamlFiles(uri)
+  test("should sort all yaml files in directory", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/folder1"))
+
+    await vscode.commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
+
     let sortedFile = fs.readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", 'utf-8').toString()
-    assert.strictEqual(sortedFile, "key: value\nakey: value")
+    assert.strictEqual(sortedFile, "akey: value\nkey: value")
     sortedFile = fs.readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", 'utf-8').toString()
-    assert.strictEqual(sortedFile, "key: value\nakey: value")
+    assert.strictEqual(sortedFile, "akey: value\nkey: value")
+
+    fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
+    fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")  
+  })
+  test("should return `true` on invalid yaml", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/folder2"))
+    assert.strictEqual(sortYamlFiles(uri), true)
   })
 })
 
@@ -105,6 +118,68 @@ data:
 keyword: value
 keyword2: value`
     assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'"), expected)
+  })
+})
+
+suite("Test validateYamlWrapper", () => {
+  test("should return true on open document", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+    assert.strictEqual(validateYamlWrapper(), true)
+  })
+})
+
+suite("Test formatYamlWrapper", () => {
+  test("should return true on a valid yaml", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const actual = `\
+key:
+    key2: value`
+      /*const expected = `\
+---
+key:
+  key2: value`*/
+      activeEditor.edit((builder) => builder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        actual))
+
+        assert.strictEqual(formatYamlWrapper(), true)
+    } else {
+      assert.strictEqual(true, false)
+    }
+  })
+})
+
+suite("Test sortYamlWrapper", () => {
+  test("should return true on a valid yaml", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const actual = `\
+key:
+  key2: value`
+
+      activeEditor.edit((builder) => builder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        actual))
+
+        assert.strictEqual(sortYamlWrapper(), true)
+    } else {
+      assert.strictEqual(true, false)
+    }
   })
 })
 
@@ -143,7 +218,6 @@ animals:
   test("should return `null` on invalid yaml", () => {
     assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'"), null)
   })
-
 })
 
 suite("Test sortYaml", () => {

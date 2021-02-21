@@ -9,7 +9,6 @@ import {
   isSelectionInvalid,
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
-  removeQuotesFromKeys,
   replaceTabsWithSpaces,
   removeTrailingCharacters,
   splitYaml,
@@ -102,18 +101,18 @@ export function getCustomSortKeywords(count: number): [string] {
 
 export function sortYamlWrapper(customSort = 0): boolean {
   if (vscode.window.activeTextEditor) {
-    const activeEditor                = vscode.window.activeTextEditor
-    const emptyLinesUntilLevel        = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel")        as number
-    const forceQuotes                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")                 as boolean
-    const indent                      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                      as number
-    const lineWidth                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                   as number
-    const noArrayIndent               = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")               as boolean
-    const quotingType                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")                 as "'" | '"'
-    const useCustomSortRecursively    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")    as boolean
-    const useLeadingDashes            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")            as boolean
-    let   doc                         = activeEditor.document.getText()
-    let   numberOfLeadingSpaces       = 0
-    let   rangeToBeReplaced           = new vscode.Range(
+    const activeEditor             = vscode.window.activeTextEditor
+    const emptyLinesUntilLevel     = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel")     as number
+    const forceQuotes              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")              as boolean
+    const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
+    const lineWidth                = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                as number
+    const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
+    const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
+    const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
+    const useLeadingDashes         = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")         as boolean
+    let   doc                      = activeEditor.document.getText()
+    let   numberOfLeadingSpaces    = 0
+    let   rangeToBeReplaced        = new vscode.Range(
       new vscode.Position(0, 0),
       new vscode.Position(activeEditor.document.lineCount + 1, 0))
 
@@ -262,13 +261,13 @@ export function validateYaml(text: string): boolean {
 }
 
 export function formatYamlWrapper(): boolean {
-  const activeEditor                = vscode.window.activeTextEditor
-  const forceQuotes                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")                 as boolean
-  const indent                      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                      as number
-  const lineWidth                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                   as number
-  const noArrayIndent               = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")               as boolean
-  const quotingType                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")                 as "'" | '"'
-  const useLeadingDashes            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")            as boolean
+  const activeEditor     = vscode.window.activeTextEditor
+  const forceQuotes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")      as boolean
+  const indent           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")           as number
+  const lineWidth        = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")        as number
+  const noArrayIndent    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")    as boolean
+  const quotingType      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")      as "'" | '"'
+  const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
 
   if (activeEditor) {
     const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, quotingType)
@@ -308,13 +307,13 @@ export function formatYaml(yaml: string, useLeadingDashes: boolean, indent: numb
  * @param {vscode.Uri} uri Base URI
  */
 export function sortYamlFiles(uri: vscode.Uri): boolean {
-  const emptyLinesUntilLevel        = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel")        as number
-  const forceQuotes                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")                 as boolean
-  const indent                      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                      as number
-  const lineWidth                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                   as number
-  const noArrayIndent               = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")               as boolean
-  const quotingType                 = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")                 as "'" | '"'
-  const useCustomSortRecursively    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively")    as boolean
+  const emptyLinesUntilLevel     = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel")     as number
+  const forceQuotes              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")              as boolean
+  const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
+  const lineWidth                = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                as number
+  const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
+  const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
+  const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
 
   const files = getYamlFilesInDirectory(uri.fsPath)
   files.forEach((file: string) => {
@@ -322,14 +321,12 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
     const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType)
     if (sortedYaml) {
       try {
-        fs.writeFileSync(file, yaml)
+        fs.writeFileSync(file, sortedYaml)
       } catch (e) {
         vscode.window.showErrorMessage("File " + file + " could not be sorted")
-        return false
       }        
     } else {
       vscode.window.showErrorMessage("File " + file + " could not be sorted")
-      return false
     }
   })
   return true
