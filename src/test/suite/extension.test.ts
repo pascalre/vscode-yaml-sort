@@ -9,7 +9,6 @@ import * as fs from "fs"
 import * as vscode from "vscode"
 import * as path from "path"
 
-// import { workspace } from "vscode"
 import {
   getCustomSortKeywords,
   sortYaml,
@@ -23,57 +22,55 @@ import {
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
-    assert.deepEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+    assert.deepStrictEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
   })
-  test("should return values of `vscode-yaml-sort.customSortKeywords_2`", () => {
-    assert.deepEqual(getCustomSortKeywords(2), [])
-  })
-  test("should return values of `vscode-yaml-sort.customSortKeywords_3`", () => {
-    assert.deepEqual(getCustomSortKeywords(3), [])
+  test("should return `[]` for custom keywords 2 and 3", () => {
+    assert.deepStrictEqual(getCustomSortKeywords(2), [])
+    assert.deepStrictEqual(getCustomSortKeywords(3), [])
   })
 
   test("should fail when parameter is not in [1, 2, 3]", () => {
-    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords(4), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords(-1), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(  0), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(  4), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords( -1), new Error("The count parameter is not in a valid range"))
     assert.throws(() => getCustomSortKeywords(1.5), new Error("The count parameter is not in a valid range"))
   })
 })
 
 suite("Test validateYaml", () => {
   test("should return `true` when passing a valid yaml", () => {
-    const actual = `\
-persons:
-  bob:
-    place: Germany
-    age: 23
-animals:
-  kitty:
-    age: 3`
-    assert.equal(validateYaml(actual), true)
+    const actual =
+      'persons:\n' +
+      '  bob:\n' +
+      '    place: Germany\n' +
+      '    age: 23\n' +
+      'animals:\n' +
+      '  kitty:\n' +
+      '    age: 3'
+    assert.strictEqual(validateYaml(actual), true)
   })
 
   test("should return `true` when passing two seperated valid yaml", () => {
-    const actual = `\
-persons:
-  bob:
-    place: Germany
-    age: 23
----
-animals:
-  kitty:
-    age: 3`
-    assert.equal(validateYaml(actual), true)
+    const actual =
+      'persons:\n' +
+      '  bob:\n' +
+      '    place: Germany\n' +
+      '    age: 23\n' +
+      '---\n' +
+      'animals:\n' +
+      '  kitty:\n' +
+      '    age: 3'
+    assert.strictEqual(validateYaml(actual), true)
   })
 
   test("should return `false` when passing an invalid yaml", () => {
-    assert.equal(validateYaml("network: ethernets:"), false)
+    assert.strictEqual(validateYaml("network: ethernets:"), false)
   })
   test("should return `false` when yaml indentation is not correct", () => {
-    assert.equal(validateYaml("person:\nbob\n  age:23"), false)
+    assert.strictEqual(validateYaml("person:\nbob\n  age:23"), false)
   })
   test("should return `false` when yaml contains duplicate keys", () => {
-    assert.equal(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false)
+    assert.strictEqual(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false)
   })
 })
 
@@ -99,24 +96,26 @@ suite("Test sortYamlFiles", () => {
 
 suite("Test dumpYaml", () => {
   test("should recursively use customSort", () => {
-    const actual = `\
-keyword: value
-keyword2: value
-data:
-  apiVersion: value
-  keyword: value
-  data: value
-  kind: value
-kind: value`
-    const expected = `\
-kind: value
-data:
-  apiVersion: value
-  kind: value
-  data: value
-  keyword: value
-keyword: value
-keyword2: value`
+    const actual =
+      'keyword: value\n' +
+      'keyword2: value\n' +
+      'data:\n' +
+      '  apiVersion: value\n' +
+      '  keyword: value\n' +
+      '  data: value\n' +
+      '  kind: value\n' +
+      'kind: value'
+
+    const expected =
+      'kind: value\n' +
+      'data:\n' +
+      '  apiVersion: value\n' +
+      '  kind: value\n' +
+      '  data: value\n' +
+      '  keyword: value\n' +
+      'keyword: value\n' +
+      'keyword2: value'
+
     assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'"), expected)
   })
 })
@@ -138,13 +137,10 @@ suite("Test formatYamlWrapper", () => {
 
     const activeEditor = vscode.window.activeTextEditor
     if (activeEditor) {
-      const actual = `\
-key:
-    key2: value`
-      /*const expected = `\
----
-key:
-  key2: value`*/
+      const actual =
+        'key:\n' +
+        '    key2: value'
+
       activeEditor.edit((builder) => builder.replace(
         new vscode.Range(
           new vscode.Position(0, 0),
@@ -166,9 +162,9 @@ suite("Test sortYamlWrapper", () => {
 
     const activeEditor = vscode.window.activeTextEditor
     if (activeEditor) {
-      const actual = `\
-key:
-  key2: value`
+      const actual =
+        'key:\n' +
+        '  key2: value'
 
       activeEditor.edit((builder) => builder.replace(
         new vscode.Range(
@@ -185,33 +181,36 @@ key:
 
 suite("Test formatYaml", () => {
   test("should sort all yaml files in directory", () => {
-    const actual = `\
-persons:
-  bob:
-    place: 'Germany'
-    age: 23
-'animals':
-  kitty:
-    age: 3
-`
-    let expected = `\
-persons:
-  bob:
-    place: Germany
-    age: 23
-animals:
-  kitty:
-    age: 3`
+    const actual = 
+      'persons:\n' +
+      '  bob:\n' +
+      '    place: "Germany"\n' +
+      '    age: 23\n' +
+      '"animals":\n' +
+      '  kitty:\n' +
+      '    age: 3'
+
+    let expected =
+      'persons:\n' +
+      '  bob:\n' +
+      '    place: Germany\n' +
+      '    age: 23\n' +
+      'animals:\n' +
+      '  kitty:\n' +
+      '    age: 3'
+
     assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'"), expected)
-    expected = `\
----
-persons:
-  bob:
-    place: Germany
-    age: 23
-animals:
-  kitty:
-    age: 3`
+
+    expected =
+      '---\n' +
+      'persons:\n' +
+      '  bob:\n' +
+      '    place: Germany\n' +
+      '    age: 23\n' +
+      'animals:\n' +
+      '  kitty:\n' +
+      '    age: 3'
+
     assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'"), expected)
   })
 
@@ -222,134 +221,126 @@ animals:
 
 suite("Test sortYaml", () => {
   test("should sort a given yaml document", async () => {
+    const actual =
+      'persons:\n' +
+      '  bob:\n' +
+      '    place: Germany\n' +
+      '    age: 23\n' +
+      '  key: >\n' +
+      '      This is a very long sentence\n' +
+      '      that spans several lines in the YAML\n' +
+      'animals:\n' +
+      '  kitty:\n' +
+      '    age: 3\n'
 
-    /* currently not supported with travis ci
-    const settings = workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("addNewLineAfterTopLevelKey", false, false)
-    */
+    const expected =
+      'animals:\n' +
+      '  kitty:\n' +
+      '    age: 3\n' +
+      'persons:\n' +
+      '  bob:\n' +
+      '    age: 23\n' +
+      '    place: Germany\n' +
+      '  key: |\n' +
+      '    This is a very long sentence that spans several lines in the YAML'
 
-    const actual = `\
-persons:
-  bob:
-    place: Germany
-    age: 23
-  key: >
-      This is a very long sentence
-      that spans several lines in the YAML
-animals:
-  kitty:
-    age: 3
-`
-    const expected = `\
-animals:
-  kitty:
-    age: 3
-persons:
-  bob:
-    age: 23
-    place: Germany
-  key: |
-    This is a very long sentence that spans several lines in the YAML`
-    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
   })
 
   test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
-    /* currently not supported with travis ci
-      const settings = workspace.getConfiguration("vscode-yaml-sort")
-      await settings.update("addNewLineAfterTopLevelKey", false, false)
-    */
-    let actual = `
-data: data
-spec: spec
-`
-    let expected = `\
-spec: spec
-data: data
-`
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    let actual =
+      'data: data\n' +
+      'spec: spec'
 
-    actual = `
-data: data
-spec:
-  - aa: b
-`
-    expected = `\
-spec:
-  - aa: b
-data: data
-`
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    let expected =
+      'spec: spec\n' +
+      'data: data\n'
 
-    actual = `
-data:
-  job: Developer
-  skills:
-    - pascal
-spec:
-  job: Boss
-  name: Stuart
-`
-    expected = `\
-spec:
-  job: Boss
-  name: Stuart
-data:
-  job: Developer
-  skills:
-    - pascal
-`
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
 
-    actual = `
-data: data
-spec:
-  - a
-  - b
-`
-    expected = `\
-spec:
-  - a
-  - b
-data: data
-`
-    assert.equal(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    actual =
+      'data: data\n' +
+      'spec:\n' +
+      '  - aa: b'
+
+    expected =
+      'spec:\n' +
+      '  - aa: b\n' +
+      'data: data\n'
+
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+
+    actual =
+      'data:\n' +
+      '  job: Developer\n' +
+      '  skills:\n' +
+      '    - pascal\n' +
+      'spec:\n' +
+      '  job: Boss\n' +
+      '  name: Stuart'
+
+    expected =
+      'spec:\n' +
+      '  job: Boss\n' +
+      '  name: Stuart\n' +
+      'data:\n' +
+      '  job: Developer\n' +
+      '  skills:\n' +
+      '    - pascal\n'
+
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+
+    actual =
+      'data: data\n' +
+      'spec:\n' +
+      '  - a\n' +
+      '  - b'
+
+    expected =
+      'spec:\n' +
+      '  - a\n' +
+      '  - b\n' +
+      'data: data\n'
+
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
   })
 
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
-    const actual = `\
-- lorem ipsum:
-    text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut \
-labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea \
-rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
-sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
-aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e'
-`
+    const actual =
+      '- lorem ipsum:\n' +
+      '    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
+      'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea ' +
+      'rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor ' +
+      'sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna ' +
+      'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e"'
 
-    const expected = `\
-- lorem ipsum:
-    text: >-
-      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut \
-labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et \
-ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor \
-sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna \
-aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-      dolores et e`
-    assert.equal(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
+    const expected =
+      '- lorem ipsum:\n' +
+      '    text: >-\n' +
+      '      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
+      'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ' +
+      'ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor ' +
+      'sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna ' +
+      'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n' +
+      '      dolores et e'
+
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
   })
 
   test("should add an empty line before `spec`", () => {
-    const actual = `
-spec: value
-data:
-  - a
-  - b`
-    const expected = `\
-data:
-  - a
-  - b
+    const actual =
+      'spec: value\n' +
+      'data:\n' +
+      '  - a\n' +
+      '  - b'
 
-spec: value`
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'"), expected)
+    const expected =
+      'data:\n' +
+      '  - a\n' +
+      '  - b\n' +
+      '\n' +
+      'spec: value'
+
+      assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'"), expected)
   })
-
 })
