@@ -1,5 +1,5 @@
 # Changelog
-## Unreleased
+## 3.1.1 - February 27, 2021
 * The configuration `useQuotesForSpecialKeywords` is no longer supported
 * Fix command `sortYamlFilesInDirectory`
 
