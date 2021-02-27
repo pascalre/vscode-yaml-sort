@@ -97,6 +97,7 @@ suite("Test sortYamlFiles", () => {
 suite("Test dumpYaml", () => {
   test("should recursively use customSort", () => {
     const actual =
+      'keyword1: value\n' +
       'keyword: value\n' +
       'keyword2: value\n' +
       'data:\n' +
@@ -114,6 +115,7 @@ suite("Test dumpYaml", () => {
       '  data: value\n' +
       '  keyword: value\n' +
       'keyword: value\n' +
+      'keyword1: value\n' +
       'keyword2: value'
 
     assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'"), expected)
@@ -155,6 +157,33 @@ suite("Test formatYamlWrapper", () => {
 })
 
 suite("Test sortYamlWrapper", () => {
+  test("should return false on invalid quotingType", async () => {
+    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("quotingType", "`", vscode.ConfigurationTarget.Global)
+
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const actual =
+        'key:\n' +
+        '  key2: value'
+
+      activeEditor.edit((builder) => builder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        actual))
+
+        assert.strictEqual(sortYamlWrapper(), false)
+    } else {
+      assert.strictEqual(true, false)
+    }
+    
+    await settings.update("quotingType", "'", vscode.ConfigurationTarget.Global)
+  })
   test("should return true on a valid yaml", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
@@ -173,6 +202,57 @@ suite("Test sortYamlWrapper", () => {
         actual))
 
         assert.strictEqual(sortYamlWrapper(), true)
+    } else {
+      assert.strictEqual(true, false)
+    }
+  })
+  test("should return false on invalid selection", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const actual =
+        'key:\n' +
+        '  key2: value'
+
+      activeEditor.edit((builder) => builder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        actual))
+      
+      activeEditor.selection = new vscode.Selection(0, 0, 0, 4)
+      assert.strictEqual(sortYamlWrapper(), false)
+    } else {
+      assert.strictEqual(true, false)
+    }
+  })
+  test("should remove yaml metadata tags (directives)", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const actual =
+        '%YAML 1.1' +
+        '---\n' +
+        'key:\n' +
+        '  key2: value'
+      const expected =
+        'key:\n' +
+        '  key2: value'
+
+      activeEditor.edit((builder) => builder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        actual))
+      
+      await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
+      assert.strictEqual(activeEditor.document.getText(), expected)
     } else {
       assert.strictEqual(true, false)
     }
