@@ -1,5 +1,21 @@
 import { validateYaml } from "./extension"
 import { glob } from "glob"
+import * as yaml from "js-yaml"
+
+/**
+ * Returns a schema from js-yaml when a schema name is passed
+ * @param {string} schema Schema 
+ * @returns {yaml.Schema} Schema
+ */
+export function getSchema(schema: string): yaml.Schema {
+  switch(schema) {
+    case "CORE_SCHEMA"     : return yaml.CORE_SCHEMA
+    case "DEFAULT_SCHEMA"  : return yaml.DEFAULT_SCHEMA
+    case "FAILSAFE_SCHEMA" : return yaml.FAILSAFE_SCHEMA
+    case "JSON_SCHEMA"     : return yaml.JSON_SCHEMA
+    default                : return yaml.DEFAULT_SCHEMA
+  }
+}
 
 /**
  * Returns all files in a directory and its subdirectories with extension .yml or .yaml

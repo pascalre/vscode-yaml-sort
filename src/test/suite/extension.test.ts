@@ -8,6 +8,7 @@ import * as assert from "assert"
 import * as fs from "fs"
 import * as vscode from "vscode"
 import * as path from "path"
+import * as yaml from "js-yaml"
 
 import {
   getCustomSortKeywords,
@@ -118,7 +119,7 @@ suite("Test dumpYaml", () => {
       'keyword1: value\n' +
       'keyword2: value'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", yaml.DEFAULT_SCHEMA), expected)
   })
 })
 
@@ -279,7 +280,7 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'"), expected)
+    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
 
     expected =
       '---\n' +
@@ -291,11 +292,11 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'"), expected)
+    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'"), null)
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA), null)
   })
 })
 
@@ -324,7 +325,7 @@ suite("Test sortYaml", () => {
       '  key: |\n' +
       '    This is a very long sentence that spans several lines in the YAML'
 
-    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
   })
 
   test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
@@ -336,7 +337,7 @@ suite("Test sortYaml", () => {
       'spec: spec\n' +
       'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
 
     actual =
       'data: data\n' +
@@ -348,7 +349,7 @@ suite("Test sortYaml", () => {
       '  - aa: b\n' +
       'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
 
     actual =
       'data:\n' +
@@ -368,7 +369,7 @@ suite("Test sortYaml", () => {
       '  skills:\n' +
       '    - pascal\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
 
     actual =
       'data: data\n' +
@@ -382,7 +383,7 @@ suite("Test sortYaml", () => {
       '  - b\n' +
       'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
   })
 
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
@@ -404,7 +405,7 @@ suite("Test sortYaml", () => {
       'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n' +
       '      dolores et e'
 
-    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
   })
 
   test("should add an empty line before `spec`", () => {
@@ -421,6 +422,14 @@ suite("Test sortYaml", () => {
       '\n' +
       'spec: value'
 
-      assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'"), expected)
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+  })
+  test("should not format a date in CORE_SCHEMA", () => {
+    const actual  = 'AWSTemplateFormatVersion: 2010-09-09'
+    let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+
+    expected  = 'AWSTemplateFormatVersion: \'2010-09-09\''
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.CORE_SCHEMA), expected)    
   })
 })

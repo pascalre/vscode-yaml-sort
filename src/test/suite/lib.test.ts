@@ -5,6 +5,7 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
+import * as yaml from "js-yaml"
 import {
   getDelimiters,
   isSelectionInvalid,
@@ -16,7 +17,8 @@ import {
   replaceTabsWithSpaces,
   addNewLineBeforeRootKeywords,
   addNewLineBeforeKeywordsUpToLevelN,
-  getYamlFilesInDirectory
+  getYamlFilesInDirectory,
+  getSchema
 } from "../../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -32,6 +34,24 @@ suite("Test removeQuotesFromKeys", () => {
   })
   test("should remove the quotes from special keywords containing colons", () => {
     assert.strictEqual(removeQuotesFromKeys("'1:2:3': 1\n'key2': 2"), "1:2:3: 1\nkey2: 2")
+  })
+})
+
+suite("Test getSchema", () => {
+  test("should return `CORE_SCHEMA`", () => {
+    assert.strictEqual(getSchema("CORE_SCHEMA"), yaml.CORE_SCHEMA)
+  })
+  test("should return `DEFAULT_SCHEMA`", () => {
+    assert.strictEqual(getSchema("DEFAULT_SCHEMA"), yaml.DEFAULT_SCHEMA)
+  })
+  test("should return `FAILSAFE_SCHEMA`", () => {
+    assert.strictEqual(getSchema("FAILSAFE_SCHEMA"), yaml.FAILSAFE_SCHEMA)
+  })
+  test("should return `JSON_SCHEMA`", () => {
+    assert.strictEqual(getSchema("JSON_SCHEMA"), yaml.JSON_SCHEMA)
+  })
+  test("should return `DEFAULT_SCHEMA`", () => {
+    assert.strictEqual(getSchema(""), yaml.DEFAULT_SCHEMA)
   })
 })
 

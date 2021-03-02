@@ -1,4 +1,8 @@
 # Changelog
+## 3.2.0 - March 2, 2021
+* (refs [#24](https://github.com/pascalre/vscode-yaml-sort/issues/24)) Unexpected date string format
+* New configuration `schema`
+
 ## 3.1.1 - February 27, 2021
 * The configuration `useQuotesForSpecialKeywords` is no longer supported
 * Fix command `sortYamlFilesInDirectory`
