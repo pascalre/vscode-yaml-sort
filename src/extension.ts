@@ -53,18 +53,19 @@ export function activate(context: vscode.ExtensionContext) {
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string}           Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean): string {
+export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: yamlParser.Schema): string {
   if (Object.keys(text).length === 0) {
     return ""
   }
 
   let yaml = yamlParser.dump(text, {
-    indent:        indent,
-    forceQuotes:   forceQuotes,
-    lineWidth:     lineWidth,
-    noArrayIndent: noArrayIndent,
-    quotingType:   quotingType,
-    sortKeys:      (!(customSort > 0 && useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
+    indent        : indent,
+    forceQuotes   : forceQuotes,
+    lineWidth     : lineWidth,
+    noArrayIndent : noArrayIndent,
+    quotingType   : quotingType,
+    schema        : schema,
+    sortKeys      : (!(customSort > 0 && useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
       const sortOrder = getCustomSortKeywords(customSort)
       const indexA = sortOrder.indexOf(a)
       const indexB = sortOrder.indexOf(b)
@@ -109,7 +110,7 @@ export function sortYamlWrapper(customSort = 0): boolean {
     const lineWidth                = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                as number
     const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
     const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
-    const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+    const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
     const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     const useLeadingDashes         = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")         as boolean
     let   doc                      = activeEditor.document.getText()
@@ -137,12 +138,12 @@ export function sortYamlWrapper(customSort = 0): boolean {
       doc = activeEditor.document.getText(rangeToBeReplaced)
 
       // check if selection to sort is valid, maybe the user missed a trailing line
-      if (isSelectionInvalid(doc)) {
+      if (isSelectionInvalid(doc, getSchema(schema))) {
         vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.")
         return false
       }
     } else {
-      if (!validateYaml(doc)) {
+      if (!validateYaml(doc, getSchema(schema))) {
         return false
       }
     }
@@ -215,7 +216,7 @@ export function sortYaml(
 
       keywords.forEach(key => {
         if (doc[key]) {
-          let sortedSubYaml = dumpYaml(doc[key], true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively)
+          let sortedSubYaml = dumpYaml(doc[key], true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, schema)
           if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
               // when key cotains more than one line, we need some transformation:
               // add a new line and indent each line some spaces
@@ -234,7 +235,7 @@ export function sortYaml(
     }
 
     // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-    sortedYaml += dumpYaml(doc, true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively)
+    sortedYaml += dumpYaml(doc, true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, schema)
 
     if (emptyLinesUntilLevel > 0) {
       sortedYaml = addNewLineBeforeKeywordsUpToLevelN(emptyLinesUntilLevel, indent, sortedYaml)
@@ -248,8 +249,9 @@ export function sortYaml(
 }
 
 export function validateYamlWrapper(): boolean {
+  const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   if (vscode.window.activeTextEditor) {
-    validateYaml(vscode.window.activeTextEditor.document.getText())
+    validateYaml(vscode.window.activeTextEditor.document.getText(), getSchema(schema))
     return true
   }
   return false
@@ -260,11 +262,10 @@ export function validateYamlWrapper(): boolean {
  * @param   {string}  yaml Yaml to be validated.
  * @returns {boolean} True, if yaml is valid.
  */
-export function validateYaml(text: string): boolean {
-
+export function validateYaml(text: string, schema: yamlParser.Schema): boolean {
   try {
     splitYaml(text).forEach((yaml) => {
-      yamlParser.load(yaml)
+      yamlParser.load(yaml, {schema: schema})
     })
     vscode.window.showInformationMessage("YAML is valid.")
     return true
@@ -281,7 +282,7 @@ export function formatYamlWrapper(): boolean {
   const lineWidth        = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")        as number
   const noArrayIndent    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")    as boolean
   const quotingType      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")      as "'" | '"'
-  const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+  const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
 
   if (activeEditor) {
@@ -315,7 +316,7 @@ export function formatYaml(
   ): string|null {
   try {
     const loadOptions = {schema: schema}
-    let   doc         = dumpYaml(yamlParser.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, false)
+    let   doc         = dumpYaml(yamlParser.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, false, schema)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }

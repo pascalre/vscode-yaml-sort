@@ -6,6 +6,7 @@
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
 import * as yaml from "js-yaml"
+import {CLOUDFORMATION_SCHEMA} from "cloudformation-js-yaml-schema"
 import {
   getDelimiters,
   isSelectionInvalid,
@@ -38,6 +39,9 @@ suite("Test removeQuotesFromKeys", () => {
 })
 
 suite("Test getSchema", () => {
+  test("should return `CLOUDFORMATION_SCHEMA`", () => {
+    assert.strictEqual(getSchema("CLOUDFORMATION_SCHEMA"), CLOUDFORMATION_SCHEMA)
+  })
   test("should return `CORE_SCHEMA`", () => {
     assert.strictEqual(getSchema("CORE_SCHEMA"), yaml.CORE_SCHEMA)
   })
@@ -211,13 +215,13 @@ test: bla
 
 suite("Test isSelectionInvalid", () => {
   test("should return `true` when `text` is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text"), false)
+    assert.strictEqual(isSelectionInvalid("text", yaml.CORE_SCHEMA), false)
   })
   test("should return `false` when a string with trailing colon is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text:"), true)
+    assert.strictEqual(isSelectionInvalid("text:", yaml.CORE_SCHEMA), true)
   })
   test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text: "), true)
+    assert.strictEqual(isSelectionInvalid("text: ", yaml.CORE_SCHEMA), true)
   })
 })
 

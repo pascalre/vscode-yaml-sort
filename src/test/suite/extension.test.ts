@@ -20,6 +20,7 @@ import {
   validateYamlWrapper,
   sortYamlWrapper
 } from "../../extension"
+import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -48,7 +49,7 @@ suite("Test validateYaml", () => {
       'animals:\n' +
       '  kitty:\n' +
       '    age: 3'
-    assert.strictEqual(validateYaml(actual), true)
+    assert.strictEqual(validateYaml(actual, yaml.CORE_SCHEMA), true)
   })
 
   test("should return `true` when passing two seperated valid yaml", () => {
@@ -61,17 +62,21 @@ suite("Test validateYaml", () => {
       'animals:\n' +
       '  kitty:\n' +
       '    age: 3'
-    assert.strictEqual(validateYaml(actual), true)
+    assert.strictEqual(validateYaml(actual, yaml.CORE_SCHEMA), true)
   })
 
   test("should return `false` when passing an invalid yaml", () => {
-    assert.strictEqual(validateYaml("network: ethernets:"), false)
+    assert.strictEqual(validateYaml("network: ethernets:", yaml.CORE_SCHEMA), false)
   })
   test("should return `false` when yaml indentation is not correct", () => {
-    assert.strictEqual(validateYaml("person:\nbob\n  age:23"), false)
+    assert.strictEqual(validateYaml("person:\nbob\n  age:23", yaml.CORE_SCHEMA), false)
   })
   test("should return `false` when yaml contains duplicate keys", () => {
-    assert.strictEqual(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n"), false)
+    assert.strictEqual(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n", yaml.CORE_SCHEMA), false)
+  })
+  test("should return `true` on CLOUDFORMATION_SCHEMA", () => {
+    assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", yaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
   })
 })
 
@@ -425,11 +430,26 @@ suite("Test sortYaml", () => {
     assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
   })
   test("should not format a date in CORE_SCHEMA", () => {
-    const actual  = 'AWSTemplateFormatVersion: 2010-09-09'
+    const actual = 'AWSTemplateFormatVersion: 2010-09-09'
     let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
     assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
 
-    expected  = 'AWSTemplateFormatVersion: \'2010-09-09\''
+    expected  = actual
     assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.CORE_SCHEMA), expected)    
+  })
+  test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
+    const actual =
+    'LoggingBucketKMSKeyAlias:\n' +
+    '  Properties:\n' +
+    '    TargetKeyId: !Sub "LoggingBucketKMSKey"\n' +
+    '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"'
+
+    const expected =
+    'LoggingBucketKMSKeyAlias:\n' +
+    '\n' +
+    '  Properties:\n' +
+    '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
+    '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, true, 500, false, "\"", CLOUDFORMATION_SCHEMA), expected) 
   })
 })

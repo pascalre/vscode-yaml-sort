@@ -1,4 +1,7 @@
 # Changelog
+## 3.3.0 - March 3, 2021
+* (refs [#23](https://github.com/pascalre/vscode-yaml-sort/issues/23)) CloudFormation Friendly
+
 ## 3.2.0 - March 2, 2021
 * (refs [#24](https://github.com/pascalre/vscode-yaml-sort/issues/24)) Unexpected date string format
 * New configuration `schema`

@@ -1,6 +1,7 @@
 import { validateYaml } from "./extension"
 import { glob } from "glob"
 import * as yaml from "js-yaml"
+import {CLOUDFORMATION_SCHEMA} from "cloudformation-js-yaml-schema"
 
 /**
  * Returns a schema from js-yaml when a schema name is passed
@@ -9,11 +10,12 @@ import * as yaml from "js-yaml"
  */
 export function getSchema(schema: string): yaml.Schema {
   switch(schema) {
-    case "CORE_SCHEMA"     : return yaml.CORE_SCHEMA
-    case "DEFAULT_SCHEMA"  : return yaml.DEFAULT_SCHEMA
-    case "FAILSAFE_SCHEMA" : return yaml.FAILSAFE_SCHEMA
-    case "JSON_SCHEMA"     : return yaml.JSON_SCHEMA
-    default                : return yaml.DEFAULT_SCHEMA
+    case "CLOUDFORMATION_SCHEMA" : return CLOUDFORMATION_SCHEMA as yaml.Schema
+    case "CORE_SCHEMA"           : return yaml.CORE_SCHEMA
+    case "DEFAULT_SCHEMA"        : return yaml.DEFAULT_SCHEMA
+    case "FAILSAFE_SCHEMA"       : return yaml.FAILSAFE_SCHEMA
+    case "JSON_SCHEMA"           : return yaml.JSON_SCHEMA
+    default                      : return yaml.DEFAULT_SCHEMA
   }
 }
 
@@ -90,17 +92,18 @@ export function splitYaml(multipleYamls: string):[string] {
 
 /**
  * Checks if a text ends with a character which suggests, that the selection is missing something.
- * @param   {string}  text Text which should represent a valid yaml selection to sort.
+ * @param   {string}      text Text which should represent a valid yaml selection to sort.
+ * @param   {yaml.Schema} schema 
  * @returns {boolean} true, if selection is missing something
  */
-export function isSelectionInvalid(text: string):boolean {
+export function isSelectionInvalid(text: string, schema: yaml.Schema):boolean {
   // remove trailing whitespaces, to check for things like 'text:  '
   text = text.trim()
   const notValidEndingCharacters = [":", "|", ">"]
   if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
     return true
   }
-  return !validateYaml(text)
+  return !validateYaml(text, schema)
 }
 
 /**
