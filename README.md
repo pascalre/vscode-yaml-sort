@@ -1,9 +1,9 @@
 # YAML Sort
 This VS Code extension exposes the possibility to sort, format and validate YAML files.
 
-[![Build Status](https://travis-ci.org/pascalre/vscode-yaml-sort.svg?branch=master)](https://travis-ci.org/pascalre/vscode-yaml-sort)
+[![Build Status](https://travis-ci.org/pascalre/svg?branch=master)](https://travis-ci.org/pascalre/vscode-yaml-sort)
 [![Coverage Status](https://coveralls.io/repos/github/pascalre/vscode-yaml-sort/badge.svg?branch=master)](https://coveralls.io/github/pascalre/vscode-yaml-sort?branch=master)
-[![GitHub issues open](https://img.shields.io/github/issues/pascalre/vscode-yaml-sort.svg)](https://github.com/pascalre/vscode-yaml-sort/issues)
+[![GitHub issues open](https://img.shields.io/github/issues/pascalre/svg)](https://github.com/pascalre/vscode-yaml-sort/issues)
 
 ### Preview
 ![Preview](images/preview.gif)
@@ -26,18 +26,19 @@ This extension contributes the following settings:
 
 | Setting                                        | Description                                                                                                          | Default          |
 |------------------------------------------------|--------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `vscode-yaml-sort.emptyLinesUntilLevel`        | When bigger than `0`, will add a new line before each keyword on level n.                                            | `0`              |
-| `vscode-yaml-sort.customSortKeywords_1`        | List of keywords for `Custom Sort 1`                                                                                 | `["apiVersion", "kind", "metadata", "spec", "data"]`                       |
-| `vscode-yaml-sort.customSortKeywords_2`        | List of keywords for `Custom Sort 2`                                                                                 | -                |
-| `vscode-yaml-sort.customSortKeywords_3`        | List of keywords for `Custom Sort 3`                                                                                 | -                |
-| `vscode-yaml-sort.forceQuotes`                 | When true, all non-key strings will be quoted even if they normally don't need to.                                   | `false`          |
-| `vscode-yaml-sort.indent`                      | Indentation width in spaces                                                                                          | `2`              |
-| `vscode-yaml-sort.lineWidth`                   | Maximum line width for YAML files                                                                                    | `500`            |
-| `vscode-yaml-sort.noArrayIndent`               | When `true`, will not add an indentation level to array elements                                                     | `false`          |
-| `vscode-yaml-sort.quotingType`                 | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.   | `'` |
-| `vscode-yaml-sort.schema`                      | Schema to use                                                                                                        | `DEFAULT_SCHEMA` |
-| `vscode-yaml-sort.useCustomSortRecursively`    | When `true`, will use the custom sort keywords recursively on a file, when using custom sort                         | `false`          |
-| `vscode-yaml-sort.useLeadingDashes`            | When `true`, sorted YAML files begin with leading dashes                                                             | `true`           |
+| `emptyLinesUntilLevel`        | When bigger than `0`, will add a new line before each keyword on level n.                                                             | `0`              |
+| `customSortKeywords_1`        | List of keywords for `Custom Sort 1`                                                                                                  | `["apiVersion", "kind", "metadata", "spec", "data"]`|
+| `customSortKeywords_2`        | List of keywords for `Custom Sort 2`                                                                                                  | -                |
+| `customSortKeywords_3`        | List of keywords for `Custom Sort 3`                                                                                                  | -                |
+| `forceQuotes`                 | When true, all non-key strings will be quoted even if they normally don't need to.                                                    | `false`          |
+| `indent`                      | Indentation width in spaces                                                                                                           | `2`              |
+| `lineWidth`                   | Maximum line width for YAML files                                                                                                     | `500`            |
+| `locale`                      | Language whose sort order should be used                                                                                              | `en`            |
+| `noArrayIndent`               | When `true`, will not add an indentation level to array elements                                                                      | `false`          |
+| `quotingType`                 | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.   | `'` |
+| `schema`                      | Schema to use                                                                                                                         | `DEFAULT_SCHEMA` |
+| `useCustomSortRecursively`    | When `true`, will use the custom sort keywords recursively on a file, when using custom sort                                          | `false`          |
+| `useLeadingDashes`            | When `true`, sorted YAML files begin with leading dashes                                                                              | `true`           |
 
 ## Enjoy!
 

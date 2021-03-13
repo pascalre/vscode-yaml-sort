@@ -1,4 +1,8 @@
 # Changelog
+## 4.0.0 - March 13, 2021
+* (refs [#25](https://github.com/pascalre/vscode-yaml-sort/issues/25)) Sort using localeCompare
+* New configuration `locale` allows to define which language to use when sorting
+
 ## 3.3.0 - March 3, 2021
 * (refs [#23](https://github.com/pascalre/vscode-yaml-sort/issues/23)) CloudFormation Friendly
 

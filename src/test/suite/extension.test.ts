@@ -22,6 +22,8 @@ import {
 } from "../../extension"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 
+const locale = "en"
+
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
     assert.deepStrictEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
@@ -124,7 +126,35 @@ suite("Test dumpYaml", () => {
       'keyword1: value\n' +
       'keyword2: value'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", yaml.DEFAULT_SCHEMA, locale), expected)
+  })
+  test("should sort with by locale behaviour", () => {
+    const actual =
+      'ä: value\n' +
+      'z: value'
+
+    let expected =
+      'ä: value\n' +
+      'z: value'
+
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", yaml.DEFAULT_SCHEMA, 'de'), expected)
+
+    expected =
+      'z: value\n' +
+      'ä: value'
+
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", yaml.DEFAULT_SCHEMA, 'sv'), expected)
+  })
+  test("should ignore case when sorting", () => {
+    const actual =
+      'completedDate: value\n' +
+      'completeTask: value'
+
+    let expected =
+      'completedDate: value\n' +
+      'completeTask: value'
+
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, "'", yaml.DEFAULT_SCHEMA, 'en'), expected)
   })
 })
 
@@ -285,7 +315,7 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
 
     expected =
       '---\n' +
@@ -297,11 +327,11 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA), null)
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), null)
   })
 })
 
@@ -330,7 +360,7 @@ suite("Test sortYaml", () => {
       '  key: |\n' +
       '    This is a very long sentence that spans several lines in the YAML'
 
-    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
   })
 
   test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
@@ -342,7 +372,7 @@ suite("Test sortYaml", () => {
       'spec: spec\n' +
       'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
 
     actual =
       'data: data\n' +
@@ -354,7 +384,7 @@ suite("Test sortYaml", () => {
       '  - aa: b\n' +
       'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
 
     actual =
       'data:\n' +
@@ -374,7 +404,7 @@ suite("Test sortYaml", () => {
       '  skills:\n' +
       '    - pascal\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
 
     actual =
       'data: data\n' +
@@ -388,7 +418,7 @@ suite("Test sortYaml", () => {
       '  - b\n' +
       'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 1, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
   })
 
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
@@ -410,7 +440,7 @@ suite("Test sortYaml", () => {
       'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n' +
       '      dolores et e'
 
-    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
   })
 
   test("should add an empty line before `spec`", () => {
@@ -427,15 +457,15 @@ suite("Test sortYaml", () => {
       '\n' +
       'spec: value'
 
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
   })
   test("should not format a date in CORE_SCHEMA", () => {
     const actual = 'AWSTemplateFormatVersion: 2010-09-09'
     let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA), expected)
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.DEFAULT_SCHEMA, locale), expected)
 
     expected  = actual
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.CORE_SCHEMA), expected)    
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, "'", yaml.CORE_SCHEMA, locale), expected)    
   })
   test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
     const actual =
@@ -450,6 +480,6 @@ suite("Test sortYaml", () => {
     '  Properties:\n' +
     '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
     '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, true, 500, false, "\"", CLOUDFORMATION_SCHEMA), expected) 
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, true, 500, false, "\"", CLOUDFORMATION_SCHEMA, locale), expected) 
   })
 })

@@ -16,6 +16,7 @@ import {
   getYamlFilesInDirectory,
   getSchema
 } from "./lib"
+import { AsyncLocalStorage } from "node:async_hooks"
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -53,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string}           Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: yamlParser.Schema): string {
+export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: yamlParser.Schema, locale: string): string {
   if (Object.keys(text).length === 0) {
     return ""
   }
@@ -79,7 +80,7 @@ export function dumpYaml(text: string, sortKeys: boolean, customSort: number, in
       if (indexA === -1 && indexB !== -1) {
         return 1
       }
-      return a > b ? 1 : a < b ? -1 : 0
+      return a.localeCompare(b, locale)
     })
   })
 
@@ -108,6 +109,7 @@ export function sortYamlWrapper(customSort = 0): boolean {
     const forceQuotes              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")              as boolean
     const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
     const lineWidth                = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                as number
+    const locale                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale")                   as string
     const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
     const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
     const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
@@ -163,7 +165,7 @@ export function sortYamlWrapper(customSort = 0): boolean {
     // sort yaml
     let validYaml = true
     splitYaml(doc).forEach((unsortedYaml) => {
-      let sortedYaml = sortYaml(unsortedYaml, customSort, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType, getSchema(schema))
+      let sortedYaml = sortYaml(unsortedYaml, customSort, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType, getSchema(schema), locale)
       if (sortedYaml) {
         if (!activeEditor.selection.isEmpty) {
           // get number of leading whitespaces, these whitespaces will be used for indentation
@@ -203,7 +205,8 @@ export function sortYaml(
     lineWidth                 : number,
     noArrayIndent             : boolean,
     quotingType               : "'" | '"',
-    schema                    : yamlParser.Schema
+    schema                    : yamlParser.Schema,
+    locale                    : string
   ): string|null {
   try {
     const loadOptions             = {schema: schema}
@@ -216,7 +219,7 @@ export function sortYaml(
 
       keywords.forEach(key => {
         if (doc[key]) {
-          let sortedSubYaml = dumpYaml(doc[key], true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, schema)
+          let sortedSubYaml = dumpYaml(doc[key], true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, schema, locale)
           if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
               // when key cotains more than one line, we need some transformation:
               // add a new line and indent each line some spaces
@@ -235,7 +238,7 @@ export function sortYaml(
     }
 
     // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-    sortedYaml += dumpYaml(doc, true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, schema)
+    sortedYaml += dumpYaml(doc, true, customSort, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, useCustomSortRecursively, schema, locale)
 
     if (emptyLinesUntilLevel > 0) {
       sortedYaml = addNewLineBeforeKeywordsUpToLevelN(emptyLinesUntilLevel, indent, sortedYaml)
@@ -280,13 +283,14 @@ export function formatYamlWrapper(): boolean {
   const forceQuotes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")      as boolean
   const indent           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")           as number
   const lineWidth        = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")        as number
+  const locale           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale")           as string
   const noArrayIndent    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")    as boolean
   const quotingType      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")      as "'" | '"'
   const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
 
   if (activeEditor) {
-    const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, getSchema(schema))
+    const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, getSchema(schema), locale)
     if (formattedYaml) {
       activeEditor.edit((builder) => builder.replace(
         new vscode.Range(
@@ -312,11 +316,12 @@ export function formatYaml(
     lineWidth        : number,
     noArrayIndent    : boolean,
     quotingType      : "'" | '"',
-    schema           : yamlParser.Schema
+    schema           : yamlParser.Schema,
+    locale           : string
   ): string|null {
   try {
     const loadOptions = {schema: schema}
-    let   doc         = dumpYaml(yamlParser.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, false, schema)
+    let   doc         = dumpYaml(yamlParser.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, quotingType, false, schema, locale)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
@@ -337,6 +342,7 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
   const forceQuotes              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")              as boolean
   const indent                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")                   as number
   const lineWidth                = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth")                as number
+  const locale                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale")                   as string
   const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
   const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
   const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
@@ -345,7 +351,7 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
   const files = getYamlFilesInDirectory(uri.fsPath)
   files.forEach((file: string) => {
     const yaml       = fs.readFileSync(file, 'utf-8').toString()
-    const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType, getSchema(schema))
+    const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, quotingType, getSchema(schema), locale)
     if (sortedYaml) {
       try {
         fs.writeFileSync(file, sortedYaml)
