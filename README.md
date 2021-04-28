@@ -1,9 +1,9 @@
 # YAML Sort
 This VS Code extension exposes the possibility to sort, format and validate YAML files.
 
-[![Build Status](https://travis-ci.org/pascalre/svg?branch=master)](https://travis-ci.org/pascalre/vscode-yaml-sort)
+[![Build Status](https://www.travis-ci.com/pascalre/vscode-yaml-sort.svg?branch=master)](https://travis-ci.org/pascalre/vscode-yaml-sort)
 [![Coverage Status](https://coveralls.io/repos/github/pascalre/vscode-yaml-sort/badge.svg?branch=master)](https://coveralls.io/github/pascalre/vscode-yaml-sort?branch=master)
-[![GitHub issues open](https://img.shields.io/github/issues/pascalre/svg)](https://github.com/pascalre/vscode-yaml-sort/issues)
+[![GitHub issues open](https://img.shields.io/github/issues/pascalre/vscode-yaml-sort.svg)](https://github.com/pascalre/vscode-yaml-sort/issues)
 
 ### Preview
 ![Preview](images/preview.gif)
