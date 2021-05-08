@@ -130,36 +130,36 @@
     "commands": [
       {
         "command": "vscode-yaml-sort.customSortYaml_1",
-        "title": "Custom sort 1",
+        "title": "YAML Sort: Custom sort 1",
         "when": "editorLangId == yaml"
       },
       {
         "command": "vscode-yaml-sort.customSortYaml_2",
-        "title": "Custom sort 2",
+        "title": "YAML Sort: Custom sort 2",
         "when": "editorLangId == yaml"
       },
       {
         "command": "vscode-yaml-sort.customSortYaml_3",
-        "title": "Custom sort 3",
+        "title": "YAML Sort: Custom sort 3",
         "when": "editorLangId == yaml"
       },
       {
         "command": "vscode-yaml-sort.formatYaml",
-        "title": "Format YAML",
+        "title": "YAML Sort: Format YAML",
         "when": "editorLangId == yaml"
       },
       {
         "command": "vscode-yaml-sort.sortYaml",
-        "title": "Sort YAML",
+        "title": "YAML Sort: Sort YAML",
         "when": "editorLangId == yaml"
       },
       {
         "command": "vscode-yaml-sort.sortYamlFilesInDirectory",
-        "title": "Recursively sort YAML files"
+        "title": "YAML Sort: Recursively sort YAML files"
       },
       {
         "command": "vscode-yaml-sort.validateYaml",
-        "title": "Validate YAML",
+        "title": "YAML Sort: Validate YAML",
         "when": "editorLangId == yaml"
       }
     ],
