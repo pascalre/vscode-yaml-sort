@@ -16,7 +16,6 @@ import {
   getYamlFilesInDirectory,
   getSchema
 } from "./lib"
-import { AsyncLocalStorage } from "node:async_hooks"
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

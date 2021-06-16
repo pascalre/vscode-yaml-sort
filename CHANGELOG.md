@@ -1,4 +1,13 @@
 # Changelog
+
+## 4.1.1 - June 16, 2021
+* Fix [CVE-2020-28469](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-28469)
+* Fix [CVE-2021-33502](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-33502)
+
+## 4.1.0 - April 28, 2021
+* (refs [#26](https://github.com/pascalre/vscode-yaml-sort/issues/26)) Un-quoted "on" and "off" strings are quoted after sorting YAML
+* New configuration `noCompatMode`
+
 ## 4.0.0 - March 13, 2021
 * (refs [#25](https://github.com/pascalre/vscode-yaml-sort/issues/25)) Sort using localeCompare
 * New configuration `locale` allows to define which language to use when sorting
