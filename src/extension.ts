@@ -21,6 +21,29 @@ import {
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
+  const formatter: vscode.DocumentFormattingEditProvider = {
+    provideDocumentFormattingEdits(): vscode.TextEdit[] {
+      return formatYamlWrapper()
+    }
+  }
+
+    // have a function that adds/removes the formatter based
+    // on a configuration setting
+    let registration: vscode.Disposable | undefined;
+    function registerFormatterIfEnabled() {
+        const isEnabled = vscode.workspace.getConfiguration().get('yaml.formatter.enabled', true);
+        if (isEnabled && !registration) {
+            registration = vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter);
+        } else if (!isEnabled && registration) {
+            registration.dispose();
+            registration = undefined;
+        }
+    }
+
+    // register at activate-time
+    registerFormatterIfEnabled();
+
+
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
@@ -280,7 +303,7 @@ export function validateYaml(text: string, schema: yamlParser.Schema): boolean {
   }
 }
 
-export function formatYamlWrapper(): boolean {
+export function formatYamlWrapper(): vscode.TextEdit[] {
   const activeEditor     = vscode.window.activeTextEditor
   const forceQuotes      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes")      as boolean
   const indent           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent")           as number
@@ -289,21 +312,21 @@ export function formatYamlWrapper(): boolean {
   const noArrayIndent    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")    as boolean
   const noCompatMode     = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode")     as boolean
   const quotingType      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")      as "'" | '"'
-  const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+  const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
 
   if (activeEditor) {
     const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
     if (formattedYaml) {
-      activeEditor.edit((builder) => builder.replace(
+      const edits = vscode.TextEdit.replace(
         new vscode.Range(
           new vscode.Position(0, 0),
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
-        formattedYaml))
-      return true
+        formattedYaml)
+      return [edits]
     }
   }
-  return false
+  return []
 }
 
 /**

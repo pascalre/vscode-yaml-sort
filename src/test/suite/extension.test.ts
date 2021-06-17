@@ -21,6 +21,7 @@ import {
   sortYamlWrapper
 } from "../../extension"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
+import exp = require("constants")
 
 const locale = "en"
 
@@ -150,7 +151,7 @@ suite("Test dumpYaml", () => {
       'completedDate: value\n' +
       'completeTask: value'
 
-    let expected =
+    const expected =
       'completedDate: value\n' +
       'completeTask: value'
 
@@ -175,17 +176,12 @@ suite("Test formatYamlWrapper", () => {
 
     const activeEditor = vscode.window.activeTextEditor
     if (activeEditor) {
-      const actual =
+      const expected =
+        '---\n' +
         'key:\n' +
-        '    key2: value'
+        '  key2: value'
 
-      activeEditor.edit((builder) => builder.replace(
-        new vscode.Range(
-          new vscode.Position(0, 0),
-          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
-        actual))
-
-        assert.strictEqual(formatYamlWrapper(), true)
+        assert.strictEqual(formatYamlWrapper()[0].newText, expected)
     } else {
       assert.strictEqual(true, false)
     }

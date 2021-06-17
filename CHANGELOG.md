@@ -1,4 +1,7 @@
 # Changelog
+## 4.2.0 - June 17, 2021
+* (refs[#30](https://github.com/pascalre/vscode-yaml-sort/issues/30)) Use as formatter
+* Old command `Format YAML` is replaced by built in command `Format document`. Formatting documents is also possible with default formatting shortcut or on document save.
 
 ## 4.1.1 - June 16, 2021
 * Fix [CVE-2020-28469](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-28469)
