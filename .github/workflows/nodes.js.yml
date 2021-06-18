@@ -1,0 +1,36 @@
+name: Node.js CI
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version:
+          - 16.x
+        os:
+          - macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: install
+        run: |
+             npm install
+             npm install -g yarn
+             npm install -g vsce
+      - name: build
+        run: |
+              vsce package
+              npm run coverage
+      - name: coverage
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

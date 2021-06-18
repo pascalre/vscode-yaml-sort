@@ -194,7 +194,7 @@
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && node ./out/test/runTest.js",
     "lint": "eslint . --ext .ts",
-    "coverage": "nyc npm run test | coveralls"
+    "coverage": "nyc npm run test"
   },
   "devDependencies": {
     "@types/mocha": "^8.2.0",
