@@ -2,7 +2,7 @@
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
   "description": "This VS Code extension exposes the possibility to sort, format and validate yaml files.",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "engines": {
     "vscode": "^1.49.0"
   },
@@ -130,6 +130,11 @@
             "JSON_SCHEMA"
           ],
           "description": "Schema to use"
+        },
+        "vscode-yaml-sort.useAsFormatter": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, will enable default YAML formatter (requires restart)."
         },
         "vscode-yaml-sort.useCustomSortRecursively": {
           "type": "boolean",

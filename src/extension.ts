@@ -27,22 +27,21 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
 
-    // have a function that adds/removes the formatter based
-    // on a configuration setting
-    let registration: vscode.Disposable | undefined;
-    function registerFormatterIfEnabled() {
-        const isEnabled = vscode.workspace.getConfiguration().get('yaml.formatter.enabled', true);
-        if (isEnabled && !registration) {
-            registration = vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter);
-        } else if (!isEnabled && registration) {
-            registration.dispose();
-            registration = undefined;
-        }
+  // have a function that adds/removes the formatter based
+  // on a configuration setting
+  let registration: vscode.Disposable | undefined;
+  function registerFormatterIfEnabled() {
+    const isEnabled = vscode.workspace.getConfiguration().get('vscode-yaml-sort.useAsFormatter', true);
+    if (isEnabled && !registration) {
+      registration = vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter);
+    } else if (!isEnabled && registration) {
+      registration.dispose();
+      registration = undefined;
     }
+  }
 
-    // register at activate-time
-    registerFormatterIfEnabled();
-
+  // register at activate-time
+  registerFormatterIfEnabled();
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand

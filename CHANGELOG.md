@@ -1,6 +1,10 @@
 # Changelog
+## 5.0.0 - July 10, 2021
+* (refs [#34](https://github.com/pascalre/vscode-yaml-sort/issues/34)) Make formatter configurable
+* Default YAML formatter is disabled by default. Use `vscode-yaml-sort.useAsFormatter` to activate it.
+
 ## 4.2.0 - June 17, 2021
-* (refs[#30](https://github.com/pascalre/vscode-yaml-sort/issues/30)) Use as formatter
+* (refs [#30](https://github.com/pascalre/vscode-yaml-sort/issues/30)) Use as formatter
 * Old command `Format YAML` is replaced by built in command `Format document`. Formatting documents is also possible with default formatting shortcut or on document save.
 
 ## 4.1.1 - June 16, 2021
