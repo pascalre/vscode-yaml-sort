@@ -21,7 +21,6 @@ import {
   sortYamlWrapper
 } from "../../extension"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
-import exp = require("constants")
 
 const locale = "en"
 

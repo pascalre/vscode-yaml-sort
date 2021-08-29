@@ -183,19 +183,19 @@ export function addNewLineBeforeRootKeywords(text: string): string{
  * @returns {string} text with new lines
  */
 export function addNewLineBeforeKeywordsUpToLevelN(n: number, indent: number, text: string): string {
-  let i = 0;
+  let level = 0;
   let result = text;
 
-  while (i < n) {
-    if (i == 0) {
+  while (level < n) {
+    if (level == 0) {
       result = result.replace(/\n[^\s]*:/g, "\n$&")
     } else {
       let spaces = " ".repeat(indent)
-      spaces = spaces.repeat(i)
-      const regex = new RegExp("\n" + spaces + "\\w*:", "g")
+      spaces = spaces.repeat(level)
+      const regex = new RegExp("\n" + spaces + "[\\w-]*:", "g")
       result = result.replace(regex, "\n$&")
     }
-    i++;
+    level++;
   }
 
   return result;

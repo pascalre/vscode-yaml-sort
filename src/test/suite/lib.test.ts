@@ -282,6 +282,22 @@ spec: value
 `
     assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
   })
+
+  test("should recognize keywords containing the char -", () => {
+    const actual = `data:
+  key:
+    key: value
+  sp-ec: value
+`
+    const expected = `data:
+
+  key:
+    key: value
+
+  sp-ec: value
+`
+    assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
+  })
 })
 
 suite("Test getYamlFilesInDirectory", () => {

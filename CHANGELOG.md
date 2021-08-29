@@ -1,4 +1,8 @@
 # Changelog
+## 5.0.1 - August 29, 2021
+* (refs [#54](https://github.com/pascalre/vscode-yaml-sort/issues/35)) emptyLinesUntilLevel doesn't work with keywords containing dashes
+* Update dependencies to latest versions
+
 ## 5.0.0 - July 10, 2021
 * (refs [#34](https://github.com/pascalre/vscode-yaml-sort/issues/34)) Make formatter configurable
 * Default YAML formatter is disabled by default. Use `vscode-yaml-sort.useAsFormatter` to activate it.

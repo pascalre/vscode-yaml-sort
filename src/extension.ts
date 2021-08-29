@@ -269,7 +269,7 @@ export function sortYaml(
     }
 
     return sortedYaml
-  } catch (e) {
+  } catch (e: any) {
     vscode.window.showErrorMessage("Keys could not be resorted: " + e.message)
     return null
   }
@@ -296,7 +296,7 @@ export function validateYaml(text: string, schema: yamlParser.Schema): boolean {
     })
     vscode.window.showInformationMessage("YAML is valid.")
     return true
-  } catch (e) {
+  } catch (e: any) {
     vscode.window.showErrorMessage("YAML is invalid: " + e.message)
     return false
   }
@@ -353,7 +353,7 @@ export function formatYaml(
     }
     vscode.window.showInformationMessage("Yaml formatted successfully")
     return doc
-  } catch (e) {
+  } catch (e: any) {
     vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
     return null
   }
