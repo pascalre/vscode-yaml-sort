@@ -315,13 +315,40 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
   const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
 
   if (activeEditor) {
-    const formattedYaml = formatYaml(activeEditor.document.getText(), useLeadingDashes, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
-    if (formattedYaml) {
+    let doc = activeEditor.document.getText()
+    let delimiters = getDelimiters(doc, true, useLeadingDashes)
+    // remove yaml metadata tags
+    const matchMetadata = /^%.*\n/gm
+    // set metadata tags, if there is no metadata tag it should be an emtpy array
+    let newText = ""
+    if (doc.match(matchMetadata)) {
+      delimiters.shift()
+      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
+    }
+    doc = doc.replace(matchMetadata, "")
+    doc = doc.replace(/^\n/, "")
+
+    let formattedYaml
+    let validYaml = true
+    const yamls = splitYaml(doc)
+    for(let unformattedYaml of yamls) {
+      formattedYaml = formatYaml(unformattedYaml, false, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
+      if (formattedYaml) {
+        newText += delimiters.shift() + formattedYaml
+      } else {
+        validYaml = false
+        break
+      }
+    }
+    if (validYaml) {
+      if (useLeadingDashes) {
+        newText = "---\n" + newText
+      }
       const edits = vscode.TextEdit.replace(
         new vscode.Range(
           new vscode.Position(0, 0),
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
-        formattedYaml)
+          newText)
       return [edits]
     }
   }

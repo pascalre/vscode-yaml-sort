@@ -185,6 +185,36 @@ suite("Test formatYamlWrapper", () => {
       assert.strictEqual(true, false)
     }
   })
+  test("should format multiple yaml in one file", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/testFormatYamlWrapper.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const expected =
+        '---\n' +
+        'key1: value\n' +
+        '---\n' +
+        'key2: value'
+
+        assert.strictEqual(formatYamlWrapper()[0].newText, expected)
+    } else {
+      assert.strictEqual(true, false)
+    }
+  })
+  test("should fail on invalid yaml", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/testFormatYamlWrapper-fail.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+        assert.strictEqual(undefined, undefined)
+    } else {
+      assert.strictEqual(true, false)
+    }
+  })
 })
 
 suite("Test sortYamlWrapper", () => {

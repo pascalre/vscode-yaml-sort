@@ -1,4 +1,6 @@
 # Changelog
+## 5.1.0 - August 29, 2021
+* (refs [#29](https://github.com/pascalre/vscode-yaml-sort/issues/29))  Support multiple yaml documents when formatting
 ## 5.0.1 - August 29, 2021
 * (refs [#54](https://github.com/pascalre/vscode-yaml-sort/issues/35)) emptyLinesUntilLevel doesn't work with keywords containing dashes
 * Update dependencies to latest versions
@@ -107,7 +109,7 @@
 * New configuration `customSortKeywords_1`
 
 ## 1.3.0 - September 29, 2019
-* (refs [#7](https://github.com/pascalre/vscode-yaml-sort/issues/7)) Keys could not be resorted: expected a single document in the stream, but found more
+* (refs [#7](https://github.com/pascalre/vscode-yaml-sort/issues/7)) Support multiple yaml documents when sorting
 
 ## 1.2.0 - June 25, 2019
 * (refs [#3](https://github.com/pascalre/vscode-yaml-sort/issues/3)) kubernetes friendly sort
