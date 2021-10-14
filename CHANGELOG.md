@@ -1,6 +1,11 @@
 # Changelog
+## 5.1.1 - October 14, 2021
+* Minor visual improvements
+* Update dependencies to latest versions
+
 ## 5.1.0 - August 29, 2021
 * (refs [#29](https://github.com/pascalre/vscode-yaml-sort/issues/29))  Support multiple yaml documents when formatting
+
 ## 5.0.1 - August 29, 2021
 * (refs [#54](https://github.com/pascalre/vscode-yaml-sort/issues/35)) emptyLinesUntilLevel doesn't work with keywords containing dashes
 * Update dependencies to latest versions
