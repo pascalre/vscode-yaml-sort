@@ -13,6 +13,10 @@
     "url": "https://github.com/pascalre/vscode-yaml-sort"
   },
   "icon": "images/icon.png",
+  "galleryBanner": {
+      "color": "#9eb7cb",
+      "theme": "dark"
+  },
   "categories": [
     "Formatters"
   ],
