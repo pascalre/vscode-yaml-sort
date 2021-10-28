@@ -331,7 +331,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
     let formattedYaml
     let validYaml = true
     const yamls = splitYaml(doc)
-    for(let unformattedYaml of yamls) {
+    for(const unformattedYaml of yamls) {
       formattedYaml = formatYaml(unformattedYaml, false, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
       if (formattedYaml) {
         newText += delimiters.shift() + formattedYaml
