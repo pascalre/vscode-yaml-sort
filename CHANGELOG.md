@@ -1,4 +1,8 @@
 # Changelog
+## 5.1.2 - October 30, 2021
+* Minor documentation improvements
+* Update dependencies to latest versions
+
 ## 5.1.1 - October 14, 2021
 * Minor visual improvements
 * Update dependencies to latest versions

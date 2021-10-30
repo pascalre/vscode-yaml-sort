@@ -21,7 +21,7 @@ Run the following command to pack code to a vsix package:
 * Update README.md
 
 ### Publishing to VS Code marketplace
-`vsce publish -p $TOKEN --packagePath PACKAGE.vsix`
+`vsce publish -p TOKEN --packagePath PACKAGE.vsix`
 
 ### Publishing to OpenVSX marketplace
 `npx ovsx publish -p TOKEN PACKAGE.vsix`
