@@ -16,7 +16,7 @@ This extension contributes the following commands:
 | `Custom Sort 2`                                | Same as `Custom Sort 1`                                                                               |
 | `Custom Sort 3`                                | Same as `Custom Sort 1`                                                                               |
 | `Format Document`                              | Formats a yaml document without sorting it. Also possible using the shortcut (e. g. `SHIFT` + `OPTION` + `F` on Mac). |
-| `Recursively sort YAML files`                  | Sorts all .yaml and .yml files in a directory and all its subdirectories                              |
+| `Recursively sort YAML files`                  | Sorts all `.yaml` and `.yml` files in a directory and all its subdirectories.                         |
 | `Sort YAML`                                    | Sorts a given YAML. You can either sort the whole YAML document or sort only a selection of the text. |
 | `Validate YAML`                                | Validates a given YAML.                                                                               |
 
@@ -37,7 +37,7 @@ This extension contributes the following settings:
 | `noCompatMode`             | if `true` don't try to be compatible with older yaml versions. Currently: don't quote "yes", "no" and so on, as required for YAML 1.1 | `false`          |
 | `quotingType`              | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.   | `'` |
 | `schema`                   | Schema to use. Possible values are `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.        | `DEFAULT_SCHEMA` |
-| `useAsFormatter`           | When true, will enable default YAML formatter (requires restart).                                                                     | `false`          |
+| `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                     | `false`          |
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort                                          | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes                                                                              | `true`           |
 
