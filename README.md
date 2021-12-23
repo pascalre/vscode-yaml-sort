@@ -1,13 +1,13 @@
 # YAML Sort
-This VS Code extension exposes the possibility to sort, format and validate YAML files.
+YAML Sort extends VS Code to sort, format and validate YAML files.
 
 [![Coverage Status](https://coveralls.io/repos/github/pascalre/vscode-yaml-sort/badge.svg?branch=master)](https://coveralls.io/github/pascalre/vscode-yaml-sort?branch=master)
 [![GitHub issues open](https://img.shields.io/github/issues/pascalre/vscode-yaml-sort.svg)](https://github.com/pascalre/vscode-yaml-sort/issues)
 
-### Preview
+## Preview
 ![Preview](images/preview.gif)
 
-## Commands
+# Commands
 This extension contributes the following commands:
 
 | Command                                        | Description                                                                                           |
@@ -20,7 +20,7 @@ This extension contributes the following commands:
 | `Sort YAML`                                    | Sorts a given YAML. You can either sort the whole YAML document or sort only a selection of the text. |
 | `Validate YAML`                                | Validates a given YAML.                                                                               |
 
-## Configuration
+# Configuration
 This extension contributes the following settings:
 
 | Setting                    | Description                                                                                                                           | Default          |
@@ -33,33 +33,27 @@ This extension contributes the following settings:
 | `indent`                   | Indentation width in spaces                                                                                                           | `2`              |
 | `lineWidth`                | Maximum line width for YAML files                                                                                                     | `500`            |
 | `locale`                   | Language whose sort order should be used                                                                                              | `en`             |
-| `noArrayIndent`            | When `true`, will not add an indentation level to array elements                                                                      | `false`          |
+| `noArrayIndent`            | When `true`, will not add an indentation level to array elements.                                                                     | `false`          |
 | `noCompatMode`             | if `true` don't try to be compatible with older yaml versions. Currently: don't quote "yes", "no" and so on, as required for YAML 1.1 | `false`          |
 | `quotingType`              | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.   | `'` |
 | `schema`                   | Schema to use. Possible values are `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.        | `DEFAULT_SCHEMA` |
 | `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                     | `false`          |
-| `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort                                          | `false`          |
-| `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes                                                                              | `true`           |
+| `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                         | `false`          |
+| `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                             | `true`           |
 
-## Enjoy!
+# Support
 
-If you like this extension, please feel free to [rate it](https://marketplace.visualstudio.com/items?itemName=PascalReitermann93.vscode-yaml-sort&ssr=false#review-details) on the marketplace.
+If you like YAML Sort, please feel free to [rate it](https://marketplace.visualstudio.com/items?itemName=PascalReitermann93.vscode-yaml-sort&ssr=false#review-details) on the marketplace.
 
-### Issues
+# Issues
 If you miss something or found a bug, please let me know and [open an issue](https://github.com/pascalre/vscode-yaml-sort/issues/new) on this project on GitHub. I am very happy about every issue which makes this project better. Do not hesitate to open a pull request with your changes.
 
 Check [open issues](https://github.com/pascalre/vscode-yaml-sort/issues) on GitHub.
 
-### Known problems
+## Known problems
 
 Be careful with anchors and references, these don't work very well in this extension.
 
-### Donation
+# License
 
-I am working as a full time server administrator and developer. Besides my job I have a kid and a wife which stresses me, when I am coding after my regular work - for free. Since this is an open source project, some issues can stay untouched for weeks or months. Even though I try to work on every issue as soon as possible. 
-
-For developing this extension I really do not charge anything. If you would like to support my work or want to give your issue a small boost feel free to donate any amount through PayPal or Bitcoin.
-
-| PayPal                                                                                               | Bitcoin                             |
-|------------------------------------------------------------------------------------------------------|------------------------------------ |
-|[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/derpascal/5) | 3GtecXv9MWcQcp3uLZg4s35iiSj5knCNZn  |
+YAML Sort is licensed under the [MIT License](https://raw.githubusercontent.com/pascalre/vscode-yaml-sort/master/LICENSE).
