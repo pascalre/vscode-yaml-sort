@@ -3,5 +3,6 @@ out/
 *.vsix
 .scannerwork/
 .vscode-test/
+.nyc_output/
 .DS_Store
 coverage/
