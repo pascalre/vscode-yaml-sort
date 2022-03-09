@@ -1,0 +1,8 @@
+{
+    "reporter": [
+      "html",
+      "text-lcov",
+      "text-summary",
+      "lcov"
+  ]
+}

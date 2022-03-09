@@ -1,4 +1,7 @@
 # Changelog
+## 5.1.4 - March 9, 2022
+* Fix test coverage report
+
 ## 5.1.3 - March 6, 2022
 * Update dependencies to latest versions
 
