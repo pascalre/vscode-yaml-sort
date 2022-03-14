@@ -1,4 +1,7 @@
 # Changelog
+## 5.1.6 - March 14, 2022
+* Refresh extension logo
+
 ## 5.1.5 - March 14, 2022
 * Slightly increase test coverage
 * Update dependencies to latest versions
