@@ -61,6 +61,12 @@ suite("Test getSchema", () => {
 
 suite("Test removeTrailingCharacters", () => {
   const actual = "text"
+  test("should return `t` when `t` and 0 are passed", () => {
+    assert.strictEqual(removeTrailingCharacters("t", 0), "t")
+  })
+  test("should return `t` when `text` and 3 are passed", () => {
+    assert.strictEqual(removeTrailingCharacters(actual, actual.length - 1 ), "t")
+  })
   test("should return `tex` when `text` and 1 are passed", () => {
     assert.strictEqual(removeTrailingCharacters(actual, 1), "tex")
   })
@@ -172,6 +178,15 @@ spec: spec
     const actual = getDelimiters(doc, true, false)
     assert.deepStrictEqual(actual, ["", "\n---  #comment\n"])
   })
+  test("should add leading dashes when useLeadingDashes=true and given document does not have leading dashes", () => {
+    doc = `
+foo: bar
+---
+foo2: baz
+`
+    const actual = getDelimiters(doc, true, true)
+    assert.deepStrictEqual(actual, ["---\n", "\n---\n"])
+  })
   test("Get each delimiter (empty selection, leading linebreak)", () => {
     doc = `
 
@@ -240,6 +255,9 @@ a-1:
     d: g`
   test("should replace all tabs with spaces", () => {
     assert.strictEqual(replaceTabsWithSpaces(actual, 2), expected)
+  })
+  test("should throw error when count is smaller than `1`", () => {
+    assert.throws(() => replaceTabsWithSpaces(actual, 0))
   })
 })
 

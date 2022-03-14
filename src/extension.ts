@@ -59,9 +59,11 @@ export function activate(context: vscode.ExtensionContext) {
     sortYamlWrapper(1)
   }))
   context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_2", () => {
+    /* istanbul ignore next */
     sortYamlWrapper(2)
   }))
   context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_3", () => {
+    /* istanbul ignore next */
     sortYamlWrapper(3)
   }))
   context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: vscode.Uri) => {
@@ -281,6 +283,7 @@ export function validateYamlWrapper(): boolean {
     validateYaml(vscode.window.activeTextEditor.document.getText(), getSchema(schema))
     return true
   }
+  /* istanbul ignore next */
   return false
 }
 
@@ -410,6 +413,7 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
       try {
         fs.writeFileSync(file, sortedYaml)
       } catch (e) {
+        /* istanbul ignore next */
         vscode.window.showErrorMessage("File " + file + " could not be sorted")
       }        
     } else {

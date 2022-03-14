@@ -45,10 +45,11 @@ export function removeQuotesFromKeys(text: string): string {
  * @returns {string} Input text with removed trailing characters.
  */
 export function removeTrailingCharacters(text: string, count = 1): string {
-  if (count < 0 || count > text.length) {
+  if (count >= 0 && count <= text.length) {
+    return text.substr(0, text.length - count)
+  } else {
     throw new Error("The count parameter is not in a valid range")
   }
-  return text.substr(0, text.length - count)
 }
 
 /**

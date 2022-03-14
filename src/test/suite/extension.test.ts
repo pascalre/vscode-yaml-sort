@@ -80,6 +80,12 @@ suite("Test validateYaml", () => {
     assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", yaml.CORE_SCHEMA), false)
     assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
   })
+  test("do not fail when executing command", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })      
+    await vscode.commands.executeCommand("vscode-yaml-sort.validateYaml")
+  })
 })
 
 suite("Test sortYamlFiles", () => {
@@ -158,7 +164,7 @@ suite("Test dumpYaml", () => {
   })
 })
 
-suite("Test validateYamlWrapper", () => {
+suite("Test validateYamlWrapper", async () => {
   test("should return true on open document", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
@@ -290,8 +296,32 @@ suite("Test sortYamlWrapper", () => {
       assert.strictEqual(true, false)
     }
   })
+  test("should ignore line if selection ends on a lines first character", async () => {
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/testSortYamlWrapper.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      const expected =
+        'key:\n' +
+        '  key2: value\n' +
+        '  key3: value\n' +
+        'key4: value'
+      
+      activeEditor.selection = new vscode.Selection(0, 0, 3, 0)
+      await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
+      // do not assert too fast
+      await new Promise(r => setTimeout(r, 2000));
+      assert.strictEqual(activeEditor.document.getText(), expected)
+    } else {
+      assert.strictEqual(true, false)
+    }
+  })
   test("should remove yaml metadata tags (directives)", async () => {
+    // Todo: This test needs a refactoring
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    // const uri = vscode.Uri.parse(path.resolve("./src/test/files/testSortYaml.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
     await vscode.window.showTextDocument(doc, { preview: false })
 
@@ -313,6 +343,8 @@ suite("Test sortYamlWrapper", () => {
         actual))
       
       await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
+      // do not assert too fast
+      // await new Promise(r => setTimeout(r, 2000));
       assert.strictEqual(activeEditor.document.getText(), expected)
     } else {
       assert.strictEqual(true, false)

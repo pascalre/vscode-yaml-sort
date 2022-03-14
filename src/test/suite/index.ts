@@ -21,8 +21,6 @@ export async function run(): Promise<void> {
     hookRequire: true,
     hookRunInContext: true,
     hookRunInThisContext: true,
-    include: [ "out/**/*.js" ],
-    exclude: [ "out/test/**" ],
   });
   await nyc.wrap();
 
