@@ -137,7 +137,7 @@ export function sortYamlWrapper(customSort = 0): boolean {
     const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
     const noCompatMode             = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode")             as boolean
     const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
-    const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+    const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
     const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     const useLeadingDashes         = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes")         as boolean
     let   doc                      = activeEditor.document.getText()
@@ -278,7 +278,7 @@ export function sortYaml(
 }
 
 export function validateYamlWrapper(): boolean {
-  const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+  const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   if (vscode.window.activeTextEditor) {
     validateYaml(vscode.window.activeTextEditor.document.getText(), getSchema(schema))
     return true
@@ -314,7 +314,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
   const noArrayIndent    = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")    as boolean
   const noCompatMode     = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode")     as boolean
   const quotingType      = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")      as "'" | '"'
-  const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+  const schema           = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")           as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
 
   if (activeEditor) {
@@ -402,7 +402,7 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
   const noArrayIndent            = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent")            as boolean
   const noCompatMode             = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode")             as boolean
   const quotingType              = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType")              as "'" | '"'
-  const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
+  const schema                   = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema")                   as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
 
   const files = getYamlFilesInDirectory(uri.fsPath)

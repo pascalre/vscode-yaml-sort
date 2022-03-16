@@ -21,6 +21,7 @@ import {
   sortYamlWrapper
 } from "../../extension"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
+import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 
 const locale = "en"
 
@@ -79,6 +80,10 @@ suite("Test validateYaml", () => {
   test("should return `true` on CLOUDFORMATION_SCHEMA", () => {
     assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", yaml.CORE_SCHEMA), false)
     assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
+  })
+  test("should return `true` on HOMEASSISTANT_SCHEMA", () => {
+    assert.strictEqual(validateYaml("password: !env_var PASSWORD default_password", yaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml("password: !env_var PASSWORD default_password", HOMEASSISTANT_SCHEMA), true)
   })
   test("do not fail when executing command", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))

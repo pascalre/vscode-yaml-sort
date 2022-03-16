@@ -1,7 +1,8 @@
 import { validateYaml } from "./extension"
 import { glob } from "glob"
 import * as yaml from "js-yaml"
-import {CLOUDFORMATION_SCHEMA} from "cloudformation-js-yaml-schema"
+import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
+import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 
 /**
  * Returns a schema from js-yaml when a schema name is passed
@@ -10,6 +11,7 @@ import {CLOUDFORMATION_SCHEMA} from "cloudformation-js-yaml-schema"
  */
 export function getSchema(schema: string): yaml.Schema {
   switch(schema) {
+    case "HOMEASSISTANT_SCHEMA"  : return HOMEASSISTANT_SCHEMA as yaml.Schema
     case "CLOUDFORMATION_SCHEMA" : return CLOUDFORMATION_SCHEMA as yaml.Schema
     case "CORE_SCHEMA"           : return yaml.CORE_SCHEMA
     case "DEFAULT_SCHEMA"        : return yaml.DEFAULT_SCHEMA

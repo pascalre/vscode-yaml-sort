@@ -1,4 +1,7 @@
 # Changelog
+## 5.2.0 - March 16, 2022
+* (refs [#42](https://github.com/pascalre/vscode-yaml-sort/issues/42)) Add support for Home Assistant custom tags
+
 ## 5.1.6 - March 14, 2022
 * Refresh extension logo
 
@@ -21,7 +24,7 @@
 * Update dependencies to latest versions
 
 ## 5.1.0 - August 29, 2021
-* (refs [#29](https://github.com/pascalre/vscode-yaml-sort/issues/29))  Support multiple yaml documents when formatting
+* (refs [#29](https://github.com/pascalre/vscode-yaml-sort/issues/29)) Support multiple yaml documents when formatting
 
 ## 5.0.1 - August 29, 2021
 * (refs [#54](https://github.com/pascalre/vscode-yaml-sort/issues/35)) emptyLinesUntilLevel doesn't work with keywords containing dashes

@@ -36,7 +36,7 @@ This extension contributes the following settings:
 | `noArrayIndent`            | When `true`, will not add an indentation level to array elements.                                                                     | `false`          |
 | `noCompatMode`             | if `true` don't try to be compatible with older yaml versions. Currently: don't quote "yes", "no" and so on, as required for YAML 1.1 | `false`          |
 | `quotingType`              | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.   | `'` |
-| `schema`                   | Schema to use. Possible values are `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.        | `DEFAULT_SCHEMA` |
+| `schema`                   | Schema to use. Possible values are `HOMEASSISTANT_SCHEMA`, `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.        | `DEFAULT_SCHEMA` |
 | `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                     | `false`          |
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                         | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                             | `true`           |
