@@ -6,7 +6,8 @@
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
 import * as yaml from "js-yaml"
-import {CLOUDFORMATION_SCHEMA} from "cloudformation-js-yaml-schema"
+import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
+import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import {
   getDelimiters,
   isSelectionInvalid,
@@ -39,6 +40,9 @@ suite("Test removeQuotesFromKeys", () => {
 })
 
 suite("Test getSchema", () => {
+  test("should return `HOMEASSISTANT_SCHEMA`", () => {
+    assert.strictEqual(getSchema("HOMEASSISTANT_SCHEMA"), HOMEASSISTANT_SCHEMA)
+  })
   test("should return `CLOUDFORMATION_SCHEMA`", () => {
     assert.strictEqual(getSchema("CLOUDFORMATION_SCHEMA"), CLOUDFORMATION_SCHEMA)
   })
