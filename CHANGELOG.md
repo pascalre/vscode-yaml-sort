@@ -1,6 +1,6 @@
 # Changelog
 ## 5.2.0 - March 16, 2022
-* (refs [#42](https://github.com/pascalre/vscode-yaml-sort/issues/42)) Add support for Home Assistant custom tags
+* (refs [#42](https://github.com/pascalre/vscode-yaml-sort/issues/42)) Add support for Home Assistant schema
 
 ## 5.1.6 - March 14, 2022
 * Refresh extension logo
