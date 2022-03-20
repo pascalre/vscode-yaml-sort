@@ -1,12 +1,12 @@
 import * as path from 'path'
 import * as Mocha from 'mocha'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const NYC = require('nyc');
 import * as glob from 'glob'
 
 // Recommended modules, loading them here to speed up NYC init
 // and minimize risk of race condition
 import 'ts-node/register'
-import 'source-map-support/register'
 
 export async function run(): Promise<void> {
   const testsRoot = path.resolve(__dirname, '..')
@@ -58,8 +58,9 @@ export async function run(): Promise<void> {
   }
 }
 
-async function captureStdout(fn: () => any) {
-  let w = process.stdout.write, buffer = '';
+async function captureStdout(fn: () => unknown) {
+  const w = process.stdout.write;
+  let buffer = '';
   process.stdout.write = (s) => { buffer = buffer + s; return true; };
   await fn();
   process.stdout.write = w;

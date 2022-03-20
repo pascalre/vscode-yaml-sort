@@ -5,22 +5,21 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
-import * as yaml from "js-yaml"
+import * as jsyaml from "js-yaml"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import {
+  addNewLineBeforeKeywordsUpToLevelN,
+  addNewLineBeforeRootKeywords,
   getDelimiters,
-  isSelectionInvalid,
+  getSchema,
+  getYamlFilesInDirectory,
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
   removeQuotesFromKeys,
   removeTrailingCharacters,
-  splitYaml,
   replaceTabsWithSpaces,
-  addNewLineBeforeRootKeywords,
-  addNewLineBeforeKeywordsUpToLevelN,
-  getYamlFilesInDirectory,
-  getSchema
+  splitYaml
 } from "../../lib"
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -47,19 +46,19 @@ suite("Test getSchema", () => {
     assert.strictEqual(getSchema("CLOUDFORMATION_SCHEMA"), CLOUDFORMATION_SCHEMA)
   })
   test("should return `CORE_SCHEMA`", () => {
-    assert.strictEqual(getSchema("CORE_SCHEMA"), yaml.CORE_SCHEMA)
+    assert.strictEqual(getSchema("CORE_SCHEMA"), jsyaml.CORE_SCHEMA)
   })
   test("should return `DEFAULT_SCHEMA`", () => {
-    assert.strictEqual(getSchema("DEFAULT_SCHEMA"), yaml.DEFAULT_SCHEMA)
+    assert.strictEqual(getSchema("DEFAULT_SCHEMA"), jsyaml.DEFAULT_SCHEMA)
   })
   test("should return `FAILSAFE_SCHEMA`", () => {
-    assert.strictEqual(getSchema("FAILSAFE_SCHEMA"), yaml.FAILSAFE_SCHEMA)
+    assert.strictEqual(getSchema("FAILSAFE_SCHEMA"), jsyaml.FAILSAFE_SCHEMA)
   })
   test("should return `JSON_SCHEMA`", () => {
-    assert.strictEqual(getSchema("JSON_SCHEMA"), yaml.JSON_SCHEMA)
+    assert.strictEqual(getSchema("JSON_SCHEMA"), jsyaml.JSON_SCHEMA)
   })
   test("should return `DEFAULT_SCHEMA`", () => {
-    assert.strictEqual(getSchema(""), yaml.DEFAULT_SCHEMA)
+    assert.strictEqual(getSchema(""), jsyaml.DEFAULT_SCHEMA)
   })
 })
 
@@ -228,19 +227,6 @@ test: bla
 `
     const actual = getDelimiters(doc, false, false)
     assert.deepEqual(actual, ["", "\n--- text\n"])
-  })
-
-})
-
-suite("Test isSelectionInvalid", () => {
-  test("should return `true` when `text` is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text", yaml.CORE_SCHEMA), false)
-  })
-  test("should return `false` when a string with trailing colon is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text:", yaml.CORE_SCHEMA), true)
-  })
-  test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text: ", yaml.CORE_SCHEMA), true)
   })
 })
 

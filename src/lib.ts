@@ -1,23 +1,22 @@
-import { validateYaml } from "./extension"
 import { glob } from "glob"
-import * as yaml from "js-yaml"
+import * as jsyaml from "js-yaml"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 
 /**
  * Returns a schema from js-yaml when a schema name is passed
  * @param {string} schema Schema 
- * @returns {yaml.Schema} Schema
+ * @returns {jsyaml.Schema} Schema
  */
-export function getSchema(schema: string): yaml.Schema {
+export function getSchema(schema: string): jsyaml.Schema {
   switch(schema) {
-    case "HOMEASSISTANT_SCHEMA"  : return HOMEASSISTANT_SCHEMA as yaml.Schema
-    case "CLOUDFORMATION_SCHEMA" : return CLOUDFORMATION_SCHEMA as yaml.Schema
-    case "CORE_SCHEMA"           : return yaml.CORE_SCHEMA
-    case "DEFAULT_SCHEMA"        : return yaml.DEFAULT_SCHEMA
-    case "FAILSAFE_SCHEMA"       : return yaml.FAILSAFE_SCHEMA
-    case "JSON_SCHEMA"           : return yaml.JSON_SCHEMA
-    default                      : return yaml.DEFAULT_SCHEMA
+    case "HOMEASSISTANT_SCHEMA"  : return HOMEASSISTANT_SCHEMA as jsyaml.Schema
+    case "CLOUDFORMATION_SCHEMA" : return CLOUDFORMATION_SCHEMA as jsyaml.Schema
+    case "CORE_SCHEMA"           : return jsyaml.CORE_SCHEMA
+    case "DEFAULT_SCHEMA"        : return jsyaml.DEFAULT_SCHEMA
+    case "FAILSAFE_SCHEMA"       : return jsyaml.FAILSAFE_SCHEMA
+    case "JSON_SCHEMA"           : return jsyaml.JSON_SCHEMA
+    default                      : return jsyaml.DEFAULT_SCHEMA
   }
 }
 
@@ -91,22 +90,6 @@ export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArra
  */
 export function splitYaml(multipleYamls: string):[string] {
   return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
-}
-
-/**
- * Checks if a text ends with a character which suggests, that the selection is missing something.
- * @param   {string}      text Text which should represent a valid yaml selection to sort.
- * @param   {yaml.Schema} schema 
- * @returns {boolean} true, if selection is missing something
- */
-export function isSelectionInvalid(text: string, schema: yaml.Schema):boolean {
-  // remove trailing whitespaces, to check for things like 'text:  '
-  text = text.trim()
-  const notValidEndingCharacters = [":", "|", ">"]
-  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
-    return true
-  }
-  return !validateYaml(text, schema)
 }
 
 /**

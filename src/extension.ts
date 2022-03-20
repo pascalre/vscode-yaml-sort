@@ -1,12 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as yamlParser from "js-yaml"
+import * as jsyaml from "js-yaml"
 import * as vscode from "vscode"
 import * as fs from "fs"
 
 import {
   getDelimiters,
-  isSelectionInvalid,
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
   replaceTabsWithSpaces,
@@ -77,12 +76,12 @@ export function activate(context: vscode.ExtensionContext) {
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string}           Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, noCompatMode: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: yamlParser.Schema, locale: string): string {
+export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, noCompatMode: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: jsyaml.Schema, locale: string): string {
   if (Object.keys(text).length === 0) {
     return ""
   }
 
-  let yaml = yamlParser.dump(text, {
+  let yaml = jsyaml.dump(text, {
     indent        : indent,
     forceQuotes   : forceQuotes,
     lineWidth     : lineWidth,
@@ -231,13 +230,14 @@ export function sortYaml(
     noArrayIndent             : boolean,
     noCompatMode              : boolean,
     quotingType               : "'" | '"',
-    schema                    : yamlParser.Schema,
+    schema                    : jsyaml.Schema,
     locale                    : string
   ): string|null {
   try {
     const loadOptions             = {schema: schema}
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
-    const doc                     = yamlParser.load(unsortedYamlWithoutTabs, loadOptions) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const doc                     = jsyaml.load(unsortedYamlWithoutTabs, loadOptions) as any
     let   sortedYaml              = ""
 
     if (customSort > 0 && !useCustomSortRecursively) {
@@ -271,8 +271,10 @@ export function sortYaml(
     }
 
     return sortedYaml
-  } catch (e: any) {
-    vscode.window.showErrorMessage("Keys could not be resorted: " + e.message)
+  } catch (e) {
+    if (e instanceof Error) {
+      vscode.window.showErrorMessage("Keys could not be resorted: " + e.message)
+    }
     return null
   }
 }
@@ -292,15 +294,17 @@ export function validateYamlWrapper(): boolean {
  * @param   {string}  yaml Yaml to be validated.
  * @returns {boolean} True, if yaml is valid.
  */
-export function validateYaml(text: string, schema: yamlParser.Schema): boolean {
+export function validateYaml(text: string, schema: jsyaml.Schema): boolean {
   try {
     splitYaml(text).forEach((yaml) => {
-      yamlParser.load(yaml, {schema: schema})
+      jsyaml.load(yaml, {schema: schema})
     })
     vscode.window.showInformationMessage("YAML is valid.")
     return true
-  } catch (e: any) {
-    vscode.window.showErrorMessage("YAML is invalid: " + e.message)
+  } catch (e) {
+    if (e instanceof Error) {
+      vscode.window.showErrorMessage("YAML is invalid: " + e.message)
+    }
     return false
   }
 }
@@ -372,19 +376,21 @@ export function formatYaml(
     noArrayIndent    : boolean,
     noCompatMode     : boolean,
     quotingType      : "'" | '"',
-    schema           : yamlParser.Schema,
+    schema           : jsyaml.Schema,
     locale           : string
   ): string|null {
   try {
     const loadOptions = {schema: schema}
-    let   doc         = dumpYaml(yamlParser.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, false, schema, locale)
+    let   doc         = dumpYaml(jsyaml.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, false, schema, locale)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
     vscode.window.showInformationMessage("Yaml formatted successfully")
     return doc
-  } catch (e: any) {
-    vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
+  } catch (e) {
+    if (e instanceof Error) {
+      vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
+    }
     return null
   }
 }
@@ -421,4 +427,21 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
     }
   })
   return true
+}
+
+
+/**
+ * Checks if a text ends with a character which suggests, that the selection is missing something.
+ * @param   {string}      text Text which should represent a valid yaml selection to sort.
+ * @param   {jsyaml.Schema} schema 
+ * @returns {boolean} true, if selection is missing something
+ */
+ export function isSelectionInvalid(text: string, schema: jsyaml.Schema):boolean {
+  // remove trailing whitespaces, to check for things like 'text:  '
+  text = text.trim()
+  const notValidEndingCharacters = [":", "|", ">"]
+  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
+    return true
+  }
+  return !validateYaml(text, schema)
 }

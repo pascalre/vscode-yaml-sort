@@ -207,21 +207,22 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "code-analysis": "npx depcruise --validate .dependency-cruiser.js src",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "coverage": "rm -rf .nyc_output && rm -rf coverage && nyc npm run test",
+    "lint": "eslint . --ext .ts",
     "pretest": "npm run compile",
     "test": "node ./out/test/runTest.js",
-    "lint": "eslint . --ext .ts",
-    "coverage": "rm -rf .nyc_output && rm -rf coverage && nyc npm run test"
+    "vscode:prepublish": "npm run compile",
+    "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",
     "@types/node": "^17.0.21",
-    "@types/vscode": "^1.49.0",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "coveralls": "^3.1.0",
+    "dependency-cruiser": "^11.4.0",
     "eslint": "^8.11.0",
     "jsdoc": "^3.6.6",
     "mocha": "^9.2.2",
@@ -233,6 +234,7 @@
   "dependencies": {
     "@types/glob": "^7.1.1",
     "@types/js-yaml": "^4.0.0",
+    "@types/vscode": "^1.65.0",
     "@vscode/test-electron": "^2.1.3",
     "cloudformation-js-yaml-schema": "^0.4.2",
     "glob": "^7.1.6",

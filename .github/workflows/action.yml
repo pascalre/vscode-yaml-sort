@@ -20,12 +20,14 @@ jobs:
              npm install
              npm install -g yarn
              npm install -g vsce
-      - name: build
+      - name: lint
+        run: npm run lint
+      - name: static code analysis
+        run: npm run code-analysis
+      - name: test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: |
-              vsce package
-              npm run coverage
+          run: npm run coverage
       - name: coverage
         uses: coverallsapp/github-action@master
         with:
