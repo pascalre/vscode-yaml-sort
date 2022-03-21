@@ -174,7 +174,7 @@ export function addNewLineBeforeKeywordsUpToLevelN(n: number, indent: number, te
 
   while (level < n) {
     if (level == 0) {
-      result = result.replace(/\n[^\s]*:/g, "\n$&")
+      result = result.replace(/\n[^\s].*:/g, "\n$&")
     } else {
       let spaces = " ".repeat(indent)
       spaces = spaces.repeat(level)

@@ -266,7 +266,7 @@ spec: value
   })
 })
 
-suite("Test addNewLineForKeywordsUntilLevel", () => {
+suite("Test addNewLineBeforeKeywordsUpToLevelN", () => {
   test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
     const actual = `data:
   key:
@@ -304,6 +304,25 @@ spec: value
 
   sp-ec: value
 `
+
+    assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
+  })
+
+  test("should recognize keywords containing spaces", () => {
+    const actual = 
+      'data:\n' +
+      '  key:\n' +
+      '    key: value\n' +
+      'foo bar: value'
+
+    const expected = 
+    'data:\n' +
+    '\n' +
+    '  key:\n' +
+    '    key: value\n' +
+    '\n' +
+    'foo bar: value'
+
     assert.strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
   })
 })

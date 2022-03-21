@@ -1,4 +1,7 @@
 # Changelog
+## 5.2.1 - March 21, 2022
+* (refs [#44](https://github.com/pascalre/vscode-yaml-sort/issues/44)) Fix: emptyLinesUntilLevel doesn't work with keys containing spaces
+
 ## 5.2.0 - March 16, 2022
 * (refs [#42](https://github.com/pascalre/vscode-yaml-sort/issues/42)) Add support for Home Assistant schema
 
@@ -27,7 +30,7 @@
 * (refs [#29](https://github.com/pascalre/vscode-yaml-sort/issues/29)) Support multiple yaml documents when formatting
 
 ## 5.0.1 - August 29, 2021
-* (refs [#54](https://github.com/pascalre/vscode-yaml-sort/issues/35)) emptyLinesUntilLevel doesn't work with keywords containing dashes
+* (refs [#35](https://github.com/pascalre/vscode-yaml-sort/issues/35)) Fix: emptyLinesUntilLevel doesn't work with keys containing dashes
 * Update dependencies to latest versions
 
 ## 5.0.0 - July 10, 2021
