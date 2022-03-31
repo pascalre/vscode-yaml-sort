@@ -1,4 +1,7 @@
 # Changelog
+## 5.2.2 - March 31, 2022
+* Fix [CVE-2021-44906](https://nvd.nist.gov/vuln/detail/CVE-2021-44906)
+
 ## 5.2.1 - March 21, 2022
 * (refs [#44](https://github.com/pascalre/vscode-yaml-sort/issues/44)) Fix: emptyLinesUntilLevel doesn't work with keys containing spaces
 * Update dependencies to latest versions
@@ -43,8 +46,8 @@
 * Old command `Format YAML` is replaced by built in command `Format document`. Formatting documents is also possible with default formatting shortcut or on document save.
 
 ## 4.1.1 - June 16, 2021
-* Fix [CVE-2020-28469](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-28469)
-* Fix [CVE-2021-33502](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-33502)
+* Fix [CVE-2020-28469](https://nvd.nist.gov/vuln/detail/CVE-2020-28469)
+* Fix [CVE-2021-33502](https://nvd.nist.gov/vuln/detail/CVE-2021-33502)
 
 ## 4.1.0 - April 28, 2021
 * (refs [#26](https://github.com/pascalre/vscode-yaml-sort/issues/26)) Un-quoted "on" and "off" strings are quoted after sorting YAML
@@ -80,7 +83,7 @@
 * New configuration `quotingType` allows the user to choose between `'` or `"` as quoting type.
 
 ## 2.7.3 - Januar 27, 2021
-* Fix [CVE-2020-7788](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7788)
+* Fix [CVE-2020-7788](https://nvd.nist.gov/vuln/detail/CVE-2020-7788)
 * Use dependency `js-yaml` in version 4.0.0
 
 ## 2.7.2 - October 31, 2020
@@ -103,8 +106,8 @@
 * Fix disappearing characters in custom sort
 
 ## 2.4.0 - September 26, 2020
-* Fix [CVE-2020-8203](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8203)
-* Fix [CVE-2020-8244](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8244)
+* Fix [CVE-2020-8203](https://nvd.nist.gov/vuln/detail/CVE-2020-8203)
+* Fix [CVE-2020-8244](https://nvd.nist.gov/vuln/detail/CVE-2020-8244)
 
 ## 2.3.2 - September 26, 2020
 * (refs [#9](https://github.com/pascalre/vscode-yaml-sort/issues/9)) Sorting tab indented yaml removes code
@@ -113,7 +116,7 @@
 * Refactor code and add more test cases
 
 ## 2.3.1 - April 4, 2020
-* Fix [CVE-2020-7598](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7598)
+* Fix [CVE-2020-7598](https://nvd.nist.gov/vuln/detail/CVE-2020-7598)
 
 ## 2.3.0 - December 1, 2019
 * (refs [#6](https://github.com/pascalre/vscode-yaml-sort/issues/6)) Support sorting files with delimiters with comment
