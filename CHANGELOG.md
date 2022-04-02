@@ -1,4 +1,8 @@
 # Changelog
+## 5.3.0 - April 02, 2022
+* (refs [#38](https://github.com/pascalre/vscode-yaml-sort/issues/38)) How to sort on save?
+* New configuration `sortOnSave`
+
 ## 5.2.2 - March 31, 2022
 * Fix [CVE-2021-44906](https://nvd.nist.gov/vuln/detail/CVE-2021-44906)
 

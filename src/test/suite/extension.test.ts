@@ -36,9 +36,9 @@ suite("Test getCustomSortKeywords", () => {
   })
 
   test("should fail when parameter is not in [1, 2, 3]", () => {
-    assert.throws(() => getCustomSortKeywords(  0), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords(  4), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords( -1), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(4), new Error("The count parameter is not in a valid range"))
+    assert.throws(() => getCustomSortKeywords(-1), new Error("The count parameter is not in a valid range"))
     assert.throws(() => getCustomSortKeywords(1.5), new Error("The count parameter is not in a valid range"))
   })
 })
@@ -101,7 +101,7 @@ suite("Test validateYaml", () => {
   test("do not fail when executing command", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })      
+    await vscode.window.showTextDocument(doc, { preview: false })
     await vscode.commands.executeCommand("vscode-yaml-sort.validateYaml")
   })
 })
@@ -118,7 +118,7 @@ suite("Test sortYamlFiles", () => {
     assert.strictEqual(sortedFile, "akey: value\nkey: value")
 
     fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
-    fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")  
+    fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")
   })
   test("should return `true` on invalid yaml", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/folder2"))
@@ -204,7 +204,7 @@ suite("Test formatYamlWrapper", () => {
         'key:\n' +
         '  key2: value'
 
-        assert.strictEqual(formatYamlWrapper()[0].newText, expected)
+      assert.strictEqual(formatYamlWrapper()[0].newText, expected)
     } else {
       assert.strictEqual(true, false)
     }
@@ -222,7 +222,7 @@ suite("Test formatYamlWrapper", () => {
         '---\n' +
         'key2: value'
 
-        assert.strictEqual(formatYamlWrapper()[0].newText, expected)
+      assert.strictEqual(formatYamlWrapper()[0].newText, expected)
     } else {
       assert.strictEqual(true, false)
     }
@@ -234,7 +234,7 @@ suite("Test formatYamlWrapper", () => {
 
     const activeEditor = vscode.window.activeTextEditor
     if (activeEditor) {
-        assert.strictEqual(undefined, undefined)
+      assert.strictEqual(undefined, undefined)
     } else {
       assert.strictEqual(true, false)
     }
@@ -242,7 +242,7 @@ suite("Test formatYamlWrapper", () => {
 })
 
 suite("Test sortYamlWrapper", () => {
-  test("should return false on invalid quotingType", async () => {
+  test("should return `[]` on invalid quotingType", async () => {
     const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
     await settings.update("quotingType", "`", vscode.ConfigurationTarget.Global)
 
@@ -262,14 +262,14 @@ suite("Test sortYamlWrapper", () => {
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-        assert.strictEqual(sortYamlWrapper(), false)
+      assert.deepStrictEqual(sortYamlWrapper(), [])
     } else {
       assert.strictEqual(true, false)
     }
-    
+
     await settings.update("quotingType", "'", vscode.ConfigurationTarget.Global)
   })
-  test("should return true on a valid yaml", async () => {
+  test("should return edits on a valid yaml", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
     await vscode.window.showTextDocument(doc, { preview: false })
@@ -278,7 +278,7 @@ suite("Test sortYamlWrapper", () => {
     if (activeEditor) {
       const actual =
         'key:\n' +
-        '  key2: value'
+        ' key2: value'
 
       activeEditor.edit((builder) => builder.replace(
         new vscode.Range(
@@ -286,12 +286,12 @@ suite("Test sortYamlWrapper", () => {
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-        assert.strictEqual(sortYamlWrapper(), true)
+      assert.notDeepStrictEqual(sortYamlWrapper(), [])
     } else {
       assert.strictEqual(true, false)
     }
   })
-  test("should return false on invalid selection", async () => {
+  test("should return `[]` on invalid selection", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
     await vscode.window.showTextDocument(doc, { preview: false })
@@ -307,9 +307,9 @@ suite("Test sortYamlWrapper", () => {
           new vscode.Position(0, 0),
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
         actual))
-      
+
       activeEditor.selection = new vscode.Selection(0, 0, 0, 4)
-      assert.strictEqual(sortYamlWrapper(), false)
+      assert.deepStrictEqual(sortYamlWrapper(), [])
     } else {
       assert.strictEqual(true, false)
     }
@@ -326,7 +326,7 @@ suite("Test sortYamlWrapper", () => {
         '  key2: value\n' +
         '  key3: value\n' +
         'key4: value'
-      
+
       activeEditor.selection = new vscode.Selection(0, 0, 3, 0)
       await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
@@ -359,7 +359,7 @@ suite("Test sortYamlWrapper", () => {
           new vscode.Position(0, 0),
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
         actual))
-      
+
       await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
       // await new Promise(r => setTimeout(r, 2000));
@@ -372,7 +372,7 @@ suite("Test sortYamlWrapper", () => {
 
 suite("Test formatYaml", () => {
   test("should sort all yaml files in directory", () => {
-    const actual = 
+    const actual =
       'persons:\n' +
       '  bob:\n' +
       '    place: "Germany"\n' +
@@ -539,40 +539,40 @@ suite("Test sortYaml", () => {
     let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
     assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, true, "'", jsyaml.DEFAULT_SCHEMA, locale), expected)
 
-    expected  = actual
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, true, "'", jsyaml.CORE_SCHEMA, locale), expected)    
+    expected = actual
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, false, 500, false, true, "'", jsyaml.CORE_SCHEMA, locale), expected)
   })
   test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
     const actual =
-    'LoggingBucketKMSKeyAlias:\n' +
-    '  Properties:\n' +
-    '    TargetKeyId: !Sub "LoggingBucketKMSKey"\n' +
-    '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"'
+      'LoggingBucketKMSKeyAlias:\n' +
+      '  Properties:\n' +
+      '    TargetKeyId: !Sub "LoggingBucketKMSKey"\n' +
+      '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"'
 
     const expected =
-    'LoggingBucketKMSKeyAlias:\n' +
-    '\n' +
-    '  Properties:\n' +
-    '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
-    '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
-    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, true, 500, false, true, "\"", CLOUDFORMATION_SCHEMA, locale), expected) 
+      'LoggingBucketKMSKeyAlias:\n' +
+      '\n' +
+      '  Properties:\n' +
+      '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
+      '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
+    assert.strictEqual(sortYaml(actual, 0, 2, 2, false, true, 500, false, true, "\"", CLOUDFORMATION_SCHEMA, locale), expected)
   })
   test("compatibility with older yaml versions should be configurable", () => {
     const actual =
-    'key:\n' +
-    '  on: foo\n' +
-    '  off: egg'
+      'key:\n' +
+      '  on: foo\n' +
+      '  off: egg'
 
     let expected =
-    'key:\n' +
-    '  "off": egg\n' +
-    '  "on": foo'
-    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, false, "\"", CLOUDFORMATION_SCHEMA, locale), expected) 
+      'key:\n' +
+      '  "off": egg\n' +
+      '  "on": foo'
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, false, "\"", CLOUDFORMATION_SCHEMA, locale), expected)
 
     expected =
-    'key:\n' +
-    '  off: egg\n' +
-    '  on: foo'
-    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, true, "\"", CLOUDFORMATION_SCHEMA, locale), expected) 
+      'key:\n' +
+      '  off: egg\n' +
+      '  on: foo'
+    assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, true, "\"", CLOUDFORMATION_SCHEMA, locale), expected)
   })
 })
