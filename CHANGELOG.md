@@ -1,4 +1,7 @@
 # Changelog
+## 5.3.1 - April 08, 2022
+* Update dependencies to latest versions
+
 ## 5.3.0 - April 02, 2022
 * (refs [#38](https://github.com/pascalre/vscode-yaml-sort/issues/38)) How to sort on save?
 * New configuration `sortOnSave`
