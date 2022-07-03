@@ -1,4 +1,7 @@
 # Changelog
+## 5.3.2 - July 03, 2022
+* Update dependencies to latest versions
+
 ## 5.3.1 - April 08, 2022
 * Update dependencies to latest versions
 
