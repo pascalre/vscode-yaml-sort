@@ -451,7 +451,7 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
 
 /**
  * Checks if a text ends with a character which suggests, that the selection is missing something.
- * @param   {string}      text Text which should represent a valid yaml selection to sort.
+ * @param   {string}        text Text which should represent a valid yaml selection to sort.
  * @param   {jsyaml.Schema} schema 
  * @returns {boolean} true, if selection is missing something
  */
@@ -463,4 +463,28 @@ export function isSelectionInvalid(text: string, schema: jsyaml.Schema): boolean
     return true
   }
   return !validateYaml(text, schema)
+}
+
+/**
+ * Finds all comments in a given yaml. To do so we need to search all lines containing the character #, which is not preceeded by the characters ` or " (string)
+ * @param text Yaml document
+ */
+export function findComments(text: string): Map<string, string> {
+  const comments = new Map<string, string>
+  const lines = text.split("\n")
+  for (let i = 0; i < lines.length; i++) {
+    let comment = ""
+    while (/^ *#/.test(lines[i])) {
+      comment += lines[i] + "\n"
+      i++
+    }
+    if (comment != "" ) {
+      if (i < lines.length) {
+        comments.set(lines[i], comment)
+      } else {
+        comments.set('', comment)
+      }
+    }
+  }
+  return comments
 }

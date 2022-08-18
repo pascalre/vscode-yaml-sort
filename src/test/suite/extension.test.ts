@@ -11,6 +11,7 @@ import * as path from "path"
 import * as jsyaml from "js-yaml"
 
 import {
+  findComments,
   formatYaml,
   formatYamlWrapper,
   getCustomSortKeywords,
@@ -575,4 +576,72 @@ suite("Test sortYaml", () => {
       '  on: foo'
     assert.strictEqual(sortYaml(actual, 0, 0, 2, false, false, 500, false, true, "\"", CLOUDFORMATION_SCHEMA, locale), expected)
   })
+
+  suite("Test findComments", () => {    
+    test("should return an empty map on a yaml without comments", () => {
+      const yaml =
+        'persons:\n' +
+        '  bob:\n' +
+        '    place: Germany\n' +
+        '    age: 23\n'
+      const expected = new Map<string, string>()
+      assert.deepEqual(findComments(yaml), expected)
+    })
+
+    test("should return a map with the line below the comment as key and the comment as value", () => {
+      const yaml =
+        'persons:\n' +
+        '# bob is 1st\n' +
+        '  bob:\n' +
+        '    place: Germany\n' +
+        '    age: 23\n'
+    
+      const expected = new Map<string, string>()
+      expected.set('  bob:', '# bob is 1st\n')
+      assert.deepEqual(findComments(yaml), expected)
+    })
+
+    test("should return a map with the line below the comment as key and the comment as value (comment on top)", () => {
+      const yaml =
+        '# comment on top\n' +
+        'persons:\n' +
+        '  bob:\n' +
+        '    place: Germany\n' +
+        '    age: 23\n'
+    
+      const expected = new Map<string, string>()
+      expected.set('persons:', '# comment on top\n')
+      assert.deepEqual(findComments(yaml), expected)
+    })
+
+    test("should return a map with the line below the comment as key and the comment as value (comment at the bottom)", () => {
+      const yaml =
+        'persons:\n' +
+        '  bob:\n' +
+        '    place: Germany\n' +
+        '    age: 23\n' +
+        '# comment at the bottom'
+    
+      const expected = new Map<string, string>()
+      expected.set('', '# comment at the bottom\n')
+      assert.deepEqual(findComments(yaml), expected)
+    })
+
+    test("should merge multiline comments", () => {
+      const yaml = 
+        'persons:\n' +
+        '# bob is 1st\n' +
+        '# alice is 2nd\n' +
+        '  bob:\n' +
+        '    place: Germany\n' +
+        '    age: 23\n'
+
+        const expected = new Map<string, string>()
+        expected.set('  bob:', '# bob is 1st\n# alice is 2nd\n')
+        assert.deepEqual(findComments(yaml), expected)
+    })
+    
+  })
+  
+
 })
