@@ -255,6 +255,7 @@ export function sortYaml(
     const loadOptions = { schema: schema }
     const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, indent)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const comments = findComments(unsortedYamlWithoutTabs)
     const doc = jsyaml.load(unsortedYamlWithoutTabs, loadOptions) as any
     let sortedYaml = ""
 
@@ -287,6 +288,8 @@ export function sortYaml(
     if (emptyLinesUntilLevel > 0) {
       sortedYaml = addNewLineBeforeKeywordsUpToLevelN(emptyLinesUntilLevel, indent, sortedYaml)
     }
+
+    sortedYaml = applyComments(sortedYaml, comments)
 
     return sortedYaml
   } catch (e) {
@@ -400,7 +403,9 @@ export function formatYaml(
 ): string | null {
   try {
     const loadOptions = { schema: schema }
+    const comments = findComments(yaml)
     let doc = dumpYaml(jsyaml.load(yaml, loadOptions) as string, false, 0, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, false, schema, locale)
+    doc = applyComments(doc, comments)
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
@@ -451,7 +456,7 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
 
 /**
  * Checks if a text ends with a character which suggests, that the selection is missing something.
- * @param   {string}      text Text which should represent a valid yaml selection to sort.
+ * @param   {string}        text Text which should represent a valid yaml selection to sort.
  * @param   {jsyaml.Schema} schema 
  * @returns {boolean} true, if selection is missing something
  */
@@ -463,4 +468,55 @@ export function isSelectionInvalid(text: string, schema: jsyaml.Schema): boolean
     return true
   }
   return !validateYaml(text, schema)
+}
+
+/**
+ * Finds all full line comments in a given yaml (ignoring comments in the same line with code).
+ * @param text Yaml document
+ */
+export function findComments(text: string): Map<string, string> {
+  const comments = new Map<string, string>
+  const lines = text.toString().split("\n")
+  for (let i = 0; i < lines.length; i++) {
+    let comment = ""
+    while (/^ *#/.test(lines[i])) {
+      comment += lines[i] + "\n"
+      i++
+    }
+    if (comment != "" ) {
+      if (i < lines.length) {
+        comments.set(comment, lines[i])
+      } else {
+        comments.set(comment, '')
+      }
+    }
+  }
+  return comments
+}
+
+export function applyComments(text: string, comments: Map<string, string>): string {
+  for (const [comment, line] of comments) {
+    if (line == '') {
+      text += "\n" + comment
+    } else {
+      let index = text.search(line)
+      if (index == -1 ) { 
+        console.log("Comment not found. Searching for lines with other indentation...")
+        const trimmedLine = line.trim()
+        index = text.search(trimmedLine)
+        if (index != -1) {
+          const textHelper = text.slice(0, index)
+          const lastLineBreak = textHelper.lastIndexOf('\n')
+          // remove trailing whitespaces
+          const textBeforeComment = textHelper.slice(0, lastLineBreak)
+          let textAfterComment = textHelper.slice(lastLineBreak)
+          textAfterComment += text.slice(text.search(trimmedLine))
+          text = textBeforeComment + "\n" + comment.split("\n")[0] + textAfterComment
+        }
+      } else { 
+        text = text.slice(0, index) + comment + "\n" + text.slice(text.search(line))
+      }
+    }
+  }
+  return text
 }

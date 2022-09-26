@@ -1,4 +1,8 @@
 # Changelog
+## 5.4.0 - September 26, 2022
+* (refs [#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)) Keep comments in the yaml file
+* Update dependencies to latest versions
+
 ## 5.3.3 - September 19, 2022
 * Update dependencies to latest versions
 
