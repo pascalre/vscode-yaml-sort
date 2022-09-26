@@ -599,7 +599,7 @@ suite("Test findComments", () => {
       '    age: 23\n'
   
     const expected = new Map<string, string>()
-    expected.set('# bob is 1st\n', '  bob:')
+    expected.set('# bob is 1st', '  bob:')
     assert.deepEqual(findComments(yaml), expected)
   })
 
@@ -612,7 +612,7 @@ suite("Test findComments", () => {
       '    age: 23\n'
   
     const expected = new Map<string, string>()
-    expected.set('# comment on top\n', 'persons:')
+    expected.set('# comment on top', 'persons:')
     assert.deepEqual(findComments(yaml), expected)
   })
 
@@ -625,7 +625,7 @@ suite("Test findComments", () => {
       '# comment at the bottom'
   
     const expected = new Map<string, string>()
-    expected.set('# comment at the bottom\n', '')
+    expected.set('# comment at the bottom', '')
     assert.deepEqual(findComments(yaml), expected)
   })
 
@@ -639,7 +639,7 @@ suite("Test findComments", () => {
       '    age: 23\n'
 
       const expected = new Map<string, string>()
-      expected.set('# bob is 1st\n# alice is 2nd\n', '  bob:')
+      expected.set('# bob is 1st\n# alice is 2nd', '  bob:')
       assert.deepEqual(findComments(yaml), expected)
   })
   
