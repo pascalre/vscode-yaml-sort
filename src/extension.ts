@@ -480,7 +480,7 @@ export function findComments(text: string): Map<string, string> {
   for (let i = 0; i < lines.length; i++) {
     let comment = ""
     while (/^ *#/.test(lines[i])) {
-      comment += lines[i] + "\n"
+      comment += lines[i]
       i++
     }
     if (comment != "" ) {
