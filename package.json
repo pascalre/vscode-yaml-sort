@@ -227,7 +227,7 @@
     "@typescript-eslint/eslint-plugin": "5.38.0",
     "@typescript-eslint/parser": "5.38.0",
     "coveralls": "3.1.1",
-    "dependency-cruiser": "11.16.0",
+    "dependency-cruiser": "11.16.1",
     "eslint": "8.24.0",
     "jsdoc": "3.6.11",
     "mocha": "10.0.0",
