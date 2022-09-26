@@ -1,6 +1,9 @@
 # Changelog
+## 5.4.2 - September 26, 2022
+* Minor bugfix for ([#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)): Handle multiline comments
+
 ## 5.4.1 - September 26, 2022
-* Minor bugfix for ([#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)): comments caused blank line
+* Minor bugfix for ([#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)): Comments caused blank line
 
 ## 5.4.0 - September 26, 2022
 * (refs [#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)) Keep comments in the yaml file
