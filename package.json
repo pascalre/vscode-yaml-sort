@@ -224,8 +224,8 @@
   "devDependencies": {
     "@types/mocha": "10.0.0",
     "@types/node": "18.7.22",
-    "@typescript-eslint/eslint-plugin": "5.38.0",
-    "@typescript-eslint/parser": "5.38.0",
+    "@typescript-eslint/eslint-plugin": "5.38.1",
+    "@typescript-eslint/parser": "5.38.1",
     "coveralls": "3.1.1",
     "dependency-cruiser": "11.16.1",
     "eslint": "8.24.0",
