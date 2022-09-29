@@ -153,6 +153,7 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
     const locale = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
     const noArrayIndent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
     const noCompatMode = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
+    const notifySuccess = vscode.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
     const quotingType = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | '"'
     const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
     const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
@@ -187,7 +188,7 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
         return []
       }
     } else {
-      if (!validateYaml(doc, getSchema(schema))) {
+      if (!validateYaml(false, doc, getSchema(schema))) {
         return []
       }
     }
@@ -229,7 +230,9 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
 
     if (validYaml) {
       const edits = vscode.TextEdit.replace(rangeToBeReplaced, newText)
-      vscode.window.showInformationMessage("Keys resorted successfully")
+      if (notifySuccess) {  
+        vscode.window.showInformationMessage("Keys resorted successfully")
+      }
       applyEdits(activeEditor, [edits])
       return [edits]
     }
@@ -303,7 +306,7 @@ export function sortYaml(
 export function validateYamlWrapper(): boolean {
   const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   if (vscode.window.activeTextEditor) {
-    validateYaml(vscode.window.activeTextEditor.document.getText(), getSchema(schema))
+    validateYaml(true, vscode.window.activeTextEditor.document.getText(), getSchema(schema))
     return true
   }
   /* istanbul ignore next */
@@ -312,15 +315,19 @@ export function validateYamlWrapper(): boolean {
 
 /**
  * Validates a given yaml document.
- * @param   {string}  yaml Yaml to be validated.
+ * @param   {string}  notifySuccess Notify successfull validation.
+ * @param   {string}  text Yaml to be validated.
+ * @param   {string}  schema Expected schema.
  * @returns {boolean} True, if yaml is valid.
  */
-export function validateYaml(text: string, schema: jsyaml.Schema): boolean {
+export function validateYaml(notifySuccess: boolean, text: string, schema: jsyaml.Schema): boolean {
   try {
     splitYaml(text).forEach((yaml) => {
       jsyaml.load(yaml, { schema: schema })
     })
-    vscode.window.showInformationMessage("YAML is valid.")
+    if (notifySuccess) {
+      vscode.window.showInformationMessage("YAML is valid.")
+    }
     return true
   } catch (e) {
     if (e instanceof Error) {
@@ -338,6 +345,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
   const locale = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
   const noArrayIndent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
   const noCompatMode = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
+  const notifySuccess = vscode.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
   const quotingType = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | '"'
   const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
@@ -360,7 +368,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
     let validYaml = true
     const yamls = splitYaml(doc)
     for (const unformattedYaml of yamls) {
-      formattedYaml = formatYaml(unformattedYaml, false, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
+      formattedYaml = formatYaml(unformattedYaml, false, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, notifySuccess, quotingType, getSchema(schema), locale)
       if (formattedYaml) {
         newText += delimiters.shift() + formattedYaml
       } else {
@@ -397,6 +405,7 @@ export function formatYaml(
   lineWidth: number,
   noArrayIndent: boolean,
   noCompatMode: boolean,
+  notifySuccess: boolean,
   quotingType: "'" | '"',
   schema: jsyaml.Schema,
   locale: string
@@ -409,7 +418,9 @@ export function formatYaml(
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
-    vscode.window.showInformationMessage("Yaml formatted successfully")
+    if (notifySuccess) {
+      vscode.window.showInformationMessage("Yaml formatted successfully")
+    }
     return doc
   } catch (e) {
     if (e instanceof Error) {
@@ -467,7 +478,7 @@ export function isSelectionInvalid(text: string, schema: jsyaml.Schema): boolean
   if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
     return true
   }
-  return !validateYaml(text, schema)
+  return !validateYaml(false, text, schema)
 }
 
 /**
