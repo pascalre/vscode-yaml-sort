@@ -1,4 +1,9 @@
 # Changelog
+## 5.5.0 - September 29, 2022
+* (refs [#65](https://github.com/pascalre/vscode-yaml-sort/issues/65)) No need to send notification when used as a formatter
+* New configuration `notifySuccess`
+* Update dependencies to latest versions
+
 ## 5.4.2 - September 26, 2022
 * Minor bugfix for ([#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)): Handle multiline comments
 

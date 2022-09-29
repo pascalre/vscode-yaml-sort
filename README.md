@@ -34,7 +34,8 @@ This extension contributes the following settings:
 | `lineWidth`                | Maximum line width for YAML files                                                                                                                                | `500`            |
 | `locale`                   | Language whose sort order should be used                                                                                                                         | `en`             |
 | `noArrayIndent`            | When `true`, will not add an indentation level to array elements.                                                                                                | `false`          |
-| `noCompatMode`             | When `true` don't try to be compatible with older yaml versions. Currently: don't quote "yes", "no" and so on, as required for YAML 1.1                          | `false`          |
+| `noCompatMode`             | When `true`, don't try to be compatible with older yaml versions. Currently: don't quote "yes", "no" and so on, as required for YAML 1.1                         | `false`          |
+| `notifySuccess`            | When `true`, will notify on successfully performed tasks.                                                                                                        | `true`           |
 | `quotingType`              | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.                    | `'`              |
 | `schema`                   | Schema to use. Possible values are `HOMEASSISTANT_SCHEMA`, `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.           | `DEFAULT_SCHEMA` |
 | `sortOnSave`               | When `true`, will sort file when saving document. Only works in combination with `editor.formatOnSave` and `vscode-yaml-sort.useAsFormatter` both set to `true`. | `true`           |

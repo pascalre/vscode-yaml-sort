@@ -67,7 +67,7 @@ suite("Test validateYaml", () => {
       'animals:\n' +
       '  kitty:\n' +
       '    age: 3'
-    assert.strictEqual(validateYaml(actual, jsyaml.CORE_SCHEMA), true)
+    assert.strictEqual(validateYaml(false, actual, jsyaml.CORE_SCHEMA), true)
   })
 
   test("should return `true` when passing two seperated valid yaml", () => {
@@ -80,25 +80,25 @@ suite("Test validateYaml", () => {
       'animals:\n' +
       '  kitty:\n' +
       '    age: 3'
-    assert.strictEqual(validateYaml(actual, jsyaml.CORE_SCHEMA), true)
+    assert.strictEqual(validateYaml(true, actual, jsyaml.CORE_SCHEMA), true)
   })
 
   test("should return `false` when passing an invalid yaml", () => {
-    assert.strictEqual(validateYaml("network: ethernets:", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml(false, "network: ethernets:", jsyaml.CORE_SCHEMA), false)
   })
   test("should return `false` when yaml indentation is not correct", () => {
-    assert.strictEqual(validateYaml("person:\nbob\n  age:23", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml(false, "person:\nbob\n  age:23", jsyaml.CORE_SCHEMA), false)
   })
   test("should return `false` when yaml contains duplicate keys", () => {
-    assert.strictEqual(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml(true, "person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n", jsyaml.CORE_SCHEMA), false)
   })
   test("should return `true` on CLOUDFORMATION_SCHEMA", () => {
-    assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", jsyaml.CORE_SCHEMA), false)
-    assert.strictEqual(validateYaml("RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
+    assert.strictEqual(validateYaml(true, "RoleName: !Sub \"AdministratorAccess\"", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml(true, "RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
   })
   test("should return `true` on HOMEASSISTANT_SCHEMA", () => {
-    assert.strictEqual(validateYaml("password: !env_var PASSWORD default_password", jsyaml.CORE_SCHEMA), false)
-    assert.strictEqual(validateYaml("password: !env_var PASSWORD default_password", HOMEASSISTANT_SCHEMA), true)
+    assert.strictEqual(validateYaml(true, "password: !env_var PASSWORD default_password", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml(true, "password: !env_var PASSWORD default_password", HOMEASSISTANT_SCHEMA), true)
   })
   test("do not fail when executing command", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
@@ -392,7 +392,7 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, true, "'", jsyaml.DEFAULT_SCHEMA, locale), expected)
+    assert.strictEqual(formatYaml(actual, false, 2, false, 500, false, true, true, "'", jsyaml.DEFAULT_SCHEMA, locale), expected)
 
     expected =
       '---\n' +
@@ -404,11 +404,11 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, true, "'", jsyaml.DEFAULT_SCHEMA, locale), expected)
+    assert.strictEqual(formatYaml(actual, true, 2, false, 500, false, true, true, "'", jsyaml.DEFAULT_SCHEMA, locale), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, true, "'", jsyaml.DEFAULT_SCHEMA, locale), null)
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, 2, false, 500, false, true, true, "'", jsyaml.DEFAULT_SCHEMA, locale), null)
   })
 })
 
