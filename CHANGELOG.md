@@ -1,4 +1,9 @@
 # Changelog
+## 6.0.0 - October 4, 2022
+* (refs [#85](https://github.com/pascalre/vscode-yaml-sort/issues/85)) Is custom sort on save planned?
+* New default for `sortOnSave` allows to specify custom sort for auto-saving
+* Update dependencies to latest versions
+
 ## 5.5.0 - September 29, 2022
 * (refs [#65](https://github.com/pascalre/vscode-yaml-sort/issues/65)) No need to send notification when used as a formatter
 * New configuration `notifySuccess`

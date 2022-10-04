@@ -38,20 +38,20 @@ This extension contributes the following settings:
 | `notifySuccess`            | When `true`, will notify on successfully performed tasks.                                                                                                        | `true`           |
 | `quotingType`              | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.                    | `'`              |
 | `schema`                   | Schema to use. Possible values are `HOMEASSISTANT_SCHEMA`, `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.           | `DEFAULT_SCHEMA` |
-| `sortOnSave`               | When `true`, will sort file when saving document. Only works in combination with `editor.formatOnSave` and `vscode-yaml-sort.useAsFormatter` both set to `true`. | `true`           |
+| `sortOnSave`               | When `0`, will sort files when saving document. When `1`, `2` or `3`, will use customSortKeywords. Set to negative value to disable sortOnSave. Only works in combination with `editor.formatOnSave` and `vscode-yaml-sort.useAsFormatter` both set to `true`. | `0`           |
 | `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                                              | `false`          |
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                                                    | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                                                        | `true`           |
 
 # FAQ
 ## How to sort on save?
-Register this extension as VS Code formatter. Also configure VS Code to format files on save. Caution: This setting will apply for all files. Changes will require a restart of VS Code. If you wish to also sort (not only format) the file on saving, set `sortOnSave` to `true`.
+Register this extension as VS Code formatter. Also configure VS Code to format files on save. Caution: This setting will apply for all files. Changes will require a restart of VS Code. If you wish to also sort (not only format) the file on saving, set `sortOnSave` to `0`. Use `1`, `2` or `3` for custom sort.
 
 #### **`.vscode/settings.json`**
 ```json
 {    
     "editor.formatOnSave": true,
-    "vscode-yaml-sort.sortOnSave": true,
+    "vscode-yaml-sort.sortOnSave": 0,
     "vscode-yaml-sort.useAsFormatter": true
 }
 ```

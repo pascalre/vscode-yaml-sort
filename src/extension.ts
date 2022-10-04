@@ -22,9 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   const formatter: vscode.DocumentFormattingEditProvider = {
     provideDocumentFormattingEdits(): vscode.TextEdit[] {
-      const sortOnSave = vscode.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as boolean;
-      if (sortOnSave) {/* istanbul ignore next */
-        return sortYamlWrapper()
+      const sortOnSave = vscode.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as number;
+      if (sortOnSave >= 0 && sortOnSave <= 3) {/* istanbul ignore next */
+        return sortYamlWrapper(sortOnSave)
       } else {/* istanbul ignore next */
         return formatYamlWrapper()
       }
@@ -230,7 +230,7 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
 
     if (validYaml) {
       const edits = vscode.TextEdit.replace(rangeToBeReplaced, newText)
-      if (notifySuccess) {  
+      if (notifySuccess) {
         vscode.window.showInformationMessage("Keys resorted successfully")
       }
       applyEdits(activeEditor, [edits])
@@ -495,7 +495,7 @@ export function findComments(text: string): Map<string, string> {
       i++
     }
     comment = comment.replace(/\n$/, "")
-    if (comment != "" ) {
+    if (comment != "") {
       if (i < lines.length) {
         comments.set(comment, lines[i])
       } else {
@@ -512,7 +512,7 @@ export function applyComments(text: string, comments: Map<string, string>): stri
       text += "\n" + comment
     } else {
       let index = text.search(line)
-      if (index == -1 ) { 
+      if (index == -1) {
         console.log("Comment not found. Searching for lines with other indentation...")
         const trimmedLine = line.trim()
         index = text.search(trimmedLine)
@@ -525,7 +525,7 @@ export function applyComments(text: string, comments: Map<string, string>): stri
           textAfterComment += text.slice(text.search(trimmedLine))
           text = textBeforeComment + "\n" + comment.split("\n")[0] + textAfterComment
         }
-      } else { 
+      } else {
         text = text.slice(0, index) + comment + "\n" + text.slice(text.search(line))
       }
     }
