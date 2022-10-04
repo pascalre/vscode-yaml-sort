@@ -25,8 +25,128 @@ import {
 } from "../../extension"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 const locale = "en"
+
+/*
+suite("Test setting sortOnSave", () => {
+  function syncWriteFile(filename: string, data: any) {
+     
+    writeFileSync(join(__dirname, filename), data, {
+      flag: 'w',
+    })
+  
+    const contents = readFileSync(join(__dirname, filename), 'utf-8')
+    console.log(contents)
+  
+    return contents
+  }
+
+  test("should not format or sort document", async () => {
+    // prepare settings
+    const editor = vscode.workspace.getConfiguration("editor")
+    await editor.update("formatOnSave", false, vscode.ConfigurationTarget.Global)
+    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("sortOnSave", -1, vscode.ConfigurationTarget.Global)
+    await settings.update("useAsFormatter", false, vscode.ConfigurationTarget.Global)
+
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+    await vscode.commands.executeCommand("workbench.action.files.save")
+
+    const expected =
+      'spec:  foo\n' +
+      'data: bar'
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      assert.strictEqual(activeEditor.document.getText(), expected)
+    }
+  })
+
+  test("should format document", async () => {
+    // prepare settings
+    const editor = vscode.workspace.getConfiguration("editor")
+    await editor.update("formatOnSave", true, vscode.ConfigurationTarget.Global)
+    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("sortOnSave", -1, vscode.ConfigurationTarget.Global)
+    await settings.update("useAsFormatter", true, vscode.ConfigurationTarget.Global)
+
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+    await vscode.commands.executeCommand("workbench.action.files.save")
+
+    const expected =
+      '---\n' +
+      'spec: foo\n' +
+      'data: bar'
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      assert.strictEqual(activeEditor.document.getText(), expected)
+
+      await settings.update("sortOnSave", -1, vscode.ConfigurationTarget.Global)
+      await vscode.commands.executeCommand("workbench.action.files.save")
+      assert.strictEqual(activeEditor.document.getText(), expected)
+    }
+  })
+
+  test("should sort document", async () => {
+    // prepare settings
+    const editor = vscode.workspace.getConfiguration("editor")
+    await editor.update("formatOnSave", true, vscode.ConfigurationTarget.Global)
+    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("sortOnSave", 0, vscode.ConfigurationTarget.Global)
+    await settings.update("useAsFormatter", true, vscode.ConfigurationTarget.Global)
+
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+    await vscode.commands.executeCommand("workbench.action.files.save")
+
+    const expected =
+      '---\n' +
+      'data: bar\n' +
+      'spec: foo'
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      assert.strictEqual(activeEditor.document.getText(), expected)
+    }
+  })
+
+  test("should sort document with customSort", async () => {
+    // prepare settings
+    const editor = vscode.workspace.getConfiguration("editor")
+    await editor.update("formatOnSave", true, vscode.ConfigurationTarget.Global)
+    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("sortOnSave", 1, vscode.ConfigurationTarget.Global)
+    await settings.update("useAsFormatter", true, vscode.ConfigurationTarget.Global)
+
+    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
+    const doc = await vscode.workspace.openTextDocument(uri)
+    await vscode.window.showTextDocument(doc, { preview: false })
+    await vscode.commands.executeCommand("workbench.action.files.save")
+
+    const expected =
+      '---\n' +
+      'spec: foo\n' +
+      'data: bar\n'
+
+    const activeEditor = vscode.window.activeTextEditor
+    if (activeEditor) {
+      assert.strictEqual(activeEditor.document.getText(), expected)
+    }
+  
+    // reset file to origin content
+    syncWriteFile("../../../src/test/files/customSort.yaml", 'spec:  foo\ndata: bar')
+  })
+})
+*/
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -293,6 +413,7 @@ suite("Test sortYamlWrapper", () => {
       assert.strictEqual(true, false)
     }
   })
+
   test("should return `[]` on invalid selection", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
@@ -579,7 +700,7 @@ suite("Test sortYaml", () => {
   })
 })
 
-suite("Test findComments", () => {    
+suite("Test findComments", () => {
   test("should return an empty map on a yaml without comments", () => {
     const yaml =
       'persons:\n' +
@@ -597,7 +718,7 @@ suite("Test findComments", () => {
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
-  
+
     const expected = new Map<string, string>()
     expected.set('# bob is 1st', '  bob:')
     assert.deepEqual(findComments(yaml), expected)
@@ -610,7 +731,7 @@ suite("Test findComments", () => {
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
-  
+
     const expected = new Map<string, string>()
     expected.set('# comment on top', 'persons:')
     assert.deepEqual(findComments(yaml), expected)
@@ -623,14 +744,14 @@ suite("Test findComments", () => {
       '    place: Germany\n' +
       '    age: 23\n' +
       '# comment at the bottom'
-  
+
     const expected = new Map<string, string>()
     expected.set('# comment at the bottom', '')
     assert.deepEqual(findComments(yaml), expected)
   })
 
   test("should merge multiline comments", () => {
-    const yaml = 
+    const yaml =
       'persons:\n' +
       '# bob is 1st\n' +
       '# alice is 2nd\n' +
@@ -638,24 +759,24 @@ suite("Test findComments", () => {
       '    place: Germany\n' +
       '    age: 23\n'
 
-      const expected = new Map<string, string>()
-      expected.set('# bob is 1st\n# alice is 2nd', '  bob:')
-      assert.deepEqual(findComments(yaml), expected)
+    const expected = new Map<string, string>()
+    expected.set('# bob is 1st\n# alice is 2nd', '  bob:')
+    assert.deepEqual(findComments(yaml), expected)
   })
-  
+
 })
 
 suite("Test applyComments", () => {
   test("should apply comment to yaml", () => {
     const comments = new Map<string, string>()
     comments.set("# bob is 1st", "  bob:")
-    const yaml = 
+    const yaml =
       'persons:\n' +
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
 
-    const expected = 
+    const expected =
       'persons:\n' +
       '# bob is 1st\n' +
       '  bob:\n' +
@@ -668,10 +789,10 @@ suite("Test applyComments", () => {
   test("should apply comment to last line in yaml", () => {
     const comments = new Map<string, string>()
     comments.set("# last line comment", "")
-    const yaml = 
+    const yaml =
       'persons: bob'
 
-    const expected = 
+    const expected =
       'persons: bob\n' +
       '# last line comment'
 
@@ -683,14 +804,14 @@ suite("Test applyComments", () => {
     comments.set("    # living in germany", "    place: Germany")
     comments.set("# bob is 1st", "  bob:")
     comments.set("# last line comment", "")
-    const yaml = 
+    const yaml =
       'persons:\n' +
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
-      ''
-  
-    const expected = 
+    ''
+
+    const expected =
       'persons:\n' +
       '# bob is 1st\n' +
       '  bob:\n' +
@@ -699,26 +820,26 @@ suite("Test applyComments", () => {
       '    age: 23\n' +
       '\n' +
       '# last line comment'
-  
+
     assert.deepEqual(applyComments(yaml, comments), expected)
   })
 
   test("should recognize indentation", () => {
     const comments = new Map<string, string>()
     comments.set("# bob is 1st", "    bob:")
-    const yaml = 
+    const yaml =
       'persons:\n' +
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
-  
-    const expected = 
+
+    const expected =
       'persons:\n' +
       '# bob is 1st\n' +
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
-  
+
     assert.deepEqual(applyComments(yaml, comments), expected)
   })
 })
