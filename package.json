@@ -233,7 +233,7 @@
     "@typescript-eslint/parser": "5.39.0",
     "coveralls": "3.1.1",
     "dependency-cruiser": "11.16.1",
-    "eslint": "8.24.0",
+    "eslint": "8.25.0",
     "jsdoc": "3.6.11",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
