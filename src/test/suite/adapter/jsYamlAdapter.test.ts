@@ -32,7 +32,7 @@ suite("Test dumpYaml", () => {
       settings.getUseCustomSortRecursively = function () {
         return true
       }
-      assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, true, "'", jsyaml.DEFAULT_SCHEMA, "en"), expected)
+      assert.strictEqual(sortYaml(actual, 1, settings), expected)
     })
   
     test("when locale is `en` should sort character `ä` over `z`", () => {
@@ -48,7 +48,10 @@ suite("Test dumpYaml", () => {
       settings.getLocale = function () {
         return "en"
       }
-      assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, true, "'", jsyaml.DEFAULT_SCHEMA, 'en'), expected)
+      settings.getUseCustomSortRecursively = function () {
+        return true
+      }
+      assert.strictEqual(sortYaml(actual, 1, settings), expected)
     })
   
     test("when locale is `sv` should sort character `z` over `ä`", () => {
@@ -64,7 +67,7 @@ suite("Test dumpYaml", () => {
       settings.getLocale = function () {
         return "sv"
       }
-      assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, true, "'", jsyaml.DEFAULT_SCHEMA, 'sv'), expected)
+      assert.strictEqual(sortYaml(actual, 1, settings), expected)
     })
     
     test("should ignore case when sorting", () => {
@@ -75,8 +78,12 @@ suite("Test dumpYaml", () => {
       const expected =
         'completedDate: value\n' +
         'completeTask: value'
-  
-      assert.strictEqual(sortYaml(actual, 1, 0, 2, true, false, 500, true, true, "'", jsyaml.DEFAULT_SCHEMA, 'en'), expected)
+
+      const settings = new Settings()
+      settings.getUseCustomSortRecursively = function () {
+        return true
+      }
+      assert.strictEqual(sortYaml(actual, 1, settings), expected)
     })
     
   })

@@ -40,6 +40,9 @@ export class Settings {
         const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as string
         return this.getJsYamlSchemaFromString(schema)
     }
+    getSortOnSave(): number {
+        return vscode.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as number
+    }
     getUseCustomSortRecursively(): boolean {
         return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     }
@@ -60,6 +63,7 @@ export class Settings {
     notifySuccess = this.getNotifySuccess()
     quotingType = this.getQuotingType()
     schema = this.getSchema()
+    sortOnSave = this.getSortOnSave()
     useCustomSortRecursively = this.getUseCustomSortRecursively()
     useLeadingDashes = this.getUseLeadingDashes()
 

@@ -59,6 +59,10 @@ suite("Test Settings - getter", () => {
         assert.deepEqual(settings.getSchema(), jsyaml.DEFAULT_SCHEMA)
     })
 
+    test("default value of sortOnSave is set to `0`", () => {
+        assert.deepEqual(settings.getSortOnSave(), 0)
+    })
+
     test("default value of useCustomSortRecursively is set to `false`", () => {
         assert.deepEqual(settings.getUseCustomSortRecursively(), false)
     })
