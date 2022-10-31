@@ -14,10 +14,10 @@ The following commands support you at developing good code:
 * `npm run lint`: Run the linter
 
 Run the following commands to run SonarScanner:
-* `docker pull sonarqube`: Pull sonarqube container.
+* `docker pull --platform linux/x86_64 sonarqube`: Pull sonarqube container.
 * `docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube:latest`: Start sonarqube container. This can take some time.
 
-### Commit Changes
+### Commit changes
 Refer to [this blogpost](https://cbea.ms/git-commit/#end) by cbeams when committing changes. Issue numbers can be added in braces to the end of the commit message.
 
 It is also required to test your changes. Detailled information about test coverage will be published to [coveralls](https://coveralls.io/github/pascalre/vscode-yaml-sort).

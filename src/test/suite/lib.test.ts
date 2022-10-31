@@ -5,14 +5,10 @@
 
 // The module "assert" provides assertion methods from node
 import * as assert from "assert"
-import * as jsyaml from "js-yaml"
-import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
-import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import {
   addNewLineBeforeKeywordsUpToLevelN,
   addNewLineBeforeRootKeywords,
   getDelimiters,
-  getSchema,
   getYamlFilesInDirectory,
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
@@ -22,7 +18,6 @@ import {
   splitYaml
 } from "../../lib"
 
-// Defines a Mocha test suite to group tests of similar kind together
 suite("Test removeQuotesFromKeys", () => {
   test("should return `key: 1` when `'key': 1` is passed", () => {
     assert.strictEqual(removeQuotesFromKeys("'key': 1"), "key: 1")
@@ -35,30 +30,6 @@ suite("Test removeQuotesFromKeys", () => {
   })
   test("should remove the quotes from special keywords containing colons", () => {
     assert.strictEqual(removeQuotesFromKeys("'1:2:3': 1\n'key2': 2"), "1:2:3: 1\nkey2: 2")
-  })
-})
-
-suite("Test getSchema", () => {
-  test("should return `HOMEASSISTANT_SCHEMA`", () => {
-    assert.strictEqual(getSchema("HOMEASSISTANT_SCHEMA"), HOMEASSISTANT_SCHEMA)
-  })
-  test("should return `CLOUDFORMATION_SCHEMA`", () => {
-    assert.strictEqual(getSchema("CLOUDFORMATION_SCHEMA"), CLOUDFORMATION_SCHEMA)
-  })
-  test("should return `CORE_SCHEMA`", () => {
-    assert.strictEqual(getSchema("CORE_SCHEMA"), jsyaml.CORE_SCHEMA)
-  })
-  test("should return `DEFAULT_SCHEMA`", () => {
-    assert.strictEqual(getSchema("DEFAULT_SCHEMA"), jsyaml.DEFAULT_SCHEMA)
-  })
-  test("should return `FAILSAFE_SCHEMA`", () => {
-    assert.strictEqual(getSchema("FAILSAFE_SCHEMA"), jsyaml.FAILSAFE_SCHEMA)
-  })
-  test("should return `JSON_SCHEMA`", () => {
-    assert.strictEqual(getSchema("JSON_SCHEMA"), jsyaml.JSON_SCHEMA)
-  })
-  test("should return `DEFAULT_SCHEMA`", () => {
-    assert.strictEqual(getSchema(""), jsyaml.DEFAULT_SCHEMA)
   })
 })
 

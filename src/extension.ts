@@ -13,8 +13,9 @@ import {
   splitYaml,
   addNewLineBeforeKeywordsUpToLevelN,
   getYamlFilesInDirectory,
-  getSchema
 } from "./lib"
+import { Settings } from "./settings"
+import { Sort } from "./sort"
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -81,21 +82,26 @@ export function activate(context: vscode.ExtensionContext) {
  * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
  * @returns {string}           Clean yaml document.
  */
-export function dumpYaml(text: string, sortKeys: boolean, customSort: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, noCompatMode: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: jsyaml.Schema, locale: string): string {
+ export function dumpYaml(text: string, sortKeys: boolean, custom: number, indent: number, forceQuotes: boolean, lineWidth: number, noArrayIndent: boolean, noCompatMode: boolean, quotingType: "'" | '"', useCustomSortRecursively: boolean, schema: jsyaml.Schema, locale: string): string {
+  const settings = new Settings()
+  settings.getLocale = function() {
+    return locale
+  }
+
   if (Object.keys(text).length === 0) {
     return ""
   }
 
   let yaml = jsyaml.dump(text, {
-    indent: indent,
+    indent: settings.getIndent(),
     forceQuotes: forceQuotes,
     lineWidth: lineWidth,
     noArrayIndent: noArrayIndent,
     noCompatMode: noCompatMode,
     quotingType: quotingType,
     schema: schema,
-    sortKeys: (!(customSort > 0 && useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
-      const sortOrder = getCustomSortKeywords(customSort)
+    sortKeys: (!(custom > 0 && useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
+      const sortOrder = settings.getCustomSortKeywords(custom)
       const indexA = sortOrder.indexOf(a)
       const indexB = sortOrder.indexOf(b)
 
@@ -108,7 +114,7 @@ export function dumpYaml(text: string, sortKeys: boolean, customSort: number, in
       if (indexA === -1 && indexB !== -1) {
         return 1
       }
-      return a.localeCompare(b, locale)
+      return a.localeCompare(b, settings.getLocale())
     })
   })
 
@@ -123,7 +129,7 @@ export function dumpYaml(text: string, sortKeys: boolean, customSort: number, in
  * @param   {number}   count Number of the keyword list.
  * @returns {[string]} Array of custom sort keywords.
  */
-export function getCustomSortKeywords(count: number): [string] {
+ export function getCustomSortKeywords(count: number): [string] {
   if (count == 1 || count == 2 || count == 3) {
     return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_" + count) as [string]
   } else
@@ -146,18 +152,12 @@ export function applyEdits(activeEditor: vscode.TextEditor, edits: [vscode.TextE
 export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
   if (vscode.window.activeTextEditor) {
     const activeEditor = vscode.window.activeTextEditor
-    const emptyLinesUntilLevel = vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel") as number
-    const forceQuotes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes") as boolean
-    const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
-    const lineWidth = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
-    const locale = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
-    const noArrayIndent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
-    const noCompatMode = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
     const notifySuccess = vscode.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
     const quotingType = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | '"'
-    const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
-    const useCustomSortRecursively = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
+
+    const settings = new Settings()
+
     let doc = activeEditor.document.getText()
     let numberOfLeadingSpaces = 0
     let rangeToBeReplaced = new vscode.Range(
@@ -183,12 +183,12 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
       doc = activeEditor.document.getText(rangeToBeReplaced)
 
       // check if selection to sort is valid, maybe the user missed a trailing line
-      if (isSelectionInvalid(doc, getSchema(schema))) {
+      if (isSelectionInvalid(doc)) {
         vscode.window.showErrorMessage("YAML selection is invalid. Please check the ending of your selection.")
         return []
       }
     } else {
-      if (!validateYaml(false, doc, getSchema(schema))) {
+      if (!validateYaml(doc, settings, false)) {
         return []
       }
     }
@@ -208,7 +208,7 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
     // sort yaml
     let validYaml = true
     splitYaml(doc).forEach((unsortedYaml) => {
-      let sortedYaml = sortYaml(unsortedYaml, customSort, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
+      let sortedYaml = sortYaml(unsortedYaml, customSort, settings.getEmptyLinesUntilLevel(), settings.getIndent(), settings.getUseCustomSortRecursively(), settings.getForceQuotes(), settings.getLineWidth(), settings.getNoArrayIndent(), settings.getNoCompatMode(), quotingType, settings.getSchema(), settings.getLocale())
       if (sortedYaml) {
         if (!activeEditor.selection.isEmpty) {
           // get number of leading whitespaces, these whitespaces will be used for indentation
@@ -304,9 +304,8 @@ export function sortYaml(
 }
 
 export function validateYamlWrapper(): boolean {
-  const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
   if (vscode.window.activeTextEditor) {
-    validateYaml(true, vscode.window.activeTextEditor.document.getText(), getSchema(schema))
+    validateYaml(vscode.window.activeTextEditor.document.getText(), new Settings(), true)
     return true
   }
   /* istanbul ignore next */
@@ -320,12 +319,12 @@ export function validateYamlWrapper(): boolean {
  * @param   {string}  schema Expected schema.
  * @returns {boolean} True, if yaml is valid.
  */
-export function validateYaml(notifySuccess: boolean, text: string, schema: jsyaml.Schema): boolean {
+export function validateYaml(text: string, settings: Settings, notify: boolean): boolean {
   try {
     splitYaml(text).forEach((yaml) => {
-      jsyaml.load(yaml, { schema: schema })
+      jsyaml.load(yaml, { schema: settings.getSchema() })
     })
-    if (notifySuccess) {
+    if (notify && settings.getNotifySuccess()) {
       vscode.window.showInformationMessage("YAML is valid.")
     }
     return true
@@ -339,20 +338,11 @@ export function validateYaml(notifySuccess: boolean, text: string, schema: jsyam
 
 export function formatYamlWrapper(): vscode.TextEdit[] {
   const activeEditor = vscode.window.activeTextEditor
-  const forceQuotes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes") as boolean
-  const indent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
-  const lineWidth = vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
-  const locale = vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
-  const noArrayIndent = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
-  const noCompatMode = vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
-  const notifySuccess = vscode.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
-  const quotingType = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | '"'
-  const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as "HOMEASSISTANT_SCHEMA" | "CLOUDFORMATION_SCHEMA" | "CORE_SCHEMA" | "DEFAULT_SCHEMA" | "FAILSAFE_SCHEMA" | "JSON_SCHEMA"
-  const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
+  const settings = new Settings()
 
   if (activeEditor) {
     let doc = activeEditor.document.getText()
-    let delimiters = getDelimiters(doc, true, useLeadingDashes)
+    let delimiters = getDelimiters(doc, true, settings.getUseLeadingDashes())
     // remove yaml metadata tags
     const matchMetadata = /^%.*\n/gm
     // set metadata tags, if there is no metadata tag it should be an emtpy array
@@ -368,7 +358,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
     let validYaml = true
     const yamls = splitYaml(doc)
     for (const unformattedYaml of yamls) {
-      formattedYaml = formatYaml(unformattedYaml, false, indent, forceQuotes, lineWidth, noArrayIndent, noCompatMode, notifySuccess, quotingType, getSchema(schema), locale)
+      formattedYaml = formatYaml(unformattedYaml, false, settings.getIndent(), settings.getForceQuotes(), settings.getLineWidth(), settings.getNoArrayIndent(), settings.getNoCompatMode(), settings.getNotifySuccess(), settings.getQuotingType(), settings.getSchema(), settings.getLocale())
       if (formattedYaml) {
         newText += delimiters.shift() + formattedYaml
       } else {
@@ -377,7 +367,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
       }
     }
     if (validYaml) {
-      if (useLeadingDashes) {
+      if (settings.getUseLeadingDashes()) {
         newText = "---\n" + newText
       }
       const edits = vscode.TextEdit.replace(
@@ -398,8 +388,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
  * @returns {string} Formatted yaml.
  */
 export function formatYaml(
-  yaml: string,
-  useLeadingDashes: boolean,
+  yaml: string,  useLeadingDashes: boolean,
   indent: number,
   forceQuotes: boolean,
   lineWidth: number,
@@ -449,7 +438,8 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
   const files = getYamlFilesInDirectory(uri.fsPath)
   files.forEach((file: string) => {
     const yaml = fs.readFileSync(file, 'utf-8').toString()
-    const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, getSchema(schema), locale)
+    const sortedYaml = sortYaml(yaml, 0, emptyLinesUntilLevel, indent, useCustomSortRecursively, forceQuotes, lineWidth, noArrayIndent, noCompatMode, quotingType, new Settings().getJsYamlSchemaFromString(schema), locale)
+
     if (sortedYaml) {
       try {
         fs.writeFileSync(file, sortedYaml)
@@ -468,17 +458,16 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
 /**
  * Checks if a text ends with a character which suggests, that the selection is missing something.
  * @param   {string}        text Text which should represent a valid yaml selection to sort.
- * @param   {jsyaml.Schema} schema 
  * @returns {boolean} true, if selection is missing something
  */
-export function isSelectionInvalid(text: string, schema: jsyaml.Schema): boolean {
+export function isSelectionInvalid(text: string): boolean {
   // remove trailing whitespaces, to check for things like 'text:  '
   text = text.trim()
   const notValidEndingCharacters = [":", "|", ">"]
   if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
     return true
   }
-  return !validateYaml(false, text, schema)
+  return !validateYaml(text, new Settings(), false)
 }
 
 /**
@@ -513,7 +502,6 @@ export function applyComments(text: string, comments: Map<string, string>): stri
     } else {
       let index = text.search(line)
       if (index == -1) {
-        console.log("Comment not found. Searching for lines with other indentation...")
         const trimmedLine = line.trim()
         index = text.search(trimmedLine)
         if (index != -1) {

@@ -3,7 +3,6 @@
 // Please refer to their documentation on https://mochajs.org/ for help.
 //
 
-// The module "assert" provides assertion methods from node
 import * as assert from "assert"
 import * as fs from "fs"
 import * as vscode from "vscode"
@@ -11,25 +10,22 @@ import * as path from "path"
 import * as jsyaml from "js-yaml"
 
 import {
-  applyComments,
-  findComments,
-  formatYaml,
   formatYamlWrapper,
   getCustomSortKeywords,
-  isSelectionInvalid,
   sortYaml,
   sortYamlFiles,
   sortYamlWrapper,
-  validateYaml,
-  validateYamlWrapper
+  validateYamlWrapper,
+  isSelectionInvalid,
+  applyComments,
+  findComments,
+  formatYaml,
+  validateYaml
 } from "../../extension"
+import { Settings } from "../../settings"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
-import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
 
 const locale = "en"
-
 /*
 suite("Test setting sortOnSave", () => {
   function syncWriteFile(filename: string, data: any) {
@@ -167,13 +163,13 @@ suite("Test getCustomSortKeywords", () => {
 
 suite("Test isSelectionInvalid", () => {
   test("should return `true` when `text` is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(isSelectionInvalid("text"), false)
   })
   test("should return `false` when a string with trailing colon is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text:", jsyaml.CORE_SCHEMA), true)
+    assert.strictEqual(isSelectionInvalid("text:"), true)
   })
   test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text: ", jsyaml.CORE_SCHEMA), true)
+    assert.strictEqual(isSelectionInvalid("text: "), true)
   })
 })
 
@@ -187,7 +183,7 @@ suite("Test validateYaml", () => {
       'animals:\n' +
       '  kitty:\n' +
       '    age: 3'
-    assert.strictEqual(validateYaml(false, actual, jsyaml.CORE_SCHEMA), true)
+    assert.strictEqual(validateYaml(actual, new Settings(), false), true)
   })
 
   test("should return `true` when passing two seperated valid yaml", () => {
@@ -200,18 +196,19 @@ suite("Test validateYaml", () => {
       'animals:\n' +
       '  kitty:\n' +
       '    age: 3'
-    assert.strictEqual(validateYaml(true, actual, jsyaml.CORE_SCHEMA), true)
+    assert.strictEqual(validateYaml(actual, new Settings(), false), true)
   })
 
   test("should return `false` when passing an invalid yaml", () => {
-    assert.strictEqual(validateYaml(false, "network: ethernets:", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml("network: ethernets:", new Settings(), false), false)
   })
   test("should return `false` when yaml indentation is not correct", () => {
-    assert.strictEqual(validateYaml(false, "person:\nbob\n  age:23", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml("person:\nbob\n  age:23", new Settings(), false), false)
   })
   test("should return `false` when yaml contains duplicate keys", () => {
-    assert.strictEqual(validateYaml(true, "person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n", jsyaml.CORE_SCHEMA), false)
+    assert.strictEqual(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n", new Settings(), false), false)
   })
+  /*
   test("should return `true` on CLOUDFORMATION_SCHEMA", () => {
     assert.strictEqual(validateYaml(true, "RoleName: !Sub \"AdministratorAccess\"", jsyaml.CORE_SCHEMA), false)
     assert.strictEqual(validateYaml(true, "RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
@@ -219,7 +216,7 @@ suite("Test validateYaml", () => {
   test("should return `true` on HOMEASSISTANT_SCHEMA", () => {
     assert.strictEqual(validateYaml(true, "password: !env_var PASSWORD default_password", jsyaml.CORE_SCHEMA), false)
     assert.strictEqual(validateYaml(true, "password: !env_var PASSWORD default_password", HOMEASSISTANT_SCHEMA), true)
-  })
+  })*/
   test("do not fail when executing command", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)

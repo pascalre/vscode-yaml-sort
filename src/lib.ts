@@ -1,24 +1,4 @@
 import { glob } from "glob"
-import * as jsyaml from "js-yaml"
-import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
-import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
-
-/**
- * Returns a schema from js-yaml when a schema name is passed
- * @param {string} schema Schema 
- * @returns {jsyaml.Schema} Schema
- */
-export function getSchema(schema: string): jsyaml.Schema {
-  switch(schema) {
-    case "HOMEASSISTANT_SCHEMA"  : return HOMEASSISTANT_SCHEMA as jsyaml.Schema
-    case "CLOUDFORMATION_SCHEMA" : return CLOUDFORMATION_SCHEMA as jsyaml.Schema
-    case "CORE_SCHEMA"           : return jsyaml.CORE_SCHEMA
-    case "DEFAULT_SCHEMA"        : return jsyaml.DEFAULT_SCHEMA
-    case "FAILSAFE_SCHEMA"       : return jsyaml.FAILSAFE_SCHEMA
-    case "JSON_SCHEMA"           : return jsyaml.JSON_SCHEMA
-    default                      : return jsyaml.DEFAULT_SCHEMA
-  }
-}
 
 /**
  * Returns all files in a directory and its subdirectories with extension .yml or .yaml
