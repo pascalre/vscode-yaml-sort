@@ -11,7 +11,6 @@ import * as jsyaml from "js-yaml"
 
 import {
   formatYamlWrapper,
-  getCustomSortKeywords,
   sortYaml,
   sortYamlFiles,
   sortYamlWrapper,
@@ -19,11 +18,11 @@ import {
   isSelectionInvalid,
   applyComments,
   findComments,
-  formatYaml,
-  validateYaml
+  formatYaml
 } from "../../extension"
 import { Settings } from "../../settings"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
+import { JsYamlAdapter } from "../../adapter/js-yaml-adapter"
 
 /*
 suite("Test setting sortOnSave", () => {
@@ -145,18 +144,22 @@ suite("Test setting sortOnSave", () => {
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
-    assert.deepStrictEqual(getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+    const settings = new Settings()
+    settings.getCustomSortKeywords = function () {
+      return ["apiVersion", "kind", "metadata", "spec", "data"]
+    }
+    assert.deepStrictEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
   })
   test("should return `[]` for custom keywords 2 and 3", () => {
-    assert.deepStrictEqual(getCustomSortKeywords(2), [])
-    assert.deepStrictEqual(getCustomSortKeywords(3), [])
+    assert.deepStrictEqual(new Settings().getCustomSortKeywords(2), [])
+    assert.deepStrictEqual(new Settings().getCustomSortKeywords(3), [])
   })
 
-  test("should fail when parameter is not in [1, 2, 3]", () => {
-    assert.throws(() => getCustomSortKeywords(0), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords(4), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords(-1), new Error("The count parameter is not in a valid range"))
-    assert.throws(() => getCustomSortKeywords(1.5), new Error("The count parameter is not in a valid range"))
+  test("should return [] when parameter is not in [1, 2, 3]", () => {
+    assert.deepStrictEqual(new Settings().getCustomSortKeywords(0), [])
+    assert.deepStrictEqual(new Settings().getCustomSortKeywords(4), [])
+    assert.deepStrictEqual(new Settings().getCustomSortKeywords(-1), [])
+    assert.deepStrictEqual(new Settings().getCustomSortKeywords(1.5), [])
   })
 })
 
@@ -173,49 +176,6 @@ suite("Test isSelectionInvalid", () => {
 })
 
 suite("Test validateYaml", () => {
-  test("should return `true` when passing a valid yaml", () => {
-    const actual =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3'
-    assert.strictEqual(validateYaml(actual, new Settings(), false), true)
-  })
-
-  test("should return `true` when passing two seperated valid yaml", () => {
-    const actual =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      '---\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3'
-    assert.strictEqual(validateYaml(actual, new Settings(), false), true)
-  })
-
-  test("should return `false` when passing an invalid yaml", () => {
-    assert.strictEqual(validateYaml("network: ethernets:", new Settings(), false), false)
-  })
-  test("should return `false` when yaml indentation is not correct", () => {
-    assert.strictEqual(validateYaml("person:\nbob\n  age:23", new Settings(), false), false)
-  })
-  test("should return `false` when yaml contains duplicate keys", () => {
-    assert.strictEqual(validateYaml("person:\n  bob:\n    age: 23\n  bob:\n    age: 25\n", new Settings(), false), false)
-  })
-  /*
-  test("should return `true` on CLOUDFORMATION_SCHEMA", () => {
-    assert.strictEqual(validateYaml(true, "RoleName: !Sub \"AdministratorAccess\"", jsyaml.CORE_SCHEMA), false)
-    assert.strictEqual(validateYaml(true, "RoleName: !Sub \"AdministratorAccess\"", CLOUDFORMATION_SCHEMA), true)
-  })
-  test("should return `true` on HOMEASSISTANT_SCHEMA", () => {
-    assert.strictEqual(validateYaml(true, "password: !env_var PASSWORD default_password", jsyaml.CORE_SCHEMA), false)
-    assert.strictEqual(validateYaml(true, "password: !env_var PASSWORD default_password", HOMEASSISTANT_SCHEMA), true)
-  })*/
   test("do not fail when executing command", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
@@ -269,7 +229,7 @@ suite("Test dumpYaml", () => {
       'keyword2: value'
 
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function() {
+    settings.getUseCustomSortRecursively = function () {
       return true
     }
     assert.strictEqual(sortYaml(actual, 1, settings), expected)
@@ -284,7 +244,7 @@ suite("Test dumpYaml", () => {
       'z: value'
 
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function() {
+    settings.getUseCustomSortRecursively = function () {
       return true
     }
     assert.strictEqual(sortYaml(actual, 1, settings), expected)
@@ -293,7 +253,7 @@ suite("Test dumpYaml", () => {
       'z: value\n' +
       'ä: value'
 
-    settings.getLocale = function() {
+    settings.getLocale = function () {
       return "sv"
     }
     assert.strictEqual(sortYaml(actual, 1, settings), expected)
@@ -308,7 +268,7 @@ suite("Test dumpYaml", () => {
       'completeTask: value'
 
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function() {
+    settings.getUseCustomSortRecursively = function () {
       return true
     }
     assert.strictEqual(sortYaml(actual, 1, settings), expected)
@@ -524,7 +484,11 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, false, true, new Settings()), expected)
+    const settings = new Settings()
+    settings.getUseLeadingDashes = function () {
+      return false
+    }
+    assert.strictEqual(formatYaml(actual, false, settings), expected)
 
     expected =
       '---\n' +
@@ -536,11 +500,11 @@ suite("Test formatYaml", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    assert.strictEqual(formatYaml(actual, true, true, new Settings()), expected)
+    assert.strictEqual(formatYaml(actual, true, new Settings()), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, true, new Settings()), null)
+    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, new Settings()), null)
   })
 })
 
@@ -667,7 +631,7 @@ suite("Test sortYaml", () => {
       'spec: value'
 
     const settings = new Settings()
-    settings.getEmptyLinesUntilLevel = function() {
+    settings.getEmptyLinesUntilLevel = function () {
       return 2
     }
     assert.strictEqual(sortYaml(actual, 0, settings), expected)
@@ -680,7 +644,7 @@ suite("Test sortYaml", () => {
     expected = actual
 
     const settings = new Settings()
-    settings.getSchema = function() {
+    settings.getSchema = function () {
       return jsyaml.CORE_SCHEMA
     }
     assert.strictEqual(sortYaml(actual, 0, settings), expected)
@@ -700,16 +664,16 @@ suite("Test sortYaml", () => {
       '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
 
     const settings = new Settings()
-    settings.getSchema = function() {
+    settings.getSchema = function () {
       return CLOUDFORMATION_SCHEMA
     }
-    settings.getForceQuotes = function() {
+    settings.getForceQuotes = function () {
       return true
     }
-    settings.getQuotingType = function() {
+    settings.getQuotingType = function () {
       return "\""
     }
-    settings.getEmptyLinesUntilLevel = function() {
+    settings.getEmptyLinesUntilLevel = function () {
       return 2
     }
     assert.strictEqual(sortYaml(actual, 0, settings), expected)
@@ -724,12 +688,12 @@ suite("Test sortYaml", () => {
       'key:\n' +
       '  "off": egg\n' +
       '  "on": foo'
-    
+
     const settings = new Settings()
-    settings.getNoCompatMode = function() {
+    settings.getNoCompatMode = function () {
       return false
     }
-    settings.getQuotingType = function() {
+    settings.getQuotingType = function () {
       return "\""
     }
     assert.strictEqual(sortYaml(actual, 0, settings), expected)
@@ -738,7 +702,7 @@ suite("Test sortYaml", () => {
       'key:\n' +
       '  off: egg\n' +
       '  on: foo'
-    settings.getNoCompatMode = function() {
+    settings.getNoCompatMode = function () {
       return true
     }
     assert.strictEqual(sortYaml(actual, 0, settings), expected)

@@ -14,10 +14,16 @@ import {
   addNewLineBeforeKeywordsUpToLevelN,
   getYamlFilesInDirectory,
 } from "./lib"
+
+import {
+  dumpYaml, JsYamlAdapter
+} from "./adapter/js-yaml-adapter"
+
 import { Settings } from "./settings"
 import { Sort } from "./sort"
 
 const settings = new Settings()
+const jsyamladapter = new JsYamlAdapter(settings)
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -37,9 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
   // on a configuration setting
   let registration: vscode.Disposable | undefined;
   function registerFormatterIfEnabled() {
-    const isEnabled = vscode.workspace.getConfiguration().get('vscode-yaml-sort.useAsFormatter', true);
+    const isEnabled = settings.getUseAsFormatter()
     if (isEnabled && !registration) {/* istanbul ignore next */
-      registration = vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter);
+      registration = vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter)
     } else if (!isEnabled && registration) {/* istanbul ignore next */
       registration.dispose();/* istanbul ignore next */
       registration = undefined;
@@ -78,62 +84,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 /**
- * Dumps a yaml with the user specific settings.
- * @param   {string}  text     Yaml document which should be dumped.
- * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
- * @returns {string}           Clean yaml document.
- */
- export function dumpYaml(text: string, sortKeys: boolean, custom: number, settings: Settings): string {
-
-  if (Object.keys(text).length === 0) {
-    return ""
-  }
-
-  let yaml = jsyaml.dump(text, {
-    indent: settings.getIndent(),
-    forceQuotes: settings.getForceQuotes(),
-    lineWidth: settings.getLineWidth(),
-    noArrayIndent: settings.getNoArrayIndent(),
-    noCompatMode: settings.getNoCompatMode(),
-    quotingType: settings.getQuotingType(),
-    schema: settings.getSchema(),
-    sortKeys: (!(custom > 0 && settings.getUseCustomSortRecursively()) ? sortKeys : (a: string, b: string) => {
-      const sortOrder = settings.getCustomSortKeywords(custom)
-      const indexA = sortOrder.indexOf(a)
-      const indexB = sortOrder.indexOf(b)
-
-      if (indexA > -1 && indexB > -1) {
-        return indexA > indexB ? 1 : indexA < indexB ? -1 : 0
-      }
-      if (indexA !== -1 && indexB === -1) {
-        return -1
-      }
-      if (indexA === -1 && indexB !== -1) {
-        return 1
-      }
-      return a.localeCompare(b, settings.getLocale())
-    })
-  })
-
-  // this is neccesary to avoid linebreaks in a selection sort
-  yaml = removeTrailingCharacters(yaml, 1)
-
-  return yaml
-}
-
-/**
- * Looks up the user settings for one of the three the custom sort keywords.
- * @param   {number}   count Number of the keyword list.
- * @returns {[string]} Array of custom sort keywords.
- */
- export function getCustomSortKeywords(count: number): [string] {
-  if (count == 1 || count == 2 || count == 3) {
-    return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_" + count) as [string]
-  } else
-    throw new Error("The count parameter is not in a valid range")
-}
-
-/**
  * Applys edits to a text editor
  * @param activeEditor Editor to apply the changes
  * @param edits Changes to apply
@@ -149,9 +99,9 @@ export function applyEdits(activeEditor: vscode.TextEditor, edits: [vscode.TextE
 export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
   if (vscode.window.activeTextEditor) {
     const activeEditor = vscode.window.activeTextEditor
-    const notifySuccess = vscode.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
-    const quotingType = vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | '"'
-    const useLeadingDashes = vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
+    const notifySuccess = settings.getNotifySuccess()
+    const quotingType = settings.getQuotingType()
+    const useLeadingDashes = settings.getUseLeadingDashes()
 
     let doc = activeEditor.document.getText()
     let numberOfLeadingSpaces = 0
@@ -183,7 +133,12 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
         return []
       }
     } else {
-      if (!validateYaml(doc, settings, false)) {
+      try {
+        jsyamladapter.validateYaml(doc)
+      } catch (e) {
+        if (e instanceof Error) {
+          vscode.window.showErrorMessage("YAML is invalid: " + e.message)
+        }
         return []
       }
     }
@@ -249,7 +204,7 @@ export function sortYaml(
     let sortedYaml = ""
 
     if (customSort > 0 && !settings.getUseCustomSortRecursively()) {
-      const keywords = getCustomSortKeywords(customSort)
+      const keywords = settings.getCustomSortKeywords(customSort)
 
       keywords.forEach(key => {
         if (doc[key]) {
@@ -291,35 +246,20 @@ export function sortYaml(
 
 export function validateYamlWrapper(): boolean {
   if (vscode.window.activeTextEditor) {
-    validateYaml(vscode.window.activeTextEditor.document.getText(), settings, true)
-    return true
+    const text = vscode.window.activeTextEditor.document.getText()
+    try {
+      jsyamladapter.validateYaml(text)
+      vscode.window.showInformationMessage("YAML is valid.")
+      return true
+    } catch (e) {
+      if (e instanceof Error) {
+        vscode.window.showErrorMessage("YAML is invalid: " + e.message)
+      }
+      return false
+    }
   }
   /* istanbul ignore next */
   return false
-}
-
-/**
- * Validates a given yaml document.
- * @param   {string}  notifySuccess Notify successfull validation.
- * @param   {string}  text Yaml to be validated.
- * @param   {string}  schema Expected schema.
- * @returns {boolean} True, if yaml is valid.
- */
-export function validateYaml(text: string, settings: Settings, notify: boolean): boolean {
-  try {
-    splitYaml(text).forEach((yaml) => {
-      jsyaml.load(yaml, { schema: settings.getSchema() })
-    })
-    if (notify && settings.getNotifySuccess()) {
-      vscode.window.showInformationMessage("YAML is valid.")
-    }
-    return true
-  } catch (e) {
-    if (e instanceof Error) {
-      vscode.window.showErrorMessage("YAML is invalid: " + e.message)
-    }
-    return false
-  }
 }
 
 export function formatYamlWrapper(): vscode.TextEdit[] {
@@ -343,7 +283,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
     let validYaml = true
     const yamls = splitYaml(doc)
     for (const unformattedYaml of yamls) {
-      formattedYaml = formatYaml(unformattedYaml, false, settings.getNotifySuccess(), settings)
+      formattedYaml = formatYaml(unformattedYaml, false, settings)
       if (formattedYaml) {
         newText += delimiters.shift() + formattedYaml
       } else {
@@ -375,7 +315,6 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
 export function formatYaml(
   yaml: string,
   useLeadingDashes: boolean,
-  notifySuccess: boolean,
   settings: Settings
 ): string | null {
   try {
@@ -386,7 +325,7 @@ export function formatYaml(
     if (useLeadingDashes) {
       doc = "---\n" + doc
     }
-    if (notifySuccess) {
+    if (settings.getNotifySuccess()) {
       vscode.window.showInformationMessage("Yaml formatted successfully")
     }
     return doc
@@ -435,7 +374,15 @@ export function isSelectionInvalid(text: string): boolean {
   if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
     return true
   }
-  return !validateYaml(text, settings, false)
+  try {
+    jsyamladapter.validateYaml(text)
+    return false
+  } catch (e) {
+    if (e instanceof Error) {
+      vscode.window.showErrorMessage("YAML is invalid: " + e.message)
+    }
+    return true
+  }
 }
 
 /**

@@ -46,6 +46,9 @@ export class Settings {
     getUseCustomSortRecursively(): boolean {
         return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     }
+    getUseAsFormatter(): boolean {
+        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useAsFormatter") as boolean
+    }
     getUseLeadingDashes(): boolean {
         return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
     }
@@ -64,17 +67,18 @@ export class Settings {
     quotingType = this.getQuotingType()
     schema = this.getSchema()
     sortOnSave = this.getSortOnSave()
+    useAsFormatter = this.getUseAsFormatter()
     useCustomSortRecursively = this.getUseCustomSortRecursively()
     useLeadingDashes = this.getUseLeadingDashes()
 
     getJsYamlSchemaFromString(schema: string): jsyaml.Schema {
-        switch(schema) {
-            case "HOMEASSISTANT_SCHEMA"  : return HOMEASSISTANT_SCHEMA as jsyaml.Schema
-            case "CLOUDFORMATION_SCHEMA" : return CLOUDFORMATION_SCHEMA as jsyaml.Schema
-            case "CORE_SCHEMA"           : return jsyaml.CORE_SCHEMA
-            case "FAILSAFE_SCHEMA"       : return jsyaml.FAILSAFE_SCHEMA
-            case "JSON_SCHEMA"           : return jsyaml.JSON_SCHEMA
-            default                      : return jsyaml.DEFAULT_SCHEMA
+        switch (schema) {
+            case "HOMEASSISTANT_SCHEMA": return HOMEASSISTANT_SCHEMA as jsyaml.Schema
+            case "CLOUDFORMATION_SCHEMA": return CLOUDFORMATION_SCHEMA as jsyaml.Schema
+            case "CORE_SCHEMA": return jsyaml.CORE_SCHEMA
+            case "FAILSAFE_SCHEMA": return jsyaml.FAILSAFE_SCHEMA
+            case "JSON_SCHEMA": return jsyaml.JSON_SCHEMA
+            default: return jsyaml.DEFAULT_SCHEMA
         }
     }
 }

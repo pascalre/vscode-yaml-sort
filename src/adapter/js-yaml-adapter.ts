@@ -1,29 +1,42 @@
 import { Settings } from "../settings"
 import * as jsyaml from "js-yaml"
-import { removeTrailingCharacters } from "../lib"
+import { removeTrailingCharacters, splitYaml } from "../lib"
+import { Sort } from "../sort"
 
+export class JsYamlAdapter {
+  settings: Settings
 
-export function hasTextYamlKeys(text: string) {
-  if (Object.keys(text).length === 0) {
-    return false
+  constructor(settings: Settings) {
+    this.settings = settings
   }
-  return true
+
+  /**
+   * Validates a yaml document
+   * @param text Yaml document
+   * @returns true if yaml is valid
+   */
+  validateYaml(text: string): boolean {
+    splitYaml(text).forEach((yaml) => {
+      jsyaml.load(yaml, { schema: this.settings.getSchema() })
+    })
+    return true
+  }
 }
 
 /**
  * Dumps a yaml with the user specific settings.
- * @param   {string}  text     Yaml document which should be dumped
- * @param   {boolean} sortKeys If true, will sort the keys in the document
- * @returns {string} Yaml document
+ * @param   {string}  text     Yaml document which should be dumped.
+ * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
+ * @returns {string}           Clean yaml document.
  */
-/*
-export function dumpYaml(text: string, settings: Settings, custom: number, sortKeys: boolean): string {
-  if (!hasTextYamlKeys(text)) {
+export function dumpYaml(text: string, sortKeys: boolean, custom: number, settings: Settings): string {
+
+  if (Object.keys(text).length === 0) {
     return ""
   }
 
-  console.log("Here we go. Custom: " + custom + ", length: " + settings.getCustomSortKeywords(custom).length + ", keywords: " + settings.getCustomSortKeywords(custom) + ", recursive: " + settings.getUseCustomSortRecursively())
-  
+  const sort = new Sort(settings, custom)
+
   let yaml = jsyaml.dump(text, {
     indent: settings.getIndent(),
     forceQuotes: settings.getForceQuotes(),
@@ -33,20 +46,7 @@ export function dumpYaml(text: string, settings: Settings, custom: number, sortK
     quotingType: settings.getQuotingType(),
     schema: settings.getSchema(),
     sortKeys: (!(custom > 0 && settings.getUseCustomSortRecursively()) ? sortKeys : (a: string, b: string) => {
-      const sortOrder = settings.getCustomSortKeywords(custom)
-      const indexA = sortOrder.indexOf(a)
-      const indexB = sortOrder.indexOf(b)
-
-      if (indexA > -1 && indexB > -1) {
-        return indexA > indexB ? 1 : indexA < indexB ? -1 : 0
-      }
-      if (indexA !== -1 && indexB === -1) {
-        return -1
-      }
-      if (indexA === -1 && indexB !== -1) {
-        return 1
-      }
-      return a.localeCompare(b, settings.getLocale())
+      return sort.customSort(a, b)
     })
   })
 
@@ -55,4 +55,3 @@ export function dumpYaml(text: string, settings: Settings, custom: number, sortK
 
   return yaml
 }
-*/
