@@ -9,13 +9,6 @@ export function getYamlFilesInDirectory(uri: string): string[] {
   return glob.sync(uri + "/**/**.y?(a)ml")
 }
 
-export function hasTextYamlKeys(text: string) {
-  if (Object.keys(text).length === 0) {
-    return false
-  }
-  return true
-}
-
 /**
  * Removes single quotes from special keywords
  * e.g. '1.4.2': will result in 1.4.2: or 'puppet::key': will result in puppet::key:

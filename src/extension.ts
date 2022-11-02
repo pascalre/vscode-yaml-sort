@@ -10,9 +10,9 @@ import {
   removeLeadingLineBreakOfFirstElement,
   replaceTabsWithSpaces,
   removeTrailingCharacters,
-  splitYaml,
   addNewLineBeforeKeywordsUpToLevelN,
   getYamlFilesInDirectory,
+  splitYaml,
 } from "./lib"
 
 import {
@@ -20,7 +20,8 @@ import {
 } from "./adapter/js-yaml-adapter"
 
 import { Settings } from "./settings"
-import { Sort } from "./sort"
+import { VsCodeAdapter } from "./adapter/vs-code-adapter"
+import { applyComments, findComments, formatYaml } from "./util/yaml-util"
 
 const settings = new Settings()
 const jsyamladapter = new JsYamlAdapter(settings)
@@ -58,42 +59,31 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.sortYaml", () => {
-    sortYamlWrapper()
-  }))
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.validateYaml", () => {
-    validateYamlWrapper()
-  }))
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.formatYaml", () => {
-    formatYamlWrapper()
-  }))
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_1", () => {
-    sortYamlWrapper(1)
-  }))
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_2", () => {
-    /* istanbul ignore next */
-    sortYamlWrapper(2)
-  }))
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_3", () => {
-    /* istanbul ignore next */
-    sortYamlWrapper(3)
-  }))
-  context.subscriptions.push(vscode.commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: vscode.Uri) => {
-    sortYamlFiles(uri)
-  }))
-}
-
-/**
- * Applys edits to a text editor
- * @param activeEditor Editor to apply the changes
- * @param edits Changes to apply
- */
-export function applyEdits(activeEditor: vscode.TextEditor, edits: [vscode.TextEdit]) {
-  if (activeEditor) {
-    const workEdits = new vscode.WorkspaceEdit()
-    workEdits.set(activeEditor.document.uri, edits)
-    vscode.workspace.applyEdit(workEdits)
-  }
+  context.subscriptions.push(
+    vscode.commands.registerCommand("vscode-yaml-sort.sortYaml", () => {
+      sortYamlWrapper()
+    }),
+    vscode.commands.registerCommand("vscode-yaml-sort.validateYaml", () => {
+      validateYamlWrapper()
+    }),
+    vscode.commands.registerCommand("vscode-yaml-sort.formatYaml", () => {
+      formatYamlWrapper()
+    }),
+    vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_1", () => {
+      sortYamlWrapper(1)
+    }),
+    vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_2", () => {
+      /* istanbul ignore next */
+      sortYamlWrapper(2)
+    }),
+    vscode.commands.registerCommand("vscode-yaml-sort.customSortYaml_3", () => {
+      /* istanbul ignore next */
+      sortYamlWrapper(3)
+    }),
+    vscode.commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: vscode.Uri) => {
+      sortYamlFiles(uri)
+    })
+  )
 }
 
 export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
@@ -183,7 +173,7 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
       if (notifySuccess) {
         vscode.window.showInformationMessage("Keys resorted successfully")
       }
-      applyEdits(activeEditor, [edits])
+      new VsCodeAdapter().applyEdits([edits])
       return [edits]
     }
   }
@@ -300,41 +290,11 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
           new vscode.Position(0, 0),
           new vscode.Position(activeEditor.document.lineCount + 1, 0)),
         newText)
-      applyEdits(activeEditor, [edits])
+      new VsCodeAdapter().applyEdits([edits])
       return [edits]
     }
   }
   return []
-}
-
-/**
- * Formats a yaml document (without sorting).
- * @param   {string} yaml Yaml to be formatted.
- * @returns {string} Formatted yaml.
- */
-export function formatYaml(
-  yaml: string,
-  useLeadingDashes: boolean,
-  settings: Settings
-): string | null {
-  try {
-    const loadOptions = { schema: settings.getSchema() }
-    const comments = findComments(yaml)
-    let doc = dumpYaml(jsyaml.load(yaml, loadOptions) as string, false, 0, settings)
-    doc = applyComments(doc, comments)
-    if (useLeadingDashes) {
-      doc = "---\n" + doc
-    }
-    if (settings.getNotifySuccess()) {
-      vscode.window.showInformationMessage("Yaml formatted successfully")
-    }
-    return doc
-  } catch (e) {
-    if (e instanceof Error) {
-      vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
-    }
-    return null
-  }
 }
 
 /**
@@ -383,55 +343,4 @@ export function isSelectionInvalid(text: string): boolean {
     }
     return true
   }
-}
-
-/**
- * Finds all full line comments in a given yaml (ignoring comments in the same line with code).
- * @param text Yaml document
- */
-export function findComments(text: string): Map<string, string> {
-  const comments = new Map<string, string>
-  const lines = text.toString().split("\n")
-  for (let i = 0; i < lines.length; i++) {
-    let comment = ""
-    while (/^ *#/.test(lines[i])) {
-      comment += lines[i] + "\n"
-      i++
-    }
-    comment = comment.replace(/\n$/, "")
-    if (comment != "") {
-      if (i < lines.length) {
-        comments.set(comment, lines[i])
-      } else {
-        comments.set(comment, '')
-      }
-    }
-  }
-  return comments
-}
-
-export function applyComments(text: string, comments: Map<string, string>): string {
-  for (const [comment, line] of comments) {
-    if (line == '') {
-      text += "\n" + comment
-    } else {
-      let index = text.search(line)
-      if (index == -1) {
-        const trimmedLine = line.trim()
-        index = text.search(trimmedLine)
-        if (index != -1) {
-          const textHelper = text.slice(0, index)
-          const lastLineBreak = textHelper.lastIndexOf('\n')
-          // remove trailing whitespaces
-          const textBeforeComment = textHelper.slice(0, lastLineBreak)
-          let textAfterComment = textHelper.slice(lastLineBreak)
-          textAfterComment += text.slice(text.search(trimmedLine))
-          text = textBeforeComment + "\n" + comment.split("\n")[0] + textAfterComment
-        }
-      } else {
-        text = text.slice(0, index) + comment + "\n" + text.slice(text.search(line))
-      }
-    }
-  }
-  return text
 }

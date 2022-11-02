@@ -2,14 +2,18 @@ import * as jsyaml from "js-yaml"
 import * as vscode from "vscode"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
+import { VsCodeAdapter } from "./adapter/vs-code-adapter"
 
 export class Settings {
+    // vscodeadapter = new VsCodeAdapter()
+
     getCustomSortKeywords(index: number): string[] {
         if ([1, 2, 3].includes(index))
             return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_" + index) as string[]
         return []
     }
     getEmptyLinesUntilLevel(): number {
+        // return this.vscodeadapter.getProperty("emptyLinesUntilLevel") as number
         return vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel") as number
     }
     getForceQuotes(): boolean {

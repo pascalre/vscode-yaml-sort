@@ -11,18 +11,16 @@ import * as jsyaml from "js-yaml"
 
 import {
   formatYamlWrapper,
-  sortYaml,
   sortYamlFiles,
   sortYamlWrapper,
   validateYamlWrapper,
   isSelectionInvalid,
-  applyComments,
-  findComments,
-  formatYaml
+  sortYaml,
 } from "../../extension"
 import { Settings } from "../../settings"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
-import { JsYamlAdapter } from "../../adapter/js-yaml-adapter"
+import { splitYaml } from "../../lib"
+import { applyComments, findComments, hasTextYamlKeys } from "../../util/yaml-util"
 
 /*
 suite("Test setting sortOnSave", () => {
@@ -201,77 +199,6 @@ suite("Test sortYamlFiles", () => {
   test("should return `true` on invalid yaml", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/folder2"))
     assert.strictEqual(sortYamlFiles(uri), true)
-  })
-})
-
-suite("Test dumpYaml", () => {
-  test("should recursively use customSort", () => {
-    const actual =
-      'keyword1: value\n' +
-      'keyword: value\n' +
-      'keyword2: value\n' +
-      'data:\n' +
-      '  apiVersion: value\n' +
-      '  keyword: value\n' +
-      '  data: value\n' +
-      '  kind: value\n' +
-      'kind: value'
-
-    const expected =
-      'kind: value\n' +
-      'data:\n' +
-      '  apiVersion: value\n' +
-      '  kind: value\n' +
-      '  data: value\n' +
-      '  keyword: value\n' +
-      'keyword: value\n' +
-      'keyword1: value\n' +
-      'keyword2: value'
-
-    const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
-  })
-  test("should sort with by locale behaviour", () => {
-    const actual =
-      'ä: value\n' +
-      'z: value'
-
-    let expected =
-      'ä: value\n' +
-      'z: value'
-
-    const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
-
-    expected =
-      'z: value\n' +
-      'ä: value'
-
-    settings.getLocale = function () {
-      return "sv"
-    }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
-  })
-  test("should ignore case when sorting", () => {
-    const actual =
-      'completedDate: value\n' +
-      'completeTask: value'
-
-    const expected =
-      'completedDate: value\n' +
-      'completeTask: value'
-
-    const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
   })
 })
 
@@ -464,391 +391,565 @@ suite("Test sortYamlWrapper", () => {
   })
 })
 
-suite("Test formatYaml", () => {
-  test("should sort all yaml files in directory", () => {
-    const actual =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: "Germany"\n' +
-      '    age: 23\n' +
-      '"animals":\n' +
-      '  kitty:\n' +
-      '    age: 3'
 
-    let expected =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3'
-
-    const settings = new Settings()
-    settings.getUseLeadingDashes = function () {
-      return false
-    }
-    assert.strictEqual(formatYaml(actual, false, settings), expected)
-
-    expected =
-      '---\n' +
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3'
-
-    assert.strictEqual(formatYaml(actual, true, new Settings()), expected)
+suite("Test hasTextYamlKeys", () => {
+  test("when a text with no yaml keys is passed, `false` is returned", () => {
+    assert.equal(hasTextYamlKeys(""), false)
   })
 
-  test("should return `null` on invalid yaml", () => {
-    assert.strictEqual(formatYaml('key: 1\nkey: 1', true, new Settings()), null)
+  test("when a text with yaml keys is passed, `true` is returned", () => {
+    assert.equal(hasTextYamlKeys("api: v1"), true)
   })
 })
 
+
+suite("Test splitYaml", () => {
+test("should return the input string, when the input does not contain `---`", () => {
+  const actual = `\
+- Orange
+- Apple`
+  assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple"])
+})
+test("should return the input document without the delimiters", () => {
+  const actual = `\
+---
+- Orange
+- Apple`
+  assert.deepStrictEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
+})
+test("should return an array with the yaml documents", () => {
+  const actual = `\
+- Orange
+- Apple
+---
+- Orange
+- Apple`
+  assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+})
+test("Split multiple yaml documents with leading dashes", () => {
+  const actual = `\
+---
+- Orange
+- Apple
+---
+- Orange
+- Apple`
+
+  assert.deepStrictEqual(splitYaml(actual),
+    ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+})
+test("Split multiple yaml documents with text behind delimiter", () => {
+  const actual = `\
+--- # comment 1
+- Orange
+- Apple
+--- text
+- Orange
+- Apple`
+ assert.deepStrictEqual(splitYaml(actual),
+  ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+})
+})
+
+
+suite("Test dumpYaml", () => {
+test("should recursively use customSort", () => {
+  const actual =
+    'keyword1: value\n' +
+    'keyword: value\n' +
+    'keyword2: value\n' +
+    'data:\n' +
+    '  apiVersion: value\n' +
+    '  keyword: value\n' +
+    '  data: value\n' +
+    '  kind: value\n' +
+    'kind: value'
+
+  const expected =
+    'kind: value\n' +
+    'data:\n' +
+    '  apiVersion: value\n' +
+    '  kind: value\n' +
+    '  data: value\n' +
+    '  keyword: value\n' +
+    'keyword: value\n' +
+    'keyword1: value\n' +
+    'keyword2: value'
+
+  const settings = new Settings()
+  settings.getUseCustomSortRecursively = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+test("should sort with by locale behaviour", () => {
+  const actual =
+    'ä: value\n' +
+    'z: value'
+
+  let expected =
+    'ä: value\n' +
+    'z: value'
+
+  const settings = new Settings()
+  settings.getUseCustomSortRecursively = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+
+  expected =
+    'z: value\n' +
+    'ä: value'
+
+  settings.getLocale = function () {
+    return "sv"
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+test("should ignore case when sorting", () => {
+  const actual =
+    'completedDate: value\n' +
+    'completeTask: value'
+
+  const expected =
+    'completedDate: value\n' +
+    'completeTask: value'
+
+  const settings = new Settings()
+  settings.getUseCustomSortRecursively = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+})
+
+
 suite("Test sortYaml", () => {
-  test("should sort a given yaml document", async () => {
-    const actual =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      '  key: >\n' +
-      '      This is a very long sentence\n' +
-      '      that spans several lines in the YAML\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3\n'
+test("should sort a given yaml document", async () => {
+  const actual =
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n' +
+    '  key: >\n' +
+    '      This is a very long sentence\n' +
+    '      that spans several lines in the YAML\n' +
+    'animals:\n' +
+    '  kitty:\n' +
+    '    age: 3\n'
 
-    const expected =
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3\n' +
-      'persons:\n' +
-      '  bob:\n' +
-      '    age: 23\n' +
-      '    place: Germany\n' +
-      '  key: |\n' +
-      '    This is a very long sentence that spans several lines in the YAML'
+  const expected =
+    'animals:\n' +
+    '  kitty:\n' +
+    '    age: 3\n' +
+    'persons:\n' +
+    '  bob:\n' +
+    '    age: 23\n' +
+    '    place: Germany\n' +
+    '  key: |\n' +
+    '    This is a very long sentence that spans several lines in the YAML'
 
-    assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
-  })
+  assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
+})
 
-  test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
-    let actual =
-      'data: data\n' +
-      'spec: spec'
+test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
+  let actual =
+    'data: data\n' +
+    'spec: spec'
 
-    let expected =
-      'spec: spec\n' +
-      'data: data\n'
+  let expected =
+    'spec: spec\n' +
+    'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+  assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
 
-    actual =
-      'data: data\n' +
-      'spec:\n' +
-      '  - aa: b'
+  actual =
+    'data: data\n' +
+    'spec:\n' +
+    '  - aa: b'
 
-    expected =
-      'spec:\n' +
-      '  - aa: b\n' +
-      'data: data\n'
+  expected =
+    'spec:\n' +
+    '  - aa: b\n' +
+    'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+  assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
 
-    actual =
-      'data:\n' +
-      '  job: Developer\n' +
-      '  skills:\n' +
-      '    - pascal\n' +
-      'spec:\n' +
-      '  job: Boss\n' +
-      '  name: Stuart'
+  actual =
+    'data:\n' +
+    '  job: Developer\n' +
+    '  skills:\n' +
+    '    - pascal\n' +
+    'spec:\n' +
+    '  job: Boss\n' +
+    '  name: Stuart'
 
-    expected =
-      'spec:\n' +
-      '  job: Boss\n' +
-      '  name: Stuart\n' +
-      'data:\n' +
-      '  job: Developer\n' +
-      '  skills:\n' +
-      '    - pascal\n'
+  expected =
+    'spec:\n' +
+    '  job: Boss\n' +
+    '  name: Stuart\n' +
+    'data:\n' +
+    '  job: Developer\n' +
+    '  skills:\n' +
+    '    - pascal\n'
 
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+  assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
 
-    actual =
-      'data: data\n' +
-      'spec:\n' +
-      '  - a\n' +
-      '  - b'
+  actual =
+    'data: data\n' +
+    'spec:\n' +
+    '  - a\n' +
+    '  - b'
 
-    expected =
-      'spec:\n' +
-      '  - a\n' +
-      '  - b\n' +
-      'data: data\n'
+  expected =
+    'spec:\n' +
+    '  - a\n' +
+    '  - b\n' +
+    'data: data\n'
 
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
-  })
+  assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+})
 
-  test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
-    const actual =
-      '- lorem ipsum:\n' +
-      '    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
-      'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea ' +
-      'rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor ' +
-      'sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna ' +
-      'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e"'
+test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
+  const actual =
+    '- lorem ipsum:\n' +
+    '    text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
+    'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea ' +
+    'rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor ' +
+    'sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna ' +
+    'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e"'
 
-    const expected =
-      '- lorem ipsum:\n' +
-      '    text: >-\n' +
-      '      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
-      'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ' +
-      'ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor ' +
-      'sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna ' +
-      'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n' +
-      '      dolores et e'
+  const expected =
+    '- lorem ipsum:\n' +
+    '    text: >-\n' +
+    '      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut ' +
+    'labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ' +
+    'ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor ' +
+    'sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna ' +
+    'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n' +
+    '      dolores et e'
 
-    assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
-  })
+  assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
+})
 
-  test("should add an empty line before `spec`", () => {
-    const actual =
-      'spec: value\n' +
-      'data:\n' +
-      '  - a\n' +
-      '  - b'
+test("should add an empty line before `spec`", () => {
+  const actual =
+    'spec: value\n' +
+    'data:\n' +
+    '  - a\n' +
+    '  - b'
 
-    const expected =
-      'data:\n' +
-      '  - a\n' +
-      '  - b\n' +
-      '\n' +
-      'spec: value'
+  const expected =
+    'data:\n' +
+    '  - a\n' +
+    '  - b\n' +
+    '\n' +
+    'spec: value'
 
-    const settings = new Settings()
-    settings.getEmptyLinesUntilLevel = function () {
-      return 2
-    }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
-  })
-  test("should not format a date in CORE_SCHEMA", () => {
-    const actual = 'AWSTemplateFormatVersion: 2010-09-09'
-    let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
-    assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
+  const settings = new Settings()
+  settings.getEmptyLinesUntilLevel = function () {
+    return 2
+  }
+  assert.strictEqual(sortYaml(actual, 0, settings), expected)
+})
+test("should not format a date in CORE_SCHEMA", () => {
+  const actual = 'AWSTemplateFormatVersion: 2010-09-09'
+  let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
+  assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
 
-    expected = actual
+  expected = actual
 
-    const settings = new Settings()
-    settings.getSchema = function () {
-      return jsyaml.CORE_SCHEMA
-    }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
-  })
-  test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
-    const actual =
-      'LoggingBucketKMSKeyAlias:\n' +
-      '  Properties:\n' +
-      '    TargetKeyId: !Sub "LoggingBucketKMSKey"\n' +
-      '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"'
+  const settings = new Settings()
+  settings.getSchema = function () {
+    return jsyaml.CORE_SCHEMA
+  }
+  assert.strictEqual(sortYaml(actual, 0, settings), expected)
+})
+test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
+  const actual =
+    'LoggingBucketKMSKeyAlias:\n' +
+    '  Properties:\n' +
+    '    TargetKeyId: !Sub "LoggingBucketKMSKey"\n' +
+    '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"'
 
-    const expected =
-      'LoggingBucketKMSKeyAlias:\n' +
-      '\n' +
-      '  Properties:\n' +
-      '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
-      '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
+  const expected =
+    'LoggingBucketKMSKeyAlias:\n' +
+    '\n' +
+    '  Properties:\n' +
+    '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
+    '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
 
-    const settings = new Settings()
-    settings.getSchema = function () {
-      return CLOUDFORMATION_SCHEMA
-    }
-    settings.getForceQuotes = function () {
-      return true
-    }
-    settings.getQuotingType = function () {
-      return "\""
-    }
-    settings.getEmptyLinesUntilLevel = function () {
-      return 2
-    }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
-  })
-  test("compatibility with older yaml versions should be configurable", () => {
-    const actual =
-      'key:\n' +
-      '  on: foo\n' +
-      '  off: egg'
+  const settings = new Settings()
+  settings.getSchema = function () {
+    return CLOUDFORMATION_SCHEMA
+  }
+  settings.getForceQuotes = function () {
+    return true
+  }
+  settings.getQuotingType = function () {
+    return "\""
+  }
+  settings.getEmptyLinesUntilLevel = function () {
+    return 2
+  }
+  assert.strictEqual(sortYaml(actual, 0, settings), expected)
+})
+test("compatibility with older yaml versions should be configurable", () => {
+  const actual =
+    'key:\n' +
+    '  on: foo\n' +
+    '  off: egg'
 
-    let expected =
-      'key:\n' +
-      '  "off": egg\n' +
-      '  "on": foo'
+  let expected =
+    'key:\n' +
+    '  "off": egg\n' +
+    '  "on": foo'
 
-    const settings = new Settings()
-    settings.getNoCompatMode = function () {
-      return false
-    }
-    settings.getQuotingType = function () {
-      return "\""
-    }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
+  const settings = new Settings()
+  settings.getNoCompatMode = function () {
+    return false
+  }
+  settings.getQuotingType = function () {
+    return "\""
+  }
+  assert.strictEqual(sortYaml(actual, 0, settings), expected)
 
-    expected =
-      'key:\n' +
-      '  off: egg\n' +
-      '  on: foo'
-    settings.getNoCompatMode = function () {
-      return true
-    }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
-  })
+  expected =
+    'key:\n' +
+    '  off: egg\n' +
+    '  on: foo'
+  settings.getNoCompatMode = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 0, settings), expected)
+})
 })
 
 suite("Test findComments", () => {
-  test("should return an empty map on a yaml without comments", () => {
-    const yaml =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
-    const expected = new Map<string, string>()
-    assert.deepEqual(findComments(yaml), expected)
-  })
+test("should return an empty map on a yaml without comments", () => {
+  const yaml =
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
+  const expected = new Map<string, string>()
+  assert.deepEqual(findComments(yaml), expected)
+})
 
-  test("should return a map with the line below the comment as key and the comment as value", () => {
-    const yaml =
-      'persons:\n' +
-      '# bob is 1st\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+test("should return a map with the line below the comment as key and the comment as value", () => {
+  const yaml =
+    'persons:\n' +
+    '# bob is 1st\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    const expected = new Map<string, string>()
-    expected.set('# bob is 1st', '  bob:')
-    assert.deepEqual(findComments(yaml), expected)
-  })
+  const expected = new Map<string, string>()
+  expected.set('# bob is 1st', '  bob:')
+  assert.deepEqual(findComments(yaml), expected)
+})
 
-  test("should return a map with the line below the comment as key and the comment as value (comment on top)", () => {
-    const yaml =
-      '# comment on top\n' +
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+test("should return a map with the line below the comment as key and the comment as value (comment on top)", () => {
+  const yaml =
+    '# comment on top\n' +
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    const expected = new Map<string, string>()
-    expected.set('# comment on top', 'persons:')
-    assert.deepEqual(findComments(yaml), expected)
-  })
+  const expected = new Map<string, string>()
+  expected.set('# comment on top', 'persons:')
+  assert.deepEqual(findComments(yaml), expected)
+})
 
-  test("should return a map with the line below the comment as key and the comment as value (comment at the bottom)", () => {
-    const yaml =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      '# comment at the bottom'
+test("should return a map with the line below the comment as key and the comment as value (comment at the bottom)", () => {
+  const yaml =
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n' +
+    '# comment at the bottom'
 
-    const expected = new Map<string, string>()
-    expected.set('# comment at the bottom', '')
-    assert.deepEqual(findComments(yaml), expected)
-  })
+  const expected = new Map<string, string>()
+  expected.set('# comment at the bottom', '')
+  assert.deepEqual(findComments(yaml), expected)
+})
 
-  test("should merge multiline comments", () => {
-    const yaml =
-      'persons:\n' +
-      '# bob is 1st\n' +
-      '# alice is 2nd\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+test("should merge multiline comments", () => {
+  const yaml =
+    'persons:\n' +
+    '# bob is 1st\n' +
+    '# alice is 2nd\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    const expected = new Map<string, string>()
-    expected.set('# bob is 1st\n# alice is 2nd', '  bob:')
-    assert.deepEqual(findComments(yaml), expected)
-  })
+  const expected = new Map<string, string>()
+  expected.set('# bob is 1st\n# alice is 2nd', '  bob:')
+  assert.deepEqual(findComments(yaml), expected)
+})
 
 })
 
 suite("Test applyComments", () => {
-  test("should apply comment to yaml", () => {
-    const comments = new Map<string, string>()
-    comments.set("# bob is 1st", "  bob:")
-    const yaml =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+test("should apply comment to yaml", () => {
+  const comments = new Map<string, string>()
+  comments.set("# bob is 1st", "  bob:")
+  const yaml =
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    const expected =
-      'persons:\n' +
-      '# bob is 1st\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+  const expected =
+    'persons:\n' +
+    '# bob is 1st\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
-  })
+  assert.deepEqual(applyComments(yaml, comments), expected)
+})
 
-  test("should apply comment to last line in yaml", () => {
-    const comments = new Map<string, string>()
-    comments.set("# last line comment", "")
-    const yaml =
-      'persons: bob'
+test("should apply comment to last line in yaml", () => {
+  const comments = new Map<string, string>()
+  comments.set("# last line comment", "")
+  const yaml =
+    'persons: bob'
 
-    const expected =
-      'persons: bob\n' +
-      '# last line comment'
+  const expected =
+    'persons: bob\n' +
+    '# last line comment'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
-  })
+  assert.deepEqual(applyComments(yaml, comments), expected)
+})
 
-  test("should apply multiple comments to yaml", () => {
-    const comments = new Map<string, string>()
-    comments.set("    # living in germany", "    place: Germany")
-    comments.set("# bob is 1st", "  bob:")
-    comments.set("# last line comment", "")
-    const yaml =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
-    ''
+test("should apply multiple comments to yaml", () => {
+  const comments = new Map<string, string>()
+  comments.set("    # living in germany", "    place: Germany")
+  comments.set("# bob is 1st", "  bob:")
+  comments.set("# last line comment", "")
+  const yaml =
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
+  ''
 
-    const expected =
-      'persons:\n' +
-      '# bob is 1st\n' +
-      '  bob:\n' +
-      '    # living in germany\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      '\n' +
-      '# last line comment'
+  const expected =
+    'persons:\n' +
+    '# bob is 1st\n' +
+    '  bob:\n' +
+    '    # living in germany\n' +
+    '    place: Germany\n' +
+    '    age: 23\n' +
+    '\n' +
+    '# last line comment'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
-  })
+  assert.deepEqual(applyComments(yaml, comments), expected)
+})
 
-  test("should recognize indentation", () => {
-    const comments = new Map<string, string>()
-    comments.set("# bob is 1st", "    bob:")
-    const yaml =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+test("should recognize indentation", () => {
+  const comments = new Map<string, string>()
+  comments.set("# bob is 1st", "    bob:")
+  const yaml =
+    'persons:\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    const expected =
-      'persons:\n' +
-      '# bob is 1st\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n'
+  const expected =
+    'persons:\n' +
+    '# bob is 1st\n' +
+    '  bob:\n' +
+    '    place: Germany\n' +
+    '    age: 23\n'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
-  })
+  assert.deepEqual(applyComments(yaml, comments), expected)
+})
+})
+
+suite("Test dumpYaml", () => {
+
+test("when useCustomSortRecursively is set to `true` should recursively use customSort", async () => {
+  const actual =
+    'keyword1: value\n' +
+    'keyword: value\n' +
+    'keyword2: value\n' +
+    'data:\n' +
+    '  apiVersion: value\n' +
+    '  keyword: value\n' +
+    '  data: value\n' +
+    '  kind: value\n' +
+    'kind: value'
+
+  const expected =
+    'kind: value\n' +
+    'data:\n' +
+    '  apiVersion: value\n' +
+    '  kind: value\n' +
+    '  data: value\n' +
+    '  keyword: value\n' +
+    'keyword: value\n' +
+    'keyword1: value\n' +
+    'keyword2: value'
+
+  const settings = new Settings()
+  settings.getUseCustomSortRecursively = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+
+test("when locale is `en` should sort character `ä` over `z`", () => {
+  const actual =
+    'ä: value\n' +
+    'z: value'
+
+  const expected =
+    'ä: value\n' +
+    'z: value'
+
+  const settings = new Settings()
+  settings.getLocale = function () {
+    return "en"
+  }
+  settings.getUseCustomSortRecursively = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+
+test("when locale is `sv` should sort character `z` over `ä`", () => {
+  const actual =
+    'ä: value\n' +
+    'z: value'
+
+  const expected =
+    'z: value\n' +
+    'ä: value'
+
+  const settings = new Settings()
+  settings.getLocale = function () {
+    return "sv"
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+
+test("should ignore case when sorting", () => {
+  const actual =
+    'completedDate: value\n' +
+    'completeTask: value'
+
+  const expected =
+    'completedDate: value\n' +
+    'completeTask: value'
+
+  const settings = new Settings()
+  settings.getUseCustomSortRecursively = function () {
+    return true
+  }
+  assert.strictEqual(sortYaml(actual, 1, settings), expected)
+})
+
 })

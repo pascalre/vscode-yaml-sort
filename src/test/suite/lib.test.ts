@@ -14,8 +14,7 @@ import {
   removeLeadingLineBreakOfFirstElement,
   removeQuotesFromKeys,
   removeTrailingCharacters,
-  replaceTabsWithSpaces,
-  splitYaml
+  replaceTabsWithSpaces
 } from "../../lib"
 
 suite("Test removeQuotesFromKeys", () => {
@@ -76,54 +75,6 @@ suite("Test prependWhitespacesOnEachLine", () => {
   const actual2 = "text\n"
   test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
     assert.strictEqual(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
-  })
-})
-
-suite("Test splitYaml", () => {
-  test("should return the input string, when the input does not contain `---`", () => {
-    const actual = `\
-- Orange
-- Apple`
-    assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple"])
-  })
-  test("should return the input document without the delimiters", () => {
-    const actual = `\
----
-- Orange
-- Apple`
-    assert.deepStrictEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
-  })
-  test("should return an array with the yaml documents", () => {
-    const actual = `\
-- Orange
-- Apple
----
-- Orange
-- Apple`
-    assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
-  })
-  test("Split multiple yaml documents with leading dashes", () => {
-    const actual = `\
----
-- Orange
-- Apple
----
-- Orange
-- Apple`
-
-    assert.deepStrictEqual(splitYaml(actual),
-      ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
-  })
-  test("Split multiple yaml documents with text behind delimiter", () => {
-    const actual = `\
---- # comment 1
-- Orange
-- Apple
---- text
-- Orange
-- Apple`
-   assert.deepStrictEqual(splitYaml(actual),
-    ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })
 
