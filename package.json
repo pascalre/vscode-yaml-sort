@@ -234,7 +234,7 @@
     "coveralls": "3.1.1",
     "dependency-cruiser": "11.18.0",
     "eslint": "8.25.0",
-    "jsdoc": "3.6.11",
+    "jsdoc": "4.0.0",
     "mocha": "10.1.0",
     "nyc": "15.1.0",
     "sonarqube-scanner": "2.8.2",
