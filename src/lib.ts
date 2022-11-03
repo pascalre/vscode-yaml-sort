@@ -1,14 +1,3 @@
-import { glob } from "glob"
-
-/**
- * Returns all files in a directory and its subdirectories with extension .yml or .yaml
- * @param   {vscode.Uri} uri Base URI
- * @returns {string[]}   List of Yaml files
- */
-export function getYamlFilesInDirectory(uri: string): string[] {
-  return glob.sync(uri + "/**/**.y?(a)ml")
-}
-
 /**
  * Removes single quotes from special keywords
  * e.g. '1.4.2': will result in 1.4.2: or 'puppet::key': will result in puppet::key:
@@ -54,11 +43,11 @@ export function prependWhitespacesOnEachLine(text: string, count: number): strin
  * @param   {RegExpMatchArray} delimiters Array for processing.
  * @returns {RegExpMatchArray}
  */
-export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArray):RegExpMatchArray {
+export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArray): RegExpMatchArray {
   let firstDelimiter = delimiters.shift()
   if (firstDelimiter) {
     firstDelimiter = firstDelimiter.replace(/^\n/, "")
-    delimiters.unshift(firstDelimiter)  
+    delimiters.unshift(firstDelimiter)
   }
   return delimiters
 }
@@ -68,7 +57,7 @@ export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArra
  * @param   {string}   multipleYamls String which contains multiple yaml documents.
  * @returns {[string]} Array of yaml documents.
  */
-export function splitYaml(multipleYamls: string):[string] {
+export function splitYaml(multipleYamls: string): [string] {
   return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
 }
 
@@ -80,7 +69,7 @@ export function splitYaml(multipleYamls: string):[string] {
  *                                   If set to false, it will add an empty array element at the beginning of the output.
  * @returns {[string]} Array of yaml delimiters.
  */
-export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean): string[] {
+export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean): RegExpMatchArray {
   // remove empty lines
   multipleYamls = multipleYamls.trim()
   multipleYamls = multipleYamls.replace(/^\n/, "")
@@ -90,7 +79,7 @@ export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, 
   }
 
   // append line break to every delimiter
-  delimiters = delimiters.map((delimiter) => "\n" + delimiter + "\n")
+  delimiters = delimiters.map((delimiter) => "\n" + delimiter + "\n") as RegExpMatchArray
 
   if (delimiters) {
     if (isSelectionEmpty) {
@@ -137,7 +126,7 @@ export function replaceTabsWithSpaces(text: string, count: number): string {
  * @param   {string} text Text to be processed
  * @returns {string} processed text
  */
-export function addNewLineBeforeRootKeywords(text: string): string{
+export function addNewLineBeforeRootKeywords(text: string): string {
   return text.replace(/\n[^\s]*:/g, "\n$&")
 }
 

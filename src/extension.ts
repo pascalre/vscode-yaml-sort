@@ -1,6 +1,5 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as jsyaml from "js-yaml"
 import * as vscode from "vscode"
 import * as fs from "fs"
 
@@ -8,23 +7,21 @@ import {
   getDelimiters,
   prependWhitespacesOnEachLine,
   removeLeadingLineBreakOfFirstElement,
-  replaceTabsWithSpaces,
-  removeTrailingCharacters,
-  addNewLineBeforeKeywordsUpToLevelN,
-  getYamlFilesInDirectory,
   splitYaml,
 } from "./lib"
 
 import {
-  dumpYaml, JsYamlAdapter
+  JsYamlAdapter
 } from "./adapter/js-yaml-adapter"
 
 import { Settings } from "./settings"
 import { VsCodeAdapter } from "./adapter/vs-code-adapter"
-import { applyComments, findComments, formatYaml } from "./util/yaml-util"
+import { formatYaml, sortYaml } from "./util/yaml-util"
+import { getYamlFilesInDirectory } from "./util/file-util"
 
 const settings = new Settings()
-const jsyamladapter = new JsYamlAdapter(settings)
+const jsyamladapter = new JsYamlAdapter()
+const vscodeadapter = new VsCodeAdapter()
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -40,21 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  // have a function that adds/removes the formatter based
-  // on a configuration setting
-  let registration: vscode.Disposable | undefined;
-  function registerFormatterIfEnabled() {
-    const isEnabled = settings.getUseAsFormatter()
-    if (isEnabled && !registration) {/* istanbul ignore next */
-      registration = vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter)
-    } else if (!isEnabled && registration) {/* istanbul ignore next */
-      registration.dispose();/* istanbul ignore next */
-      registration = undefined;
-    }
-  }
-
   // register at activate-time
-  registerFormatterIfEnabled();
+  vscodeadapter.registerFormatter(formatter)
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
@@ -173,68 +157,16 @@ export function sortYamlWrapper(customSort = 0): vscode.TextEdit[] {
       if (notifySuccess) {
         vscode.window.showInformationMessage("Keys resorted successfully")
       }
-      new VsCodeAdapter().applyEdits([edits])
+      vscodeadapter.applyEdits([edits])
       return [edits]
     }
   }
   return []
 }
 
-export function sortYaml(
-  unsortedYaml: string,
-  customSort = 0,
-  settings: Settings
-): string | null {
-  try {
-    const loadOptions = { schema: settings.getSchema() }
-    const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, settings.getIndent())
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const comments = findComments(unsortedYamlWithoutTabs)
-    const doc = jsyaml.load(unsortedYamlWithoutTabs, loadOptions) as any
-    let sortedYaml = ""
-
-    if (customSort > 0 && !settings.getUseCustomSortRecursively()) {
-      const keywords = settings.getCustomSortKeywords(customSort)
-
-      keywords.forEach(key => {
-        if (doc[key]) {
-          let sortedSubYaml = dumpYaml(doc[key], true, customSort, settings)
-          if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
-            // when key cotains more than one line, we need some transformation:
-            // add a new line and indent each line some spaces
-            sortedSubYaml = prependWhitespacesOnEachLine(sortedSubYaml, settings.getIndent())
-            if (sortedSubYaml.endsWith("\n")) {
-              sortedSubYaml = removeTrailingCharacters(sortedSubYaml, settings.getIndent())
-            }
-            sortedYaml += key + ":\n" + sortedSubYaml + "\n"
-          } else {
-            sortedYaml += key + ": " + sortedSubYaml + "\n"
-          }
-          // delete key from yaml
-          delete doc[key]
-        }
-      })
-    }
-
-    // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-    sortedYaml += dumpYaml(doc, true, customSort, settings)
-
-    if (settings.getEmptyLinesUntilLevel() > 0) {
-      sortedYaml = addNewLineBeforeKeywordsUpToLevelN(settings.getEmptyLinesUntilLevel(), settings.getIndent(), sortedYaml)
-    }
-
-    sortedYaml = applyComments(sortedYaml, comments)
-
-    return sortedYaml
-  } catch (e) {
-    if (e instanceof Error) {
-      vscode.window.showErrorMessage("Keys could not be resorted: " + e.message)
-    }
-    return null
-  }
-}
 
 export function validateYamlWrapper(): boolean {
+//  const text = vscodeadapter.getActiveDocument()
   if (vscode.window.activeTextEditor) {
     const text = vscode.window.activeTextEditor.document.getText()
     try {
@@ -320,7 +252,6 @@ export function sortYamlFiles(uri: vscode.Uri): boolean {
   })
   return true
 }
-
 
 /**
  * Checks if a text ends with a character which suggests, that the selection is missing something.

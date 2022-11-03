@@ -2,7 +2,6 @@ import * as jsyaml from "js-yaml"
 import * as vscode from "vscode"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
-import { VsCodeAdapter } from "./adapter/vs-code-adapter"
 
 export class Settings {
     // vscodeadapter = new VsCodeAdapter()
@@ -21,6 +20,16 @@ export class Settings {
     }
     getIndent(): number {
         return vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
+    }
+    getJsYamlSchemaFromString(schema: string): jsyaml.Schema {
+        switch (schema) {
+            case "HOMEASSISTANT_SCHEMA": return HOMEASSISTANT_SCHEMA as jsyaml.Schema
+            case "CLOUDFORMATION_SCHEMA": return CLOUDFORMATION_SCHEMA as jsyaml.Schema
+            case "CORE_SCHEMA": return jsyaml.CORE_SCHEMA
+            case "FAILSAFE_SCHEMA": return jsyaml.FAILSAFE_SCHEMA
+            case "JSON_SCHEMA": return jsyaml.JSON_SCHEMA
+            default: return jsyaml.DEFAULT_SCHEMA
+        }
     }
     getLineWidth(): number {
         return vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
@@ -74,15 +83,4 @@ export class Settings {
     useAsFormatter = this.getUseAsFormatter()
     useCustomSortRecursively = this.getUseCustomSortRecursively()
     useLeadingDashes = this.getUseLeadingDashes()
-
-    getJsYamlSchemaFromString(schema: string): jsyaml.Schema {
-        switch (schema) {
-            case "HOMEASSISTANT_SCHEMA": return HOMEASSISTANT_SCHEMA as jsyaml.Schema
-            case "CLOUDFORMATION_SCHEMA": return CLOUDFORMATION_SCHEMA as jsyaml.Schema
-            case "CORE_SCHEMA": return jsyaml.CORE_SCHEMA
-            case "FAILSAFE_SCHEMA": return jsyaml.FAILSAFE_SCHEMA
-            case "JSON_SCHEMA": return jsyaml.JSON_SCHEMA
-            default: return jsyaml.DEFAULT_SCHEMA
-        }
-    }
 }

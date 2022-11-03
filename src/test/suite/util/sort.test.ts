@@ -1,6 +1,6 @@
 import * as assert from "assert"
-import { Settings } from "../../settings"
-import { Sort } from "../../sort"
+import { Settings } from "../../../settings"
+import { Sort } from "../../../util/sort"
 
 suite("Test Sort - localeSort()", () => {
   test("when `locale` is `sv` and a is `ä` and b is `z` should return 1", () => {

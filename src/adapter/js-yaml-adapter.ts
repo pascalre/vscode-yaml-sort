@@ -1,12 +1,12 @@
 import { Settings } from "../settings"
 import * as jsyaml from "js-yaml"
 import { removeTrailingCharacters, splitYaml } from "../lib"
-import { Sort } from "../sort"
+import { Sort } from "../util/sort"
 
 export class JsYamlAdapter {
   settings: Settings
 
-  constructor(settings: Settings) {
+  constructor(settings = new Settings()) {
     this.settings = settings
   }
 
