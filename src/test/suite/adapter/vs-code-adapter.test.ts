@@ -19,11 +19,10 @@ suite("Test VsCodeAdapter - getActiveDocument()", () => {
 
     if (vscode.window.activeTextEditor) {
       const expected =
-        '---\n' +
         'key:\n' +
         '  key2: value'
 
-      assert.strictEqual(new VsCodeAdapter().getActiveDocument(), expected)
+      assert.strictEqual(new VsCodeAdapter().getActiveDocument(vscode.window.activeTextEditor), expected)
     } else {
       assert.fail("vscode.window.activeTextEditor is not set")
     }

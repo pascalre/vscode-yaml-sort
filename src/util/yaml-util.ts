@@ -1,8 +1,9 @@
-import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, removeTrailingCharacters, replaceTabsWithSpaces } from "../lib"
+import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, replaceTabsWithSpaces } from "../lib"
 import { Settings } from "../settings"
 import * as jsyaml from "js-yaml"
 import * as vscode from "vscode"
-import { dumpYaml } from "../adapter/js-yaml-adapter"
+import { dumpYaml, JsYamlAdapter } from "../adapter/js-yaml-adapter"
+import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 
 export function hasTextYamlKeys(text: string) {
     if (Object.keys(text).length === 0) {
@@ -11,10 +12,56 @@ export function hasTextYamlKeys(text: string) {
     return true
 }
 
+/**
+ * Removes a given count of characters from a string.
+ * @param   {string} text  String for processing.
+ * @param   {number} count The number of characters to remove from the end of the returned string.
+ * @returns {string} Input text with removed trailing characters.
+ */
+ export function removeTrailingCharacters(text: string, count = 1): string {
+    if (count >= 0 && count <= text.length) {
+      return text.substring(0, text.length - count)
+    } else {
+      throw new Error("The count parameter is not in a valid range")
+    }
+  }
+
+/**
+ * Checks if a text ends with a character which suggests, that the selection is missing something.
+ * @param   {string}        text Text which should represent a valid yaml selection to sort.
+ * @returns {boolean} true, if selection is missing something
+ */
+export function isSelectionInvalid(text: string): boolean {
+    // remove trailing whitespaces, to check for things like 'text:  '
+    text = text.trim()
+    const notValidEndingCharacters = [":", "|", ">"]
+    if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
+        return true
+    }
+    try {
+        new JsYamlAdapter().validateYaml(text)
+        return false
+    } catch (e) {
+        if (e instanceof Error) {
+            new VsCodeAdapter().showMessage(Severity.ERROR, e.message)
+        }
+        return true
+    }
+}
+
+export function validateTextRange(text: string) {
+    // remove trailing whitespaces, to check for things like 'text:  '
+    text = text.trim()
+    const notValidEndingCharacters = [":", "|", ">"]
+    if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
+        throw new Error("YAML selection is invalid. Check the ending of your selection.")
+    }
+}
+
 export function sortYaml(
     unsortedYaml: string,
-    customSort = 0,
-    settings: Settings
+    settings: Settings,
+    customSort = 0
 ): string | null {
     try {
         const loadOptions = { schema: settings.getSchema() }
@@ -102,6 +149,7 @@ export function formatYaml(
 export function findComments(text: string): Map<string, string> {
     const comments = new Map<string, string>
     const lines = text.toString().split("\n")
+
     for (let i = 0; i < lines.length; i++) {
         let comment = ""
         while (/^ *#/.test(lines[i])) {
@@ -117,6 +165,8 @@ export function findComments(text: string): Map<string, string> {
             }
         }
     }
+
+
     return comments
 }
 
@@ -144,4 +194,58 @@ export function applyComments(text: string, comments: Map<string, string>): stri
         }
     }
     return text
+}
+
+/**
+ * Splits a string, which contains multiple yaml documents.
+ * @param   {string}   multipleYamls String which contains multiple yaml documents.
+ * @returns {[string]} Array of yaml documents.
+ */
+export function splitYaml(multipleYamls: string): [string] {
+    return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
+}
+
+/**
+ * Returns all delimiters with comments.
+ * @param   {string}  multipleYamls String which contains multiple yaml documents.
+ * @param   {boolean} isSelectionEmpty Specify if the text is an selection
+ * @param   {boolean} useLeadingDashes Specify if the documents should have a leading delimiter.
+ *                                   If set to false, it will add an empty array element at the beginning of the output.
+ * @returns {[string]} Array of yaml delimiters.
+ */
+export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean): RegExpMatchArray {
+    // remove empty lines
+    multipleYamls = multipleYamls.trim()
+    multipleYamls = multipleYamls.replace(/^\n/, "")
+    let delimiters = multipleYamls.match(/^---.*/gm)
+    if (!delimiters) {
+        return [""]
+    }
+
+    // append line break to every delimiter
+    delimiters = delimiters.map((delimiter) => "\n" + delimiter + "\n") as RegExpMatchArray
+
+    if (delimiters) {
+        if (isSelectionEmpty) {
+            if (!useLeadingDashes && multipleYamls.startsWith("---")) {
+                delimiters.shift()
+                delimiters.unshift("")
+            } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
+                delimiters.unshift("---\n")
+            } else {
+                delimiters.unshift("")
+            }
+        } else {
+            if (!multipleYamls.startsWith("---")) {
+                delimiters.unshift("")
+            } else {
+                let firstDelimiter = delimiters.shift()
+                if (firstDelimiter) {
+                    firstDelimiter = firstDelimiter.replace(/^\n/, "")
+                    delimiters.unshift(firstDelimiter)
+                }
+            }
+        }
+    }
+    return delimiters
 }

@@ -4,138 +4,12 @@
 //
 
 import * as assert from "assert"
-import * as fs from "fs"
 import * as vscode from "vscode"
 import * as path from "path"
 
-import {
-  formatYamlWrapper,
-  sortYamlFiles,
-  sortYamlWrapper,
-  validateYamlWrapper,
-  isSelectionInvalid
-} from "../../extension"
 import { Settings } from "../../settings"
-import { splitYaml } from "../../lib"
-import { applyComments, findComments, hasTextYamlKeys } from "../../util/yaml-util"
-
-/*
-suite("Test setting sortOnSave", () => {
-  function syncWriteFile(filename: string, data: any) {
-     
-    writeFileSync(join(__dirname, filename), data, {
-      flag: 'w',
-    })
-  
-    const contents = readFileSync(join(__dirname, filename), 'utf-8')
-    console.log(contents)
-  
-    return contents
-  }
-
-  test("should not format or sort document", async () => {
-    // prepare settings
-    const editor = vscode.workspace.getConfiguration("editor")
-    await editor.update("formatOnSave", false, vscode.ConfigurationTarget.Global)
-    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("sortOnSave", -1, vscode.ConfigurationTarget.Global)
-    await settings.update("useAsFormatter", false, vscode.ConfigurationTarget.Global)
-
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-    await vscode.commands.executeCommand("workbench.action.files.save")
-
-    const expected =
-      'spec:  foo\n' +
-      'data: bar'
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      assert.strictEqual(activeEditor.document.getText(), expected)
-    }
-  })
-
-  test("should format document", async () => {
-    // prepare settings
-    const editor = vscode.workspace.getConfiguration("editor")
-    await editor.update("formatOnSave", true, vscode.ConfigurationTarget.Global)
-    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("sortOnSave", -1, vscode.ConfigurationTarget.Global)
-    await settings.update("useAsFormatter", true, vscode.ConfigurationTarget.Global)
-
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-    await vscode.commands.executeCommand("workbench.action.files.save")
-
-    const expected =
-      '---\n' +
-      'spec: foo\n' +
-      'data: bar'
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      assert.strictEqual(activeEditor.document.getText(), expected)
-
-      await settings.update("sortOnSave", -1, vscode.ConfigurationTarget.Global)
-      await vscode.commands.executeCommand("workbench.action.files.save")
-      assert.strictEqual(activeEditor.document.getText(), expected)
-    }
-  })
-
-  test("should sort document", async () => {
-    // prepare settings
-    const editor = vscode.workspace.getConfiguration("editor")
-    await editor.update("formatOnSave", true, vscode.ConfigurationTarget.Global)
-    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("sortOnSave", 0, vscode.ConfigurationTarget.Global)
-    await settings.update("useAsFormatter", true, vscode.ConfigurationTarget.Global)
-
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-    await vscode.commands.executeCommand("workbench.action.files.save")
-
-    const expected =
-      '---\n' +
-      'data: bar\n' +
-      'spec: foo'
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      assert.strictEqual(activeEditor.document.getText(), expected)
-    }
-  })
-
-  test("should sort document with customSort", async () => {
-    // prepare settings
-    const editor = vscode.workspace.getConfiguration("editor")
-    await editor.update("formatOnSave", true, vscode.ConfigurationTarget.Global)
-    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("sortOnSave", 1, vscode.ConfigurationTarget.Global)
-    await settings.update("useAsFormatter", true, vscode.ConfigurationTarget.Global)
-
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/customSort.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-    await vscode.commands.executeCommand("workbench.action.files.save")
-
-    const expected =
-      '---\n' +
-      'spec: foo\n' +
-      'data: bar\n'
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      assert.strictEqual(activeEditor.document.getText(), expected)
-    }
-  
-    // reset file to origin content
-    syncWriteFile("../../../src/test/files/customSort.yaml", 'spec:  foo\ndata: bar')
-  })
-})
-*/
+import { applyComments, findComments, hasTextYamlKeys, isSelectionInvalid, splitYaml } from "../../util/yaml-util"
+import { sortYamlWrapper } from "../../controller"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -179,86 +53,8 @@ suite("Test validateYaml", () => {
   })
 })
 
-suite("Test sortYamlFiles", () => {
-  test("should sort all yaml files in directory", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/folder1"))
-
-    await vscode.commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
-
-    let sortedFile = fs.readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", 'utf-8').toString()
-    assert.strictEqual(sortedFile, "akey: value\nkey: value")
-    sortedFile = fs.readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", 'utf-8').toString()
-    assert.strictEqual(sortedFile, "akey: value\nkey: value")
-
-    fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
-    fs.writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")
-  })
-  test("should return `true` on invalid yaml", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/folder2"))
-    assert.strictEqual(sortYamlFiles(uri), true)
-  })
-})
-
-suite("Test validateYamlWrapper", async () => {
-  test("should return true on open document", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-    assert.strictEqual(validateYamlWrapper(), true)
-  })
-})
-
-suite("Test formatYamlWrapper", () => {
-  test("should return true on a valid yaml", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      const expected =
-        '---\n' +
-        'key:\n' +
-        '  key2: value'
-
-      assert.strictEqual(formatYamlWrapper()[0].newText, expected)
-    } else {
-      assert.strictEqual(true, false)
-    }
-  })
-  test("should format multiple yaml in one file", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/testFormatYamlWrapper.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      const expected =
-        '---\n' +
-        'key1: value\n' +
-        '---\n' +
-        'key2: value'
-
-      assert.strictEqual(formatYamlWrapper()[0].newText, expected)
-    } else {
-      assert.strictEqual(true, false)
-    }
-  })
-  test("should fail on invalid yaml", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/testFormatYamlWrapper-fail.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-
-    const activeEditor = vscode.window.activeTextEditor
-    if (activeEditor) {
-      assert.strictEqual(undefined, undefined)
-    } else {
-      assert.strictEqual(true, false)
-    }
-  })
-})
-
 suite("Test sortYamlWrapper", () => {
+  /*
   test("should return `[]` on invalid quotingType", async () => {
     const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
     await settings.update("quotingType", "`", vscode.ConfigurationTarget.Global)
@@ -286,6 +82,7 @@ suite("Test sortYamlWrapper", () => {
 
     await settings.update("quotingType", "'", vscode.ConfigurationTarget.Global)
   })
+  */
   test("should return edits on a valid yaml", async () => {
     const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await vscode.workspace.openTextDocument(uri)
@@ -558,7 +355,6 @@ suite("Test applyComments", () => {
       '  bob:\n' +
       '    place: Germany\n' +
       '    age: 23\n'
-    ''
 
     const expected =
       'persons:\n' +

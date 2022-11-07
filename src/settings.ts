@@ -23,12 +23,18 @@ export class Settings {
     }
     getJsYamlSchemaFromString(schema: string): jsyaml.Schema {
         switch (schema) {
-            case "HOMEASSISTANT_SCHEMA": return HOMEASSISTANT_SCHEMA as jsyaml.Schema
-            case "CLOUDFORMATION_SCHEMA": return CLOUDFORMATION_SCHEMA as jsyaml.Schema
-            case "CORE_SCHEMA": return jsyaml.CORE_SCHEMA
-            case "FAILSAFE_SCHEMA": return jsyaml.FAILSAFE_SCHEMA
-            case "JSON_SCHEMA": return jsyaml.JSON_SCHEMA
-            default: return jsyaml.DEFAULT_SCHEMA
+            case "HOMEASSISTANT_SCHEMA":
+                return HOMEASSISTANT_SCHEMA as jsyaml.Schema
+            case "CLOUDFORMATION_SCHEMA":
+                return CLOUDFORMATION_SCHEMA as jsyaml.Schema
+            case "CORE_SCHEMA":
+                return jsyaml.CORE_SCHEMA
+            case "FAILSAFE_SCHEMA":
+                return jsyaml.FAILSAFE_SCHEMA
+            case "JSON_SCHEMA":
+                return jsyaml.JSON_SCHEMA
+            default:
+                return jsyaml.DEFAULT_SCHEMA
         }
     }
     getLineWidth(): number {

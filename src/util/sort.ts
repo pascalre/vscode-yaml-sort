@@ -19,7 +19,13 @@ export class Sort {
     const indexB = sortOrder.indexOf(b)
 
     if (indexA > -1 && indexB > -1) {
-      return indexA > indexB ? 1 : indexA < indexB ? -1 : 0
+      if (indexA > indexB) {
+        return 1
+      }
+      if (indexA < indexB) {
+        return -1
+      }
+      return 0
     }
     if (indexA !== -1 && indexB === -1) {
       return -1

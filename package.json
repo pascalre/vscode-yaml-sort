@@ -222,6 +222,7 @@
     "coverage": "rm -rf .nyc_output && rm -rf coverage && nyc npm run test",
     "lint": "eslint . --ext .ts",
     "pretest": "npm run compile",
+    "sonar": "node sonar-project.js",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"

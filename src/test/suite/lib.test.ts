@@ -8,29 +8,11 @@ import * as assert from "assert"
 import {
   addNewLineBeforeKeywordsUpToLevelN,
   addNewLineBeforeRootKeywords,
-  getDelimiters,
   prependWhitespacesOnEachLine,
-  removeLeadingLineBreakOfFirstElement,
-  removeQuotesFromKeys,
-  removeTrailingCharacters,
   replaceTabsWithSpaces
 } from "../../lib"
 import { getYamlFilesInDirectory } from "../../util/file-util"
-
-suite("Test removeQuotesFromKeys", () => {
-  test("should return `key: 1` when `'key': 1` is passed", () => {
-    assert.strictEqual(removeQuotesFromKeys("'key': 1"), "key: 1")
-  })
-  test("should remove the quotes from multiple keywords", () => {
-    assert.strictEqual(removeQuotesFromKeys("'key': 1\n'key2': 2"), "key: 1\nkey2: 2")
-  })
-  test("should remove the quotes from special keywords containing dots", () => {
-    assert.strictEqual(removeQuotesFromKeys("'1.2.3': 1\n'key2': 2"), "1.2.3: 1\nkey2: 2")
-  })
-  test("should remove the quotes from special keywords containing colons", () => {
-    assert.strictEqual(removeQuotesFromKeys("'1:2:3': 1\n'key2': 2"), "1:2:3: 1\nkey2: 2")
-  })
-})
+import { getDelimiters, removeTrailingCharacters } from "../../util/yaml-util"
 
 suite("Test removeTrailingCharacters", () => {
   const actual = "text"

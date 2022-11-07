@@ -13,9 +13,14 @@ The following commands support you at developing good code:
 * `npm run test`: Run the tests
 * `npm run lint`: Run the linter
 
-Run the following commands to run SonarScanner:
-* `docker pull --platform linux/x86_64 sonarqube`: Pull sonarqube container.
-* `docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube:latest`: Start sonarqube container. This can take some time.
+### SonarQube
+* `docker-compose up -d`: Start the sonarqube container. This will take some time.
+* `docker-compose stop`: Stop the container
+* `docker-compose down`: Remove the container
+
+SonarQube will be reachable on `http://localhost:9000`.
+
+* `npm run sonar`: Start sonarscanner and upload result to local container
 
 ### Commit changes
 Refer to [this blogpost](https://cbea.ms/git-commit/#end) by cbeams when committing changes. Issue numbers can be added in braces to the end of the commit message.

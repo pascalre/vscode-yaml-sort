@@ -1,28 +1,4 @@
 /**
- * Removes single quotes from special keywords
- * e.g. '1.4.2': will result in 1.4.2: or 'puppet::key': will result in puppet::key:
- * @param  {string} text String for processing.
- * @returns {string} processed text
- */
-export function removeQuotesFromKeys(text: string): string {
-  return text.replace(/'(.*)':/g, "$1:")
-}
-
-/**
- * Removes a given count of characters from a string.
- * @param   {string} text  String for processing.
- * @param   {number} count The number of characters to remove from the end of the returned string.
- * @returns {string} Input text with removed trailing characters.
- */
-export function removeTrailingCharacters(text: string, count = 1): string {
-  if (count >= 0 && count <= text.length) {
-    return text.substr(0, text.length - count)
-  } else {
-    throw new Error("The count parameter is not in a valid range")
-  }
-}
-
-/**
  * Prepends a given count of whitespaces to every single line in a text.
  * Lines with yaml seperators (---) will not be indented
  * @param   {string} text  Text which should get some leading whitespaces on each line.
@@ -48,60 +24,6 @@ export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArra
   if (firstDelimiter) {
     firstDelimiter = firstDelimiter.replace(/^\n/, "")
     delimiters.unshift(firstDelimiter)
-  }
-  return delimiters
-}
-
-/**
- * Splits a string, which contains multiple yaml documents.
- * @param   {string}   multipleYamls String which contains multiple yaml documents.
- * @returns {[string]} Array of yaml documents.
- */
-export function splitYaml(multipleYamls: string): [string] {
-  return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
-}
-
-/**
- * Returns all delimiters with comments.
- * @param   {string}  multipleYamls String which contains multiple yaml documents.
- * @param   {boolean} isSelectionEmpty Specify if the text is an selection
- * @param   {boolean} useLeadingDashes Specify if the documents should have a leading delimiter.
- *                                   If set to false, it will add an empty array element at the beginning of the output.
- * @returns {[string]} Array of yaml delimiters.
- */
-export function getDelimiters(multipleYamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean): RegExpMatchArray {
-  // remove empty lines
-  multipleYamls = multipleYamls.trim()
-  multipleYamls = multipleYamls.replace(/^\n/, "")
-  let delimiters = multipleYamls.match(/^---.*/gm)
-  if (!delimiters) {
-    return [""]
-  }
-
-  // append line break to every delimiter
-  delimiters = delimiters.map((delimiter) => "\n" + delimiter + "\n") as RegExpMatchArray
-
-  if (delimiters) {
-    if (isSelectionEmpty) {
-      if (!useLeadingDashes && multipleYamls.startsWith("---")) {
-        delimiters.shift()
-        delimiters.unshift("")
-      } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
-        delimiters.unshift("---\n")
-      } else {
-        delimiters.unshift("")
-      }
-    } else {
-      if (!multipleYamls.startsWith("---")) {
-        delimiters.unshift("")
-      } else {
-        let firstDelimiter = delimiters.shift()
-        if (firstDelimiter) {
-          firstDelimiter = firstDelimiter.replace(/^\n/, "")
-          delimiters.unshift(firstDelimiter)
-        }
-      }
-    }
   }
   return delimiters
 }

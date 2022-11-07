@@ -36,6 +36,9 @@ suite("Test Sort - customSort()", () => {
   test("when `custom` is `1` and keywords are `['kind', 'data']` and a is `kind` and b is `data` should return -1", () => {
     assert.strictEqual(sort.customSort("kind", "data"), -1)
   })
+  test("when `custom` is `1` and keywords are `['kind', 'data']` and a is `kind` and b is `kind` should return 0", () => {
+    assert.strictEqual(sort.customSort("kind", "kind"), 0)
+  })
 })
 
 suite("Test Sort - getSortingAlgorithm()", () => {

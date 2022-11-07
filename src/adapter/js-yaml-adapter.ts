@@ -1,7 +1,7 @@
 import { Settings } from "../settings"
 import * as jsyaml from "js-yaml"
-import { removeTrailingCharacters, splitYaml } from "../lib"
 import { Sort } from "../util/sort"
+import { removeTrailingCharacters, splitYaml } from "../util/yaml-util"
 
 export class JsYamlAdapter {
   settings: Settings

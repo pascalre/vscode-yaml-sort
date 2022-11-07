@@ -33,7 +33,7 @@ suite("Test dumpYaml", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
 
   test("when locale is `en` should sort character `ä` over `z`", () => {
@@ -52,7 +52,7 @@ suite("Test dumpYaml", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
 
   test("when locale is `sv` should sort character `z` over `ä`", () => {
@@ -68,7 +68,7 @@ suite("Test dumpYaml", () => {
     settings.getLocale = function () {
       return "sv"
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
 
   test("should ignore case when sorting", () => {
@@ -84,7 +84,7 @@ suite("Test dumpYaml", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
 
 })
@@ -117,7 +117,7 @@ suite("Test dumpYaml", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
   test("should sort with by locale behaviour", () => {
     const actual =
@@ -132,7 +132,7 @@ suite("Test dumpYaml", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   
     expected =
       'z: value\n' +
@@ -141,7 +141,7 @@ suite("Test dumpYaml", () => {
     settings.getLocale = function () {
       return "sv"
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
   test("should ignore case when sorting", () => {
     const actual =
@@ -156,7 +156,7 @@ suite("Test dumpYaml", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 1, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 1), expected)
   })
   })
   
@@ -186,7 +186,7 @@ suite("Test dumpYaml", () => {
       '  key: |\n' +
       '    This is a very long sentence that spans several lines in the YAML'
   
-    assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 1), expected)
   })
   
   test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
@@ -198,7 +198,7 @@ suite("Test dumpYaml", () => {
       'spec: spec\n' +
       'data: data\n'
   
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 1), expected)
   
     actual =
       'data: data\n' +
@@ -210,7 +210,7 @@ suite("Test dumpYaml", () => {
       '  - aa: b\n' +
       'data: data\n'
   
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 1), expected)
   
     actual =
       'data:\n' +
@@ -230,7 +230,7 @@ suite("Test dumpYaml", () => {
       '  skills:\n' +
       '    - pascal\n'
   
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 1), expected)
   
     actual =
       'data: data\n' +
@@ -244,7 +244,7 @@ suite("Test dumpYaml", () => {
       '  - b\n' +
       'data: data\n'
   
-    assert.strictEqual(sortYaml(actual, 1, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 1), expected)
   })
   
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
@@ -266,7 +266,7 @@ suite("Test dumpYaml", () => {
       'aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n' +
       '      dolores et e'
   
-    assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 1), expected)
   })
   
   test("should add an empty line before `spec`", () => {
@@ -287,12 +287,12 @@ suite("Test dumpYaml", () => {
     settings.getEmptyLinesUntilLevel = function () {
       return 2
     }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 0), expected)
   })
   test("should not format a date in CORE_SCHEMA", () => {
     const actual = 'AWSTemplateFormatVersion: 2010-09-09'
     let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
-    assert.strictEqual(sortYaml(actual, 0, new Settings()), expected)
+    assert.strictEqual(sortYaml(actual, new Settings(), 0), expected)
   
     expected = actual
   
@@ -300,7 +300,7 @@ suite("Test dumpYaml", () => {
     settings.getSchema = function () {
       return jsyaml.CORE_SCHEMA
     }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 0), expected)
   })
   test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
     const actual =
@@ -329,7 +329,7 @@ suite("Test dumpYaml", () => {
     settings.getEmptyLinesUntilLevel = function () {
       return 2
     }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 0), expected)
   })
   test("compatibility with older yaml versions should be configurable", () => {
     const actual =
@@ -349,7 +349,7 @@ suite("Test dumpYaml", () => {
     settings.getQuotingType = function () {
       return "\""
     }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 0), expected)
   
     expected =
       'key:\n' +
@@ -358,7 +358,7 @@ suite("Test dumpYaml", () => {
     settings.getNoCompatMode = function () {
       return true
     }
-    assert.strictEqual(sortYaml(actual, 0, settings), expected)
+    assert.strictEqual(sortYaml(actual, settings, 0), expected)
   })
   })
   
