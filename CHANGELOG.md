@@ -1,4 +1,8 @@
 # Changelog
+## 6.0.0 - December 6, 2022
+* (refs [#98](https://github.com/pascalre/vscode-yaml-sort/issues/98)) Refactor project
+* Update dependencies to latest versions
+
 ## 6.0.0 - October 4, 2022
 * (refs [#85](https://github.com/pascalre/vscode-yaml-sort/issues/85)) Is custom sort on save planned?
 * New default for `sortOnSave` allows to specify custom sort for auto-saving
