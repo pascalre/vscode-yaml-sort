@@ -62,7 +62,7 @@ async function captureStdout(fn: () => unknown) {
   const w = process.stdout.write;
   let buffer = '';
   process.stdout.write = (s) => { buffer = buffer + s; return true; };
-  await fn();
+  fn();
   process.stdout.write = w;
   return buffer;
 }
