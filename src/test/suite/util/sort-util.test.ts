@@ -1,6 +1,6 @@
 import * as assert from "assert"
 import { Settings } from "../../../settings"
-import { Sort } from "../../../util/sort"
+import { SortUtil } from "../../../util/sort-util"
 
 suite("Test Sort - localeSort()", () => {
   test("when `locale` is `sv` and a is `ä` and b is `z` should return 1", () => {
@@ -8,7 +8,7 @@ suite("Test Sort - localeSort()", () => {
     settings.getLocale = function () {
       return "sv"
     }
-    const sort = new Sort(settings)
+    const sort = new SortUtil(settings)
     assert.strictEqual(sort.localeSort("ä", "z"), 1)
   })
 
@@ -17,7 +17,7 @@ suite("Test Sort - localeSort()", () => {
     settings.getLocale = function () {
       return "en"
     }
-    const sort = new Sort(settings)
+    const sort = new SortUtil(settings)
     assert.strictEqual(sort.localeSort("ä", "z"), -1)
   })
 })
@@ -27,7 +27,7 @@ suite("Test Sort - customSort()", () => {
   settings.getCustomSortKeywords = function () {
     return ['kind', 'data']
   }
-  const sort = new Sort(settings)
+  const sort = new SortUtil(settings)
   sort.custom = 1
 
   test("when `custom` is `1` and keywords are `['kind', 'data']` and a is `data` and b is `kind` should return 1", () => {
@@ -47,13 +47,13 @@ suite("Test Sort - getSortingAlgorithm()", () => {
     settings.getUseCustomSortRecursively = function () {
       return true
     }
-    const sort = new Sort(settings)
+    const sort = new SortUtil(settings)
     sort.custom = 1
     assert.strictEqual(sort.getSortingAlgorithm(), sort.customSort)
   })
   test("when `custom` is `0` return localeSort", () => {
     const settings = new Settings()
-    const sort = new Sort(settings)
+    const sort = new SortUtil(settings)
     assert.strictEqual(sort.getSortingAlgorithm(), sort.localeSort)
   })
 })

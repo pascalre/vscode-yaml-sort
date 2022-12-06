@@ -10,6 +10,20 @@ suite("Test VsCodeAdapter - getProperty()", () => {
     assert.strictEqual(vscodeadapter.getProperty("locale"), "en")
   })
 })
+/*
+suite("Test VsCodeAdapter - applyEdits()", () => {
+  const vscodeadapter = new VsCodeAdapter()
+  const textEditor = vscode.window.activeTextEditor
+  if (textEditor) {
+    const edits = vscodeadapter.getEdits(textEditor, 'foobar')
+    vscode.window.activeTextEditor = undefined
+    assert.throws(() => vscodeadapter.applyEdits([edits]))
+  
+    test("when property is locale should return en", () => {
+      assert.strictEqual(vscodeadapter.getProperty("locale"), "en")
+    })
+  }
+})*/
 
 suite("Test VsCodeAdapter - getActiveDocument()", () => {
   test("when text editor is active should open document", async () => {

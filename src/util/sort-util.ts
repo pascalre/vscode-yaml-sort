@@ -1,6 +1,6 @@
 import { Settings } from "../settings";
 
-export class Sort {
+export class SortUtil {
   settings: Settings
   custom = 0
 

@@ -6,12 +6,11 @@ export enum Severity {
 }
 
 export class VsCodeAdapter {
-  section: string
+  section = "vscode-yaml-sort"
   settings: Settings
 
-  constructor(settings = new Settings(), section = "vscode-yaml-sort") {
+  constructor(settings = new Settings()) {
     this.settings = settings
-    this.section = section
   }
 
   getProperty(property: string) {
@@ -53,15 +52,10 @@ export class VsCodeAdapter {
     return textEditor.document.getText(range)
   }
 
-  /*
-  getText(textEditor: vscode.TextEditor) {
-    if (textEditor.selection.isEmpty) {
-      return this.getActiveDocument(textEditor)
-    } else {
-      const selection = this.getSelectedRange(textEditor)
-      return textEditor.document.getText(selection)
-    }
-  }*/
+  getEdits(textEditor: vscode.TextEditor, text: string) {
+    const range = this.getRange(textEditor)
+    return vscode.TextEdit.replace(range, text)
+  }
 
   /**
   * Applys edits to a text editor
@@ -92,7 +86,7 @@ export class VsCodeAdapter {
     switch(severity) {
       case Severity.ERROR :
         vscode.window.showErrorMessage(message)
-        break;
+        break
       case Severity.INFO :
         if (this.settings.getNotifySuccess()) {
           vscode.window.showInformationMessage(message)

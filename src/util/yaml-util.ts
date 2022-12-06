@@ -1,9 +1,93 @@
 import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, replaceTabsWithSpaces } from "../lib"
 import { Settings } from "../settings"
-import * as jsyaml from "js-yaml"
 import * as vscode from "vscode"
-import { dumpYaml, JsYamlAdapter } from "../adapter/js-yaml-adapter"
+import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
+
+export class YamlUtil {
+    settings: Settings
+    jsyamladapter: JsYamlAdapter
+
+    constructor(settings = new Settings()) {
+        this.settings = settings
+        this.jsyamladapter = new JsYamlAdapter(settings)
+    }
+
+    sortYaml(unsortedYaml: string, customSort = 0): string | null {
+        try {
+            const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.getIndent())
+            const comments = findComments(unsortedYamlWithoutTabs)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
+            let sortedYaml = ""
+
+            if (customSort > 0 && !this.settings.getUseCustomSortRecursively()) {
+                const keywords = this.settings.getCustomSortKeywords(customSort)
+
+                keywords.forEach(key => {
+                    if (doc[key]) {
+                        let sortedSubYaml = this.jsyamladapter.dumpYaml(doc[key], true, customSort, this.settings)
+                        if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
+                            // when key cotains more than one line, we need some transformation:
+                            // add a new line and indent each line some spaces
+                            sortedSubYaml = prependWhitespacesOnEachLine(sortedSubYaml, this.settings.getIndent())
+                            if (sortedSubYaml.endsWith("\n")) {
+                                sortedSubYaml = removeTrailingCharacters(sortedSubYaml, this.settings.getIndent())
+                            }
+                            sortedYaml += key + ":\n" + sortedSubYaml + "\n"
+                        } else {
+                            sortedYaml += key + ": " + sortedSubYaml + "\n"
+                        }
+                        // delete key from yaml
+                        delete doc[key]
+                    }
+                })
+            }
+
+            // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
+            sortedYaml += this.jsyamladapter.dumpYaml(doc, true, customSort, this.settings)
+
+            if (this.settings.getEmptyLinesUntilLevel() > 0) {
+                sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.getEmptyLinesUntilLevel(), this.settings.getIndent(), sortedYaml)
+            }
+
+            sortedYaml = applyComments(sortedYaml, comments)
+
+            return sortedYaml
+        } catch (e) {
+            if (e instanceof Error) {
+                vscode.window.showErrorMessage("Keys could not be resorted: " + e.message)
+            }
+            return null
+        }
+    }
+
+
+    /**
+     * Formats a yaml document (without sorting).
+     * @param   {string} yaml Yaml to be formatted.
+     * @returns {string} Formatted yaml.
+     */
+    formatYaml(yaml: string, useLeadingDashes: boolean): string | null {
+        try {
+            const comments = findComments(yaml)
+            let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(yaml) as string, false, 0, this.settings)
+            doc = applyComments(doc, comments)
+            if (useLeadingDashes) {
+                doc = "---\n" + doc
+            }
+            if (this.settings.getNotifySuccess()) {
+                vscode.window.showInformationMessage("Yaml formatted successfully")
+            }
+            return doc
+        } catch (e) {
+            if (e instanceof Error) {
+                vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
+            }
+            return null
+        }
+    }
+}
 
 export function hasTextYamlKeys(text: string) {
     if (Object.keys(text).length === 0) {
@@ -18,13 +102,13 @@ export function hasTextYamlKeys(text: string) {
  * @param   {number} count The number of characters to remove from the end of the returned string.
  * @returns {string} Input text with removed trailing characters.
  */
- export function removeTrailingCharacters(text: string, count = 1): string {
+export function removeTrailingCharacters(text: string, count = 1): string {
     if (count >= 0 && count <= text.length) {
-      return text.substring(0, text.length - count)
+        return text.substring(0, text.length - count)
     } else {
-      throw new Error("The count parameter is not in a valid range")
+        throw new Error("The count parameter is not in a valid range")
     }
-  }
+}
 
 /**
  * Checks if a text ends with a character which suggests, that the selection is missing something.
@@ -58,90 +142,6 @@ export function validateTextRange(text: string) {
     }
 }
 
-export function sortYaml(
-    unsortedYaml: string,
-    settings: Settings,
-    customSort = 0
-): string | null {
-    try {
-        const loadOptions = { schema: settings.getSchema() }
-        const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, settings.getIndent())
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const comments = findComments(unsortedYamlWithoutTabs)
-        const doc = jsyaml.load(unsortedYamlWithoutTabs, loadOptions) as any
-        let sortedYaml = ""
-
-        if (customSort > 0 && !settings.getUseCustomSortRecursively()) {
-            const keywords = settings.getCustomSortKeywords(customSort)
-
-            keywords.forEach(key => {
-                if (doc[key]) {
-                    let sortedSubYaml = dumpYaml(doc[key], true, customSort, settings)
-                    if ((sortedSubYaml.includes(":") && !sortedSubYaml.startsWith("|")) || sortedSubYaml.startsWith("-")) {
-                        // when key cotains more than one line, we need some transformation:
-                        // add a new line and indent each line some spaces
-                        sortedSubYaml = prependWhitespacesOnEachLine(sortedSubYaml, settings.getIndent())
-                        if (sortedSubYaml.endsWith("\n")) {
-                            sortedSubYaml = removeTrailingCharacters(sortedSubYaml, settings.getIndent())
-                        }
-                        sortedYaml += key + ":\n" + sortedSubYaml + "\n"
-                    } else {
-                        sortedYaml += key + ": " + sortedSubYaml + "\n"
-                    }
-                    // delete key from yaml
-                    delete doc[key]
-                }
-            })
-        }
-
-        // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-        sortedYaml += dumpYaml(doc, true, customSort, settings)
-
-        if (settings.getEmptyLinesUntilLevel() > 0) {
-            sortedYaml = addNewLineBeforeKeywordsUpToLevelN(settings.getEmptyLinesUntilLevel(), settings.getIndent(), sortedYaml)
-        }
-
-        sortedYaml = applyComments(sortedYaml, comments)
-
-        return sortedYaml
-    } catch (e) {
-        if (e instanceof Error) {
-            vscode.window.showErrorMessage("Keys could not be resorted: " + e.message)
-        }
-        return null
-    }
-}
-
-/**
- * Formats a yaml document (without sorting).
- * @param   {string} yaml Yaml to be formatted.
- * @returns {string} Formatted yaml.
- */
-export function formatYaml(
-    yaml: string,
-    useLeadingDashes: boolean,
-    settings: Settings
-): string | null {
-    try {
-        const loadOptions = { schema: settings.getSchema() }
-        const comments = findComments(yaml)
-        let doc = dumpYaml(jsyaml.load(yaml, loadOptions) as string, false, 0, settings)
-        doc = applyComments(doc, comments)
-        if (useLeadingDashes) {
-            doc = "---\n" + doc
-        }
-        if (settings.getNotifySuccess()) {
-            vscode.window.showInformationMessage("Yaml formatted successfully")
-        }
-        return doc
-    } catch (e) {
-        if (e instanceof Error) {
-            vscode.window.showErrorMessage("Yaml could not be formatted: " + e.message)
-        }
-        return null
-    }
-}
-
 /**
  * Finds all full line comments in a given yaml (ignoring comments in the same line with code).
  * @param text Yaml document
@@ -165,7 +165,6 @@ export function findComments(text: string): Map<string, string> {
             }
         }
     }
-
 
     return comments
 }
