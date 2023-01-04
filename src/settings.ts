@@ -1,4 +1,4 @@
-import * as jsyaml from "js-yaml"
+import { Schema, CORE_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, DEFAULT_SCHEMA } from "js-yaml"
 import { workspace } from "vscode"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
@@ -23,22 +23,6 @@ export class Settings {
     getIndent(): number {
         return this.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
     }
-    getJsYamlSchemaFromString(schema: string): jsyaml.Schema {
-        switch (schema) {
-            case "HOMEASSISTANT_SCHEMA":
-                return HOMEASSISTANT_SCHEMA as jsyaml.Schema
-            case "CLOUDFORMATION_SCHEMA":
-                return CLOUDFORMATION_SCHEMA as jsyaml.Schema
-            case "CORE_SCHEMA":
-                return jsyaml.CORE_SCHEMA
-            case "FAILSAFE_SCHEMA":
-                return jsyaml.FAILSAFE_SCHEMA
-            case "JSON_SCHEMA":
-                return jsyaml.JSON_SCHEMA
-            default:
-                return jsyaml.DEFAULT_SCHEMA
-        }
-    }
     getLineWidth(): number {
         return this.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
     }
@@ -57,9 +41,9 @@ export class Settings {
     getQuotingType(): "'" | "\"" {
         return this.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | "\""
     }
-    getSchema(): jsyaml.Schema {
+    getSchema(): Schema {
         const schema = this.workspace.getConfiguration().get("vscode-yaml-sort.schema") as string
-        return this.getJsYamlSchemaFromString(schema)
+        return Settings.getJsYamlSchemaFromString(schema)
     }
     getSortOnSave(): number {
         return this.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as number
@@ -91,4 +75,21 @@ export class Settings {
     useAsFormatter = this.getUseAsFormatter()
     useCustomSortRecursively = this.getUseCustomSortRecursively()
     useLeadingDashes = this.getUseLeadingDashes()
+
+    static getJsYamlSchemaFromString(schema: string): Schema {
+        switch (schema) {
+            case "HOMEASSISTANT_SCHEMA":
+                return HOMEASSISTANT_SCHEMA as Schema
+            case "CLOUDFORMATION_SCHEMA":
+                return CLOUDFORMATION_SCHEMA as Schema
+            case "CORE_SCHEMA":
+                return CORE_SCHEMA
+            case "FAILSAFE_SCHEMA":
+                return FAILSAFE_SCHEMA
+            case "JSON_SCHEMA":
+                return JSON_SCHEMA
+            default:
+                return DEFAULT_SCHEMA
+        }
+    }
 }

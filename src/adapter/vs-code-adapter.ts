@@ -1,4 +1,4 @@
-import * as vscode from "vscode"
+import { workspace, TextEditor, Range, Position, Selection, TextEdit, WorkspaceEdit, window, DocumentFormattingEditProvider, languages, Disposable }  from "vscode"
 import { Settings } from "../settings"
 
 export enum Severity {
@@ -14,20 +14,42 @@ export class VsCodeAdapter {
   }
 
   getProperty(property: string) {
-    return vscode.workspace.getConfiguration().get(`${this.section}.${property}`)
+    return workspace.getConfiguration().get(`${this.section}.${property}`)
   }
 
-  getActiveDocument(textEditor: vscode.TextEditor) {
-    return textEditor.document.getText()
+  // have a function that adds/removes the formatter based
+  // on a configuration setting
+  registerFormatter(formatter: DocumentFormattingEditProvider) {
+    let registration: Disposable | undefined
+    const useAsFormatter = this.settings.getUseAsFormatter()
+    if (useAsFormatter && !registration) {
+      languages.registerDocumentFormattingEditProvider('yaml', formatter)
+    } else if (!useAsFormatter && registration) {
+      registration.dispose()
+    }
   }
 
-  getFullDocumentRange(textEditor: vscode.TextEditor) {
-    return new vscode.Range(
-      new vscode.Position(0, 0),
-      new vscode.Position(textEditor.document.lineCount + 1, 0))
+  showMessage(severity: Severity, message: string) {
+    if (severity === Severity.ERROR) {
+      window.showErrorMessage(message)
+    } else {
+      if (this.settings.getNotifySuccess()) {
+        window.showInformationMessage(message)
+      }
+    }
   }
 
-  getSelectedRange(textEditor: vscode.TextEditor) {
+  static getText(textEditor: TextEditor, range: Range) {
+    return textEditor.document.getText(range)
+  }
+
+  static getFullDocumentRange(textEditor: TextEditor) {
+    return new Range(
+      new Position(0, 0),
+      new Position(textEditor.document.lineCount + 1, 0))
+  }
+
+  static getSelectedRange(textEditor: TextEditor) {
     let endLine = textEditor.selection.end.line
     // if selection ends on the first character on a new line ignore this line
     if (textEditor.selection.end.character === 0) {
@@ -35,26 +57,9 @@ export class VsCodeAdapter {
     }
 
     // ensure selection covers whole start and end line
-    return new vscode.Selection(
+    return new Selection(
       textEditor.selection.start.line, 0,
       endLine, textEditor.document.lineAt(endLine).range.end.character)
-  }
-
-  getRange(textEditor: vscode.TextEditor) {
-    if (textEditor.selection.isEmpty) {
-      return this.getFullDocumentRange(textEditor)
-    } else {
-      return this.getSelectedRange(textEditor)
-    }
-  }
-
-  getText(textEditor: vscode.TextEditor, range: vscode.Range) {
-    return textEditor.document.getText(range)
-  }
-
-  getEdits(textEditor: vscode.TextEditor, text: string) {
-    const range = this.getRange(textEditor)
-    return vscode.TextEdit.replace(range, text)
   }
 
   /**
@@ -62,37 +67,30 @@ export class VsCodeAdapter {
   * @param activeEditor Editor to apply the changes
   * @param edits Changes to apply
   */
-  applyEdits(edit: [vscode.TextEdit]) {
-    if (vscode.window.activeTextEditor) {
-      const workspaceEdit = new vscode.WorkspaceEdit()
-      workspaceEdit.set(vscode.window.activeTextEditor.document.uri, edit)
-      vscode.workspace.applyEdit(workspaceEdit)
+  static applyEdits(edit: [TextEdit]) {
+    if (window.activeTextEditor) {
+      const workspaceEdit = new WorkspaceEdit()
+      workspaceEdit.set(window.activeTextEditor.document.uri, edit)
+      workspace.applyEdit(workspaceEdit)
     }
   }
 
-  // have a function that adds/removes the formatter based
-  // on a configuration setting
-  registerFormatter(formatter: vscode.DocumentFormattingEditProvider) {
-    let registration: vscode.Disposable | undefined
-    const useAsFormatter = this.settings.getUseAsFormatter()
-    if (useAsFormatter && !registration) {
-      vscode.languages.registerDocumentFormattingEditProvider('yaml', formatter)
-    } else if (!useAsFormatter && registration) {
-      registration.dispose()
+  static getActiveDocument(textEditor: TextEditor) {
+    return textEditor.document.getText()
+  }
+
+  static getRange(textEditor: TextEditor) {
+    if (textEditor.selection.isEmpty) {
+      return VsCodeAdapter.getFullDocumentRange(textEditor)
+    } else {
+      return VsCodeAdapter.getSelectedRange(textEditor)
     }
   }
 
-  showMessage(severity: Severity, message: string) {
-    switch(severity) {
-      case Severity.ERROR :
-        vscode.window.showErrorMessage(message)
-        break
-      case Severity.INFO :
-        if (this.settings.getNotifySuccess()) {
-          vscode.window.showInformationMessage(message)
-        }
-        break
-    }
+  static getEdits(textEditor: TextEditor, text: string) {
+    const range = VsCodeAdapter.getRange(textEditor)
+    return TextEdit.replace(range, text)
   }
+
 }
 

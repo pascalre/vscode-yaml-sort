@@ -1,4 +1,4 @@
-import * as fs from "fs"
+import { readFileSync } from "fs"
 import { sync } from "glob"
 import { Settings } from "../settings"
 
@@ -20,6 +20,6 @@ export class FileUtil {
   }
 
   readFile(file: string) {
-    return fs.readFileSync(file, this.encoding).toString()
+    return readFileSync(file, this.encoding).toString()
   }
 }

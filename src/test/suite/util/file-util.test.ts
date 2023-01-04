@@ -1,4 +1,4 @@
-import * as assert from "assert"
+import { strictEqual, throws, deepStrictEqual } from "assert"
 import { Settings } from "../../../settings"
 import { FileUtil } from "../../../util/file-util"
 
@@ -6,11 +6,11 @@ suite("Test FileUtil - readFile()", () => {
   const fileutil = new FileUtil()
 
   test("when `file` is a path to an existing file should return the files content", () => {
-    assert.strictEqual(fileutil.readFile("./src/test/suite/util/resources/readFile.txt"), "lorem impsum")
+    strictEqual(fileutil.readFile("./src/test/suite/util/resources/readFile.txt"), "lorem impsum")
   })
 
   test("when `file` is a path to a non existing file should throw", () => {
-    assert.throws(() => fileutil.readFile("nonexistent-path"), Error)
+    throws(() => fileutil.readFile("nonexistent-path"), Error)
   })
 })
 
@@ -28,7 +28,7 @@ suite("Test FileUtil - getFilesWithExtensions()", () => {
       "./src/test/suite/util/resources/bar.yml",
       "./src/test/suite/util/resources/subfolder/.customyaml",
     ]
-    assert.deepStrictEqual(fileutil.getFilesWithExtensions("./src/test/suite/util/resources"), expected)
+    deepStrictEqual(fileutil.getFilesWithExtensions("./src/test/suite/util/resources"), expected)
   })
 
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
@@ -40,6 +40,6 @@ suite("Test FileUtil - getFilesWithExtensions()", () => {
       './src/test/files/getYamlFilesInDirectory/folder2/file.yaml',
       './src/test/files/getYamlFilesInDirectory/file.yml'
     ]
-    assert.deepStrictEqual(fileutil.getFilesWithExtensions("./src/test/files/getYamlFilesInDirectory"), expected)
+    deepStrictEqual(fileutil.getFilesWithExtensions("./src/test/files/getYamlFilesInDirectory"), expected)
   })
 })

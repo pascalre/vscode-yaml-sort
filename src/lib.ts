@@ -64,12 +64,12 @@ export function addNewLineBeforeKeywordsUpToLevelN(n: number, indent: number, te
   let result = text;
 
   while (level < n) {
-    if (level == 0) {
+    if (level === 0) {
       result = result.replace(/\n[^\s].*:/g, "\n$&")
     } else {
       let spaces = " ".repeat(indent)
       spaces = spaces.repeat(level)
-      const regex = new RegExp("\n" + spaces + "[\\w-]*:", "g")
+      const regex = new RegExp(`\n${spaces}[\\w-]*:`, "g")
       result = result.replace(regex, "\n$&")
     }
     level++;

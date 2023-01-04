@@ -35,12 +35,4 @@ export class SortUtil {
     }
     return this.localeSort(a, b)
   }
-
-  getSortingAlgorithm() {
-    if (this.custom > 0 && this.settings.getUseCustomSortRecursively()) {
-      return this.customSort
-    } else {
-      return this.localeSort
-    }
-  }
 }

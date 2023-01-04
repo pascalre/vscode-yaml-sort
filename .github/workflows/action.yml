@@ -10,25 +10,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: install
         run: |
              npm install
              npm install -g yarn
              npm install -g vsce
+
       - name: lint
         run: npm run lint
+
       - name: static code analysis
         run: npm run code-analysis
+
       - name: test
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npm run coverage
-      - name: coverage
+
+      - name: Report test coverage to Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Report test coverage to DeepSource
+        uses: deepsourcelabs/test-coverage-action@master
+        with:
+          key: javascript
+          coverage-file: coverage/lcov.info
+          dsn: ${{ secrets.DEEPSOURCE_DSN }}
+

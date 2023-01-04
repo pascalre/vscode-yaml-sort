@@ -1,4 +1,4 @@
-import * as assert from "assert"
+import { equal, strictEqual } from "assert"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import jsyaml = require("js-yaml")
 import { Settings } from "../../../settings"
@@ -6,7 +6,7 @@ import { YamlUtil } from "../../../util/yaml-util"
 
 suite("Test dumpYaml", () => {
 
-  test("when useCustomSortRecursively is set to `true` should recursively use customSort", async () => {
+  test("when useCustomSortRecursively is set to `true` should recursively use customSort", () => {
     const actual =
       'keyword1: value\n' +
       'keyword: value\n' +
@@ -34,7 +34,7 @@ suite("Test dumpYaml", () => {
       return true
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
 
   test("when locale is `en` should sort character `ä` over `z`", () => {
@@ -54,7 +54,7 @@ suite("Test dumpYaml", () => {
       return true
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
 
   test("when locale is `sv` should sort character `z` over `ä`", () => {
@@ -71,7 +71,7 @@ suite("Test dumpYaml", () => {
       return "sv"
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
 
   test("should ignore case when sorting", () => {
@@ -88,7 +88,7 @@ suite("Test dumpYaml", () => {
       return true
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
 
 })
@@ -122,7 +122,7 @@ suite("Test dumpYaml", () => {
       return true
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
   test("should sort with by locale behaviour", () => {
     const actual =
@@ -138,7 +138,7 @@ suite("Test dumpYaml", () => {
       return true
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   
     expected =
       'z: value\n' +
@@ -147,7 +147,7 @@ suite("Test dumpYaml", () => {
     yamlutil.settings.getLocale = function () {
       return "sv"
     }
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
   test("should ignore case when sorting", () => {
     const actual =
@@ -163,13 +163,13 @@ suite("Test dumpYaml", () => {
       return true
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
-  })
-  
-  
-  suite("Test sortYaml", () => {
-  test("should sort a given yaml document", async () => {
+})
+
+
+suite("Test sortYaml", () => {
+  test("should sort a given yaml document", () => {
     const actual =
       'persons:\n' +
       '  bob:\n' +
@@ -194,10 +194,10 @@ suite("Test dumpYaml", () => {
       '    This is a very long sentence that spans several lines in the YAML'
   
     const yamlutil = new YamlUtil()
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
   
-  test("should put top level keyword `spec` before `data` when passing customsort=1", async () => {
+  test("should put top level keyword `spec` before `data` when passing customsort=1", () => {
     let actual =
       'data: data\n' +
       'spec: spec'
@@ -207,7 +207,7 @@ suite("Test dumpYaml", () => {
       'data: data\n'
   
     const yamlutil = new YamlUtil()
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   
     actual =
       'data: data\n' +
@@ -219,7 +219,7 @@ suite("Test dumpYaml", () => {
       '  - aa: b\n' +
       'data: data\n'
   
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   
     actual =
       'data:\n' +
@@ -239,7 +239,7 @@ suite("Test dumpYaml", () => {
       '  skills:\n' +
       '    - pascal\n'
   
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   
     actual =
       'data: data\n' +
@@ -253,7 +253,7 @@ suite("Test dumpYaml", () => {
       '  - b\n' +
       'data: data\n'
   
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
   
   test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
@@ -276,7 +276,7 @@ suite("Test dumpYaml", () => {
       '      dolores et e'
   
     const yamlutil = new YamlUtil()
-    assert.strictEqual(yamlutil.sortYaml(actual, 1), expected)
+    strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
   
   test("should add an empty line before `spec`", () => {
@@ -298,13 +298,13 @@ suite("Test dumpYaml", () => {
       return 2
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 0), expected)
+    strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
   test("should not format a date in CORE_SCHEMA", () => {
     const actual = 'AWSTemplateFormatVersion: 2010-09-09'
     let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
     let yamlutil = new YamlUtil()
-    assert.strictEqual(yamlutil.sortYaml(actual, 0), expected)
+    strictEqual(yamlutil.sortYaml(actual, 0), expected)
   
     expected = actual
   
@@ -314,7 +314,7 @@ suite("Test dumpYaml", () => {
     }
     yamlutil = new YamlUtil(settings)
 
-    assert.strictEqual(yamlutil.sortYaml(actual, 0), expected)
+    strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
   test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
     const actual =
@@ -344,7 +344,7 @@ suite("Test dumpYaml", () => {
       return 2
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 0), expected)
+    strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
   test("compatibility with older yaml versions should be configurable", () => {
     const actual =
@@ -365,7 +365,7 @@ suite("Test dumpYaml", () => {
       return "\""
     }
     const yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.sortYaml(actual, 0), expected)
+    strictEqual(yamlutil.sortYaml(actual, 0), expected)
   
     expected =
       'key:\n' +
@@ -374,10 +374,9 @@ suite("Test dumpYaml", () => {
     yamlutil.settings.getNoCompatMode = function () {
       return true
     }
-    assert.strictEqual(yamlutil.sortYaml(actual, 0), expected)
+    strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
-  })
-  
+})
 
 suite("Test formatYaml", () => {
   test("should sort all yaml files in directory", () => {
@@ -404,7 +403,7 @@ suite("Test formatYaml", () => {
       return false
     }
     let yamlutil = new YamlUtil(settings)
-    assert.strictEqual(yamlutil.formatYaml(actual, false), expected)
+    strictEqual(yamlutil.formatYaml(actual, false), expected)
 
     expected =
       '---\n' +
@@ -417,11 +416,53 @@ suite("Test formatYaml", () => {
       '    age: 3'
 
     yamlutil = new YamlUtil()
-    assert.strictEqual(yamlutil.formatYaml(actual, true), expected)
+    strictEqual(yamlutil.formatYaml(actual, true), expected)
   })
 
   test("should return `null` on invalid yaml", () => {
     const yamlutil = new YamlUtil()
-    assert.strictEqual(yamlutil.formatYaml('key: 1\nkey: 1', true), null)
+    strictEqual(yamlutil.formatYaml('key: 1\nkey: 1', true), null)
+  })
+})
+
+suite("Test YamlUtil - getNumberOfLeadingSpaces()", () => {
+  test("should return the number of leading spaces of 'text'", () => {
+    strictEqual(YamlUtil.getNumberOfLeadingSpaces("  foo"), 2)
+    strictEqual(YamlUtil.getNumberOfLeadingSpaces("foo"), 0)
+    strictEqual(YamlUtil.getNumberOfLeadingSpaces("foo  "), 0)
+  })
+})
+
+suite("Test YamlUtil - isValueMultiline", () => {
+  test("when text starts with '-' should return true", () => {
+    const text =
+      '- foo: bar\n' +
+      '  bar: baz'
+    equal(YamlUtil.isValueMultiline(text), true)
+  })
+})
+
+suite("Test YamlUtil - transformMultilineValue()", () => {
+  const yamlutil = new YamlUtil()
+  yamlutil.settings.getIndent = function () {
+    return 2
+  }
+  test("Should prepend spaces on each line", () => {
+    const text =
+      '- foo: bar\n' +
+      '  bar: baz'
+    const expected =
+      '  - foo: bar\n' +
+      '    bar: baz'
+    strictEqual(yamlutil.transformMultilineValue(text), expected)
+  })
+  test("When text ends with newline should remove trailing indent", () => {
+    const text =
+      '- foo: bar\n' +
+      '  bar: baz\n'
+    const expected =
+      '  - foo: bar\n' +
+      '    bar: baz\n'
+    strictEqual(yamlutil.transformMultilineValue(text), expected)
   })
 })

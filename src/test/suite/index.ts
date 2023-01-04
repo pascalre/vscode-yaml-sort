@@ -1,19 +1,19 @@
-import * as path from 'path'
-import * as Mocha from 'mocha'
+import { resolve, join} from 'path'
+import Mocha = require('mocha')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const NYC = require('nyc');
-import * as glob from 'glob'
+const NYC = require('nyc')
+import { sync } from 'glob'
 
 // Recommended modules, loading them here to speed up NYC init
 // and minimize risk of race condition
 import 'ts-node/register'
 
 export async function run(): Promise<void> {
-  const testsRoot = path.resolve(__dirname, '..')
+  const testsRoot = resolve(__dirname, '..')
 
     // Setup coverage pre-test, including post-test hook to report
   const nyc = new NYC({
-    cwd: path.join(__dirname, '..', '..', '..'),
+    cwd: join(__dirname, '..', '..', '..'),
     reporter: ['text-summary', 'html', 'lcov'],
     all: true,
     silent: false,
@@ -24,17 +24,8 @@ export async function run(): Promise<void> {
   });
   await nyc.wrap();
 
-// Check the modules already loaded and warn in case of race condition
-  // (ideally, at this point the require cache should only contain one file - this module)
-  const myFilesRegex = /vscode-yaml-sort\/out/;
-  const filterFn = myFilesRegex.test.bind(myFilesRegex);
-  if (Object.keys(require.cache).filter(filterFn).length > 1) {
-    console.warn('NYC initialized after modules were loaded', Object.keys(require.cache).filter(filterFn));
-  }
-
   // Debug which files will be included/excluded
   // console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
-
   await nyc.createTempDirectory();
 	// Create the mocha test
 	const mocha = new Mocha({
@@ -44,25 +35,13 @@ export async function run(): Promise<void> {
 	})
   
   // Add all files to the test suite
-  const files = glob.sync('**/*.test.js', { cwd: testsRoot });
-  files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
+  const files = sync('**/*.test.js', { cwd: testsRoot });
+  files.forEach(f => mocha.addFile(resolve(testsRoot, f)));
 
-  const failures: number = await new Promise(resolve => mocha.run(resolve));
+  const failures: number = await new Promise(executor => mocha.run(executor));
   await nyc.writeCoverageFile();
-
-  // Capture text-summary reporter's output and log it in console
-  console.log(await captureStdout(nyc.report.bind(nyc)));
 
   if (failures > 0) {
     throw new Error(`${failures} tests failed.`);
   }
-}
-
-async function captureStdout(fn: () => unknown) {
-  const w = process.stdout.write;
-  let buffer = '';
-  process.stdout.write = (s) => { buffer = buffer + s; return true; };
-  fn();
-  process.stdout.write = w;
-  return buffer;
 }
