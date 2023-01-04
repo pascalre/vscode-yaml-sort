@@ -3,9 +3,9 @@
 // Please refer to their documentation on https://mochajs.org/ for help.
 //
 
-import * as assert from "assert"
-import * as vscode from "vscode"
-import * as path from "path"
+import { deepStrictEqual, strictEqual, notDeepStrictEqual, equal, deepEqual } from "assert"
+import { Uri, workspace, window, commands, Position, Range, Selection } from "vscode"
+import { resolve } from "path"
 
 import { Settings } from "../../settings"
 import { applyComments, findComments, hasTextYamlKeys, isSelectionInvalid, splitYaml } from "../../util/yaml-util"
@@ -17,124 +17,124 @@ suite("Test getCustomSortKeywords", () => {
     settings.getCustomSortKeywords = function () {
       return ["apiVersion", "kind", "metadata", "spec", "data"]
     }
-    assert.deepStrictEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+    deepStrictEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
   })
   test("should return `[]` for custom keywords 2 and 3", () => {
-    assert.deepStrictEqual(new Settings().getCustomSortKeywords(2), [])
-    assert.deepStrictEqual(new Settings().getCustomSortKeywords(3), [])
+    deepStrictEqual(new Settings().getCustomSortKeywords(2), [])
+    deepStrictEqual(new Settings().getCustomSortKeywords(3), [])
   })
 
   test("should return [] when parameter is not in [1, 2, 3]", () => {
-    assert.deepStrictEqual(new Settings().getCustomSortKeywords(0), [])
-    assert.deepStrictEqual(new Settings().getCustomSortKeywords(4), [])
-    assert.deepStrictEqual(new Settings().getCustomSortKeywords(-1), [])
-    assert.deepStrictEqual(new Settings().getCustomSortKeywords(1.5), [])
+    deepStrictEqual(new Settings().getCustomSortKeywords(0), [])
+    deepStrictEqual(new Settings().getCustomSortKeywords(4), [])
+    deepStrictEqual(new Settings().getCustomSortKeywords(-1), [])
+    deepStrictEqual(new Settings().getCustomSortKeywords(1.5), [])
   })
 })
 
 suite("Test isSelectionInvalid", () => {
   test("should return `true` when `text` is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text"), false)
+    strictEqual(isSelectionInvalid("text"), false)
   })
   test("should return `false` when a string with trailing colon is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text:"), true)
+    strictEqual(isSelectionInvalid("text:"), true)
   })
   test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
-    assert.strictEqual(isSelectionInvalid("text: "), true)
+    strictEqual(isSelectionInvalid("text: "), true)
   })
 })
 
 suite("Test validateYaml", () => {
   test("do not fail when executing command", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
-    await vscode.commands.executeCommand("vscode-yaml-sort.validateYaml")
+    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await workspace.openTextDocument(uri)
+    await window.showTextDocument(doc, { preview: false })
+    await commands.executeCommand("vscode-yaml-sort.validateYaml")
   })
 })
 
 suite("Test sortYamlWrapper", () => {
   /*
   test("should return `[]` on invalid quotingType", async () => {
-    const settings = vscode.workspace.getConfiguration("vscode-yaml-sort")
-    await settings.update("quotingType", "`", vscode.ConfigurationTarget.Global)
+    const settings = workspace.getConfiguration("vscode-yaml-sort")
+    await settings.update("quotingType", "`", ConfigurationTarget.Global)
 
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
+    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await workspace.openTextDocument(uri)
+    await window.showTextDocument(doc, { preview: false })
 
-    const activeEditor = vscode.window.activeTextEditor
+    const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
         'key:\n' +
         '  key2: value'
 
       activeEditor.edit((builder) => builder.replace(
-        new vscode.Range(
-          new vscode.Position(0, 0),
-          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        new Range(
+          new Position(0, 0),
+          new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      assert.deepStrictEqual(sortYamlWrapper(), [])
+      deepStrictEqual(sortYamlWrapper(), [])
     } else {
-      assert.strictEqual(true, false)
+      strictEqual(true, false)
     }
 
-    await settings.update("quotingType", "'", vscode.ConfigurationTarget.Global)
+    await settings.update("quotingType", "'", ConfigurationTarget.Global)
   })
   */
   test("should return edits on a valid yaml", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
+    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await workspace.openTextDocument(uri)
+    await window.showTextDocument(doc, { preview: false })
 
-    const activeEditor = vscode.window.activeTextEditor
+    const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
         'key:\n' +
         ' key2: value'
 
       activeEditor.edit((builder) => builder.replace(
-        new vscode.Range(
-          new vscode.Position(0, 0),
-          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        new Range(
+          new Position(0, 0),
+          new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      assert.notDeepStrictEqual(sortYamlWrapper(), [])
+      notDeepStrictEqual(sortYamlWrapper(), [])
     } else {
-      assert.strictEqual(true, false)
+      strictEqual(true, false)
     }
   })
 
   test("should return `[]` on invalid selection", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
+    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const doc = await workspace.openTextDocument(uri)
+    await window.showTextDocument(doc, { preview: false })
 
-    const activeEditor = vscode.window.activeTextEditor
+    const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
         'key:\n' +
         '  key2: value'
 
       activeEditor.edit((builder) => builder.replace(
-        new vscode.Range(
-          new vscode.Position(0, 0),
-          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        new Range(
+          new Position(0, 0),
+          new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      activeEditor.selection = new vscode.Selection(0, 0, 0, 4)
-      assert.deepStrictEqual(sortYamlWrapper(), [])
+      activeEditor.selection = new Selection(0, 0, 0, 4)
+      deepStrictEqual(sortYamlWrapper(), [])
     } else {
-      assert.strictEqual(true, false)
+      strictEqual(true, false)
     }
   })
   test("should ignore line if selection ends on a lines first character", async () => {
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/testSortYamlWrapper.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
+    const uri = Uri.parse(resolve("./src/test/files/testSortYamlWrapper.yaml"))
+    const doc = await workspace.openTextDocument(uri)
+    await window.showTextDocument(doc, { preview: false })
 
-    const activeEditor = vscode.window.activeTextEditor
+    const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const expected =
         'key:\n' +
@@ -142,23 +142,23 @@ suite("Test sortYamlWrapper", () => {
         '  key3: value\n' +
         'key4: value'
 
-      activeEditor.selection = new vscode.Selection(0, 0, 3, 0)
-      await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
+      activeEditor.selection = new Selection(0, 0, 3, 0)
+      await commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
       await new Promise(r => setTimeout(r, 2000));
-      assert.strictEqual(activeEditor.document.getText(), expected)
+      strictEqual(activeEditor.document.getText(), expected)
     } else {
-      assert.strictEqual(true, false)
+      strictEqual(true, false)
     }
   })
   test("should remove yaml metadata tags (directives)", async () => {
     // Todo: This test needs a refactoring
-    const uri = vscode.Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    // const uri = vscode.Uri.parse(path.resolve("./src/test/files/testSortYaml.yaml"))
-    const doc = await vscode.workspace.openTextDocument(uri)
-    await vscode.window.showTextDocument(doc, { preview: false })
+    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    // const uri = Uri.parse(resolve("./src/test/files/testSortYaml.yaml"))
+    const doc = await workspace.openTextDocument(uri)
+    await window.showTextDocument(doc, { preview: false })
 
-    const activeEditor = vscode.window.activeTextEditor
+    const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
         '%YAML 1.1' +
@@ -170,17 +170,17 @@ suite("Test sortYamlWrapper", () => {
         '  key2: value'
 
       activeEditor.edit((builder) => builder.replace(
-        new vscode.Range(
-          new vscode.Position(0, 0),
-          new vscode.Position(activeEditor.document.lineCount + 1, 0)),
+        new Range(
+          new Position(0, 0),
+          new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      await vscode.commands.executeCommand("vscode-yaml-sort.sortYaml")
+      await commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
       // await new Promise(r => setTimeout(r, 2000));
-      assert.strictEqual(activeEditor.document.getText(), expected)
+      strictEqual(activeEditor.document.getText(), expected)
     } else {
-      assert.strictEqual(true, false)
+      strictEqual(true, false)
     }
   })
 })
@@ -188,11 +188,11 @@ suite("Test sortYamlWrapper", () => {
 
 suite("Test hasTextYamlKeys", () => {
   test("when a text with no yaml keys is passed, `false` is returned", () => {
-    assert.equal(hasTextYamlKeys(""), false)
+    equal(hasTextYamlKeys(""), false)
   })
 
   test("when a text with yaml keys is passed, `true` is returned", () => {
-    assert.equal(hasTextYamlKeys("api: v1"), true)
+    equal(hasTextYamlKeys("api: v1"), true)
   })
 })
 
@@ -202,14 +202,14 @@ suite("Test splitYaml", () => {
     const actual = `\
 - Orange
 - Apple`
-    assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple"])
+    deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple"])
   })
   test("should return the input document without the delimiters", () => {
     const actual = `\
 ---
 - Orange
 - Apple`
-    assert.deepStrictEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
+    deepStrictEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
   })
   test("should return an array with the yaml documents", () => {
     const actual = `\
@@ -218,7 +218,7 @@ suite("Test splitYaml", () => {
 ---
 - Orange
 - Apple`
-    assert.deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+    deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Split multiple yaml documents with leading dashes", () => {
     const actual = `\
@@ -229,7 +229,7 @@ suite("Test splitYaml", () => {
 - Orange
 - Apple`
 
-    assert.deepStrictEqual(splitYaml(actual),
+    deepStrictEqual(splitYaml(actual),
       ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Split multiple yaml documents with text behind delimiter", () => {
@@ -240,7 +240,7 @@ suite("Test splitYaml", () => {
 --- text
 - Orange
 - Apple`
-    assert.deepStrictEqual(splitYaml(actual),
+    deepStrictEqual(splitYaml(actual),
       ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })
@@ -254,7 +254,7 @@ suite("Test findComments", () => {
       '    place: Germany\n' +
       '    age: 23\n'
     const expected = new Map<string, string>()
-    assert.deepEqual(findComments(yaml), expected)
+    deepEqual(findComments(yaml), expected)
   })
 
   test("should return a map with the line below the comment as key and the comment as value", () => {
@@ -267,7 +267,7 @@ suite("Test findComments", () => {
 
     const expected = new Map<string, string>()
     expected.set('# bob is 1st', '  bob:')
-    assert.deepEqual(findComments(yaml), expected)
+    deepEqual(findComments(yaml), expected)
   })
 
   test("should return a map with the line below the comment as key and the comment as value (comment on top)", () => {
@@ -280,7 +280,7 @@ suite("Test findComments", () => {
 
     const expected = new Map<string, string>()
     expected.set('# comment on top', 'persons:')
-    assert.deepEqual(findComments(yaml), expected)
+    deepEqual(findComments(yaml), expected)
   })
 
   test("should return a map with the line below the comment as key and the comment as value (comment at the bottom)", () => {
@@ -293,7 +293,7 @@ suite("Test findComments", () => {
 
     const expected = new Map<string, string>()
     expected.set('# comment at the bottom', '')
-    assert.deepEqual(findComments(yaml), expected)
+    deepEqual(findComments(yaml), expected)
   })
 
   test("should merge multiline comments", () => {
@@ -307,7 +307,7 @@ suite("Test findComments", () => {
 
     const expected = new Map<string, string>()
     expected.set('# bob is 1st\n# alice is 2nd', '  bob:')
-    assert.deepEqual(findComments(yaml), expected)
+    deepEqual(findComments(yaml), expected)
   })
 
 })
@@ -329,7 +329,7 @@ suite("Test applyComments", () => {
       '    place: Germany\n' +
       '    age: 23\n'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
+    deepEqual(applyComments(yaml, comments), expected)
   })
 
   test("should apply comment to last line in yaml", () => {
@@ -342,7 +342,7 @@ suite("Test applyComments", () => {
       'persons: bob\n' +
       '# last line comment'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
+    deepEqual(applyComments(yaml, comments), expected)
   })
 
   test("should apply multiple comments to yaml", () => {
@@ -366,7 +366,7 @@ suite("Test applyComments", () => {
       '\n' +
       '# last line comment'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
+    deepEqual(applyComments(yaml, comments), expected)
   })
 
   test("should recognize indentation", () => {
@@ -385,6 +385,6 @@ suite("Test applyComments", () => {
       '    place: Germany\n' +
       '    age: 23\n'
 
-    assert.deepEqual(applyComments(yaml, comments), expected)
+    deepEqual(applyComments(yaml, comments), expected)
   })
 })

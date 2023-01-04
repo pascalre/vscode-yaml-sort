@@ -13,7 +13,9 @@ The following commands support you at developing good code:
 * `npm run test`: Run the tests
 * `npm run lint`: Run the linter
 
-### SonarQube
+### Static code analysis
+#### SonarQube
+##### Local
 * `docker-compose up -d`: Start the sonarqube container. This will take some time.
 * `docker-compose stop`: Stop the container
 * `docker-compose down`: Remove the container
@@ -21,6 +23,12 @@ The following commands support you at developing good code:
 SonarQube will be reachable on `http://localhost:9000`.
 
 * `npm run sonar`: Start sonarscanner and upload result to local container
+
+##### SonarCloud
+Find analysis on [sonarcloud.io](https://sonarcloud.io/project/overview?id=pascalre_vscode-yaml-sort)
+
+#### DeepSource
+Find analysis on [deepsource.io](https://deepsource.io/gh/pascalre/vscode-yaml-sort)
 
 ### Commit changes
 Refer to [this blogpost](https://cbea.ms/git-commit/#end) by cbeams when committing changes. Issue numbers can be added in braces to the end of the commit message.

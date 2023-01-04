@@ -1,5 +1,5 @@
 import { Settings } from "../settings"
-import * as jsyaml from "js-yaml"
+import { load, dump } from "js-yaml"
 import { SortUtil } from "../util/sort-util"
 import { removeTrailingCharacters, splitYaml } from "../util/yaml-util"
 
@@ -15,7 +15,7 @@ export class JsYamlAdapter {
   }
 
   load(text: string) {
-    return jsyaml.load(text, this.getLoadOptions())
+    return load(text, this.getLoadOptions())
   }
 
   /**
@@ -25,7 +25,7 @@ export class JsYamlAdapter {
    */
   validateYaml(text: string): boolean {
     splitYaml(text).forEach((yaml) => {
-      jsyaml.load(yaml, { schema: this.settings.getSchema() })
+      load(yaml, { schema: this.settings.getSchema() })
     })
     return true
   }
@@ -37,23 +37,23 @@ export class JsYamlAdapter {
    * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
    * @returns {string}           Clean yaml document.
    */
-  dumpYaml(text: string, sortKeys: boolean, custom: number, settings: Settings): string {
+  dumpYaml(text: string, sortKeys: boolean, custom: number): string {
 
     if (Object.keys(text).length === 0) {
       return ""
     }
 
-    const sort = new SortUtil(settings, custom)
+    const sort = new SortUtil(this.settings, custom)
 
-    let yaml = jsyaml.dump(text, {
-      indent: settings.getIndent(),
-      forceQuotes: settings.getForceQuotes(),
-      lineWidth: settings.getLineWidth(),
-      noArrayIndent: settings.getNoArrayIndent(),
-      noCompatMode: settings.getNoCompatMode(),
-      quotingType: settings.getQuotingType(),
-      schema: settings.getSchema(),
-      sortKeys: (!(custom > 0 && settings.getUseCustomSortRecursively()) ? sortKeys : (a: string, b: string) => {
+    let yaml = dump(text, {
+      indent: this.settings.getIndent(),
+      forceQuotes: this.settings.getForceQuotes(),
+      lineWidth: this.settings.getLineWidth(),
+      noArrayIndent: this.settings.getNoArrayIndent(),
+      noCompatMode: this.settings.getNoCompatMode(),
+      quotingType: this.settings.getQuotingType(),
+      schema: this.settings.getSchema(),
+      sortKeys: (!(custom > 0 && this.settings.getUseCustomSortRecursively()) ? sortKeys : (a: string, b: string) => {
         return sort.customSort(a, b)
       })
     })
