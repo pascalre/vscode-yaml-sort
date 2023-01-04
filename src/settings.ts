@@ -1,25 +1,27 @@
 import * as jsyaml from "js-yaml"
-import * as vscode from "vscode"
+import { workspace } from "vscode"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 
 export class Settings {
-    // vscodeadapter = new VsCodeAdapter()
+    workspace = workspace
 
     getCustomSortKeywords(index: number): string[] {
         if ([1, 2, 3].includes(index))
-            return vscode.workspace.getConfiguration().get("vscode-yaml-sort.customSortKeywords_" + index) as string[]
+            return this.workspace.getConfiguration().get(`vscode-yaml-sort.customSortKeywords_${index}`) as string[]
         return []
     }
     getEmptyLinesUntilLevel(): number {
-        // return this.vscodeadapter.getProperty("emptyLinesUntilLevel") as number
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel") as number
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel") as number
+    }
+    getExtensions(): string[] {
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.extensions") as string[]
     }
     getForceQuotes(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes") as boolean
     }
     getIndent(): number {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
     }
     getJsYamlSchemaFromString(schema: string): jsyaml.Schema {
         switch (schema) {
@@ -38,38 +40,38 @@ export class Settings {
         }
     }
     getLineWidth(): number {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
     }
     getLocale(): string {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
     }
     getNoArrayIndent(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
     }
     getNoCompatMode(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
     }
     getNotifySuccess(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
     }
     getQuotingType(): "'" | "\"" {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | "\""
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | "\""
     }
     getSchema(): jsyaml.Schema {
-        const schema = vscode.workspace.getConfiguration().get("vscode-yaml-sort.schema") as string
+        const schema = this.workspace.getConfiguration().get("vscode-yaml-sort.schema") as string
         return this.getJsYamlSchemaFromString(schema)
     }
     getSortOnSave(): number {
-        return vscode.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as number
+        return this.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as number
     }
     getUseCustomSortRecursively(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
     }
     getUseAsFormatter(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useAsFormatter") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.useAsFormatter") as boolean
     }
     getUseLeadingDashes(): boolean {
-        return vscode.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
+        return this.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
     }
 
     customSortKeywords1 = this.getCustomSortKeywords(1)
