@@ -1,5 +1,11 @@
 # Changelog
-## 6.0.0 - December 6, 2022
+
+## 6.0.2 - January 4, 2023
+* (refs [#48](https://github.com/pascalre/vscode-yaml-sort/issues/48)) error in Recursively sort
+* New configuration `extensions` enables recursive sorting of files with unusual extension
+* Update dependencies to latest versions
+
+## 6.0.1 - December 6, 2022
 * (refs [#98](https://github.com/pascalre/vscode-yaml-sort/issues/98)) Refactor project
 * Update dependencies to latest versions
 

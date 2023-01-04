@@ -4,7 +4,7 @@ import { JsYamlAdapter } from "./adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "./adapter/vs-code-adapter"
 import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "./lib"
 import { Settings } from "./settings"
-import { getYamlFilesInDirectory } from "./util/file-util"
+import { FileUtil } from "./util/file-util"
 import { getDelimiters, splitYaml, validateTextRange, YamlUtil } from "./util/yaml-util"
 
 const settings = new Settings()
@@ -133,7 +133,7 @@ export function formatYamlWrapper(): vscode.TextEdit[] {
  * @param {vscode.Uri} uri Base URI
  */
 export function sortYamlFiles(uri: vscode.Uri): boolean {
-  const files = getYamlFilesInDirectory(uri.fsPath)
+  const files = new FileUtil().getFilesWithExtensions(uri.fsPath)
   files.forEach((file: string) => {
     const yaml = fs.readFileSync(file, 'utf-8').toString()
     const sortedYaml = yamlutil.sortYaml(yaml, 0)
