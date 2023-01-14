@@ -32,7 +32,7 @@ export class FileUtil {
     if (sortedYaml) {
       writeFileSync(file, sortedYaml)
     } else {
-      throws
+      throw new Error(`File ${file} could not be sorted`)
     }
   }
 }

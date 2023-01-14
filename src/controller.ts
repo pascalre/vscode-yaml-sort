@@ -53,7 +53,9 @@ export class Controller {
     try {
       this.fileutil.sortFile(file)
     } catch (e) {
-      this.vscodeadapter.showMessage(Severity.ERROR, `File ${file} could not be sorted`)
+      if (e instanceof Error) {
+        this.vscodeadapter.showMessage(Severity.ERROR, e.message)
+      }
     }
   }
 }
