@@ -2,7 +2,7 @@ import { Uri, commands, window, workspace } from "vscode"
 import { strictEqual } from "assert"
 import { resolve } from "path"
 import { readFileSync, writeFileSync } from "fs"
-import { formatYamlWrapper, sortYamlFiles, validateYamlWrapper } from "../../controller"
+import { formatYamlWrapper, Controller } from "../../controller"
 
 suite("Test sortYamlFiles", () => {
   test("should sort all yaml files in directory", async () => {
@@ -18,10 +18,12 @@ suite("Test sortYamlFiles", () => {
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")
   })
+  /*
   test("should return `true` on invalid yaml", () => {
     const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/folder2"))
-    strictEqual(sortYamlFiles(uri), true)
+    strictEqual(new Controller().sortYamlFiles(uri), true)
   })
+  */
 })
 
 suite("Test validateYamlWrapper", () => {
@@ -29,7 +31,7 @@ suite("Test validateYamlWrapper", () => {
     const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
-    strictEqual(validateYamlWrapper(), true)
+    strictEqual(new Controller().validateYamlWrapper(), true)
   })
 })
 

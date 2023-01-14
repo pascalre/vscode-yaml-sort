@@ -28,7 +28,7 @@ suite("Test FileUtil - getFilesWithExtensions()", () => {
       "./src/test/suite/util/resources/bar.yml",
       "./src/test/suite/util/resources/subfolder/.customyaml",
     ]
-    deepStrictEqual(fileutil.getFilesWithExtensions("./src/test/suite/util/resources"), expected)
+    deepStrictEqual(fileutil.getFiles("./src/test/suite/util/resources"), expected)
   })
 
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
@@ -40,6 +40,6 @@ suite("Test FileUtil - getFilesWithExtensions()", () => {
       './src/test/files/getYamlFilesInDirectory/folder2/file.yaml',
       './src/test/files/getYamlFilesInDirectory/file.yml'
     ]
-    deepStrictEqual(fileutil.getFilesWithExtensions("./src/test/files/getYamlFilesInDirectory"), expected)
+    deepStrictEqual(fileutil.getFiles("./src/test/files/getYamlFilesInDirectory"), expected)
   })
 })

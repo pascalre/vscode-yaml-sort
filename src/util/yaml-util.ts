@@ -1,114 +1,115 @@
 import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, replaceTabsWithSpaces } from "../lib"
 import { Settings } from "../settings"
-import { window } from "vscode"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
+import { CommentUtil } from "./comment-util"
 
 export class YamlUtil {
-    settings: Settings
-    jsyamladapter: JsYamlAdapter
+  settings: Settings
+  jsyamladapter: JsYamlAdapter
 
-    constructor(settings = new Settings()) {
-        this.settings = settings
-        this.jsyamladapter = new JsYamlAdapter(settings)
+  constructor(settings = new Settings()) {
+    this.settings = settings
+    this.jsyamladapter = new JsYamlAdapter(settings)
+  }
+
+  static getNumberOfLeadingSpaces(text: string): number {
+    if (!text.startsWith(" ")) {
+      return 0
+    } else {
+      return text.search(/\S/)
     }
+  }
 
-    static getNumberOfLeadingSpaces(text: string): number {
-        if (!text.startsWith(" ")) {
-            return 0
-        } else {
-            return text.search(/\S/)
-        }
+  static isValueMultiline(text: string) {
+    return (!text.startsWith("|") && text.includes(":")) || text.startsWith("-")
+  }
+
+  transformMultilineValue(text: string) {
+    let result = prependWhitespacesOnEachLine(text, this.settings.getIndent())
+    if (text.endsWith("\n")) {
+      result = removeTrailingCharacters(result, this.settings.getIndent())
     }
-    
-    static isValueMultiline(text: string) {
-        return (!text.startsWith("|") && text.includes(":")) || text.startsWith("-")
+    return result
+  }
+
+  sortYaml(unsortedYaml: string, customSort = 0): string | null {
+    try {
+      const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.getIndent())
+      const commentutil = new CommentUtil(unsortedYamlWithoutTabs)
+      commentutil.findComments()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
+      let sortedYaml = ""
+
+      if (customSort > 0 && !this.settings.getUseCustomSortRecursively()) {
+        const keywords = this.settings.getCustomSortKeywords(customSort)
+
+        keywords.forEach(key => {
+          if (doc[key]) {
+            let sortedSubYaml = this.jsyamladapter.dumpYaml(doc[key], true, customSort)
+            if (YamlUtil.isValueMultiline(sortedSubYaml)) {
+              sortedSubYaml = this.transformMultilineValue(sortedSubYaml)
+              sortedYaml += `${key}:\n${sortedSubYaml}\n`
+            } else {
+              sortedYaml += `${key}: ${sortedSubYaml}\n`
+            }
+            // delete key from yaml
+            delete doc[key]
+          }
+        })
+      }
+
+      // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
+      sortedYaml += this.jsyamladapter.dumpYaml(doc, true, customSort)
+
+      if (this.settings.getEmptyLinesUntilLevel() > 0) {
+        sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.getEmptyLinesUntilLevel(), this.settings.getIndent(), sortedYaml)
+      }
+
+      sortedYaml = commentutil.applyComments(sortedYaml)
+
+      return sortedYaml
+    } catch (e) {
+      if (e instanceof Error) {
+        new VsCodeAdapter().showMessage(Severity.ERROR, `Keys could not be resorted: ${e.message}`)
+      }
+      return null
     }
+  }
 
-    transformMultilineValue(text: string) {
-        let result = prependWhitespacesOnEachLine(text, this.settings.getIndent())
-        if (text.endsWith("\n")) {
-            result = removeTrailingCharacters(result, this.settings.getIndent())
-        }
-        return result
+  /**
+   * Formats a yaml document (without sorting).
+   * @param   {string} yaml Yaml to be formatted.
+   * @returns {string} Formatted yaml.
+   */
+  formatYaml(yaml: string, useLeadingDashes: boolean): string | null {
+    try {
+      const commentutil = new CommentUtil(yaml)
+      commentutil.findComments()
+      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(yaml) as string, false, 0)
+      doc = commentutil.applyComments(doc)
+      if (useLeadingDashes) {
+        doc = `---\n${doc}`
+      }
+      if (this.settings.getNotifySuccess()) {
+        new VsCodeAdapter().showMessage(Severity.INFO, "Yaml formatted successfully")
+      }
+      return doc
+    } catch (e) {
+      if (e instanceof Error) {
+        new VsCodeAdapter().showMessage(Severity.ERROR, `Yaml could not be formatted: ${e.message}`)
+      }
+      return null
     }
-
-    sortYaml(unsortedYaml: string, customSort = 0): string | null {
-        try {
-            const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.getIndent())
-            const comments = findComments(unsortedYamlWithoutTabs)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
-            let sortedYaml = ""
-
-            if (customSort > 0 && !this.settings.getUseCustomSortRecursively()) {
-                const keywords = this.settings.getCustomSortKeywords(customSort)
-
-                keywords.forEach(key => {
-                    if (doc[key]) {
-                        let sortedSubYaml = this.jsyamladapter.dumpYaml(doc[key], true, customSort)
-                        if (YamlUtil.isValueMultiline(sortedSubYaml)) {
-                            sortedSubYaml = this.transformMultilineValue(sortedSubYaml)
-                            sortedYaml += `${key}:\n${sortedSubYaml}\n`
-                        } else {
-                            sortedYaml += `${key}: ${sortedSubYaml}\n`
-                        }
-                        // delete key from yaml
-                        delete doc[key]
-                    }
-                })
-            }
-
-            // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-            sortedYaml += this.jsyamladapter.dumpYaml(doc, true, customSort)
-
-            if (this.settings.getEmptyLinesUntilLevel() > 0) {
-                sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.getEmptyLinesUntilLevel(), this.settings.getIndent(), sortedYaml)
-            }
-
-            sortedYaml = applyComments(sortedYaml, comments)
-
-            return sortedYaml
-        } catch (e) {
-            if (e instanceof Error) {
-                window.showErrorMessage(`Keys could not be resorted: ${e.message}`)
-            }
-            return null
-        }
-    }
-
-
-    /**
-     * Formats a yaml document (without sorting).
-     * @param   {string} yaml Yaml to be formatted.
-     * @returns {string} Formatted yaml.
-     */
-    formatYaml(yaml: string, useLeadingDashes: boolean): string | null {
-        try {
-            const comments = findComments(yaml)
-            let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(yaml) as string, false, 0)
-            doc = applyComments(doc, comments)
-            if (useLeadingDashes) {
-                doc = `---\n${doc}`
-            }
-            if (this.settings.getNotifySuccess()) {
-                window.showInformationMessage("Yaml formatted successfully")
-            }
-            return doc
-        } catch (e) {
-            if (e instanceof Error) {
-                window.showErrorMessage(`Yaml could not be formatted: ${e.message}`)
-            }
-            return null
-        }
-    }
+  }
 }
 
 export function hasTextYamlKeys(text: string) {
-    if (Object.keys(text).length === 0) {
-        return false
-    }
-    return true
+  if (Object.keys(text).length === 0) {
+    return false
+  }
+  return true
 }
 
 /**
@@ -118,11 +119,11 @@ export function hasTextYamlKeys(text: string) {
  * @returns {string} Input text with removed trailing characters.
  */
 export function removeTrailingCharacters(text: string, count = 1): string {
-    if (count >= 0 && count <= text.length) {
-        return text.substring(0, text.length - count)
-    } else {
-        throw new Error("The count parameter is not in a valid range")
-    }
+  if (count >= 0 && count <= text.length) {
+    return text.substring(0, text.length - count)
+  } else {
+    throw new Error("The count parameter is not in a valid range")
+  }
 }
 
 /**
@@ -131,84 +132,30 @@ export function removeTrailingCharacters(text: string, count = 1): string {
  * @returns {boolean} true, if selection is missing something
  */
 export function isSelectionInvalid(selection: string): boolean {
-    // remove trailing whitespaces, to check for things like 'text:  '
-    const text = selection.trim()
-    const notValidEndingCharacters = [":", "|", ">"]
-    if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
-        return true
+  // remove trailing whitespaces, to check for things like 'text:  '
+  const text = selection.trim()
+  const notValidEndingCharacters = [":", "|", ">"]
+  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
+    return true
+  }
+  try {
+    new JsYamlAdapter().validateYaml(text)
+    return false
+  } catch (e) {
+    if (e instanceof Error) {
+      new VsCodeAdapter().showMessage(Severity.ERROR, e.message)
     }
-    try {
-        new JsYamlAdapter().validateYaml(text)
-        return false
-    } catch (e) {
-        if (e instanceof Error) {
-            new VsCodeAdapter().showMessage(Severity.ERROR, e.message)
-        }
-        return true
-    }
+    return true
+  }
 }
 
 export function validateTextRange(textRange: string) {
-    // remove trailing whitespaces, to check for things like 'text:  '
-    const text = textRange.trim()
-    const notValidEndingCharacters = [":", "|", ">"]
-    if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
-        throw new Error("YAML selection is invalid. Check the ending of your selection.")
-    }
-}
-
-/**
- * Finds all full line comments in a given yaml (ignoring comments in the same line with code).
- * @param text Yaml document
- */
-export function findComments(text: string): Map<string, string> {
-    const comments = new Map<string, string>
-    const lines = text.toString().split("\n")
-
-    for (let i = 0; i < lines.length; i++) {
-        let comment = ""
-        while (/^ *#/.test(lines[i])) {
-            comment += `${lines[i]}\n`
-            i++
-        }
-        comment = comment.replace(/\n$/, "")
-        if (comment !== "") {
-            if (i < lines.length) {
-                comments.set(comment, lines[i])
-            } else {
-                comments.set(comment, '')
-            }
-        }
-    }
-
-    return comments
-}
-
-export function applyComments(text: string, comments: Map<string, string>): string {
-    let result = text
-    for (const [comment, line] of comments) {
-        if (line === '') {
-            result += `\n${comment}`
-        } else {
-            let index = result.search(line)
-            if (index === -1) {
-                const trimmedLine = line.trim()
-                index = result.search(trimmedLine)
-                if (index !== -1) {
-                    const textHelper = result.slice(0, index)
-                    const lastLineBreak = textHelper.lastIndexOf('\n')
-                    // remove trailing whitespaces
-                    const textBeforeComment = textHelper.slice(0, lastLineBreak)
-                    let textAfterComment = textHelper.slice(lastLineBreak)
-                    textAfterComment += result.slice(result.search(trimmedLine))
-                    result = `${textBeforeComment}\n${comment.split("\n")[0]}${textAfterComment}`
-                }
-            } else {
-                result = `${result.slice(0, index)}${comment}\n${result.slice(result.search(line))}`
-            }
-        }
-    }
-    return result
+  // remove trailing whitespaces, to check for things like 'text:  '
+  const text = textRange.trim()
+  const notValidEndingCharacters = [":", "|", ">"]
+  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
+    throw new Error("YAML selection is invalid. Check the ending of your selection.")
+  }
 }
 
 /**
@@ -217,7 +164,7 @@ export function applyComments(text: string, comments: Map<string, string>): stri
  * @returns {[string]} Array of yaml documents.
  */
 export function splitYaml(multipleYamls: string): [string] {
-    return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
+  return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
 }
 
 /**
@@ -229,38 +176,38 @@ export function splitYaml(multipleYamls: string): [string] {
  * @returns {[string]} Array of yaml delimiters.
  */
 export function getDelimiters(yamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean): RegExpMatchArray {
-    // remove empty lines
-    let multipleYamls = yamls.trim()
-    multipleYamls = multipleYamls.replace(/^\n/, "")
-    let delimiters = multipleYamls.match(/^---.*/gm)
-    if (!delimiters) {
-        return [""]
-    }
+  // remove empty lines
+  let multipleYamls = yamls.trim()
+  multipleYamls = multipleYamls.replace(/^\n/, "")
+  let delimiters = multipleYamls.match(/^---.*/gm)
+  if (!delimiters) {
+    return [""]
+  }
 
-    // append line break to every delimiter
-    delimiters = delimiters.map((delimiter) => `\n${delimiter}\n`) as RegExpMatchArray
+  // append line break to every delimiter
+  delimiters = delimiters.map((delimiter) => `\n${delimiter}\n`) as RegExpMatchArray
 
-    if (delimiters) {
-        if (isSelectionEmpty) {
-            if (!useLeadingDashes && multipleYamls.startsWith("---")) {
-                delimiters.shift()
-                delimiters.unshift("")
-            } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
-                delimiters.unshift("---\n")
-            } else {
-                delimiters.unshift("")
-            }
-        } else {
-            if (!multipleYamls.startsWith("---")) {
-                delimiters.unshift("")
-            } else {
-                let firstDelimiter = delimiters.shift()
-                if (firstDelimiter) {
-                    firstDelimiter = firstDelimiter.replace(/^\n/, "")
-                    delimiters.unshift(firstDelimiter)
-                }
-            }
+  if (delimiters) {
+    if (isSelectionEmpty) {
+      if (!useLeadingDashes && multipleYamls.startsWith("---")) {
+        delimiters.shift()
+        delimiters.unshift("")
+      } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
+        delimiters.unshift("---\n")
+      } else {
+        delimiters.unshift("")
+      }
+    } else {
+      if (!multipleYamls.startsWith("---")) {
+        delimiters.unshift("")
+      } else {
+        let firstDelimiter = delimiters.shift()
+        if (firstDelimiter) {
+          firstDelimiter = firstDelimiter.replace(/^\n/, "")
+          delimiters.unshift(firstDelimiter)
         }
+      }
     }
-    return delimiters
+  }
+  return delimiters
 }
