@@ -12,7 +12,7 @@ export function activate(context: ExtensionContext) {
 
   const formatter: DocumentFormattingEditProvider = {
     provideDocumentFormattingEdits(): TextEdit[] {
-      if (settings.sortOnSave >= 0 && settings.sortOnSave <= 3) {
+      if (settings.doSortOnSave()) {
         return sortYamlWrapper(settings.sortOnSave)
       } else {/* istanbul ignore next */
         return formatYamlWrapper()

@@ -1,9 +1,4 @@
-//
-// Note: This example test is leveraging the Mocha test framework.
-// Please refer to their documentation on https://mochajs.org/ for help.
-//
-
-import { deepStrictEqual, strictEqual, notDeepStrictEqual, equal, deepEqual } from "assert"
+import { deepStrictEqual, strictEqual, notDeepStrictEqual, equal } from "assert"
 import { Uri, workspace, window, commands, Position, Range, Selection } from "vscode"
 import { resolve } from "path"
 

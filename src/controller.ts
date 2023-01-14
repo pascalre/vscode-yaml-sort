@@ -8,7 +8,7 @@ import { getDelimiters, splitYaml, validateTextRange, YamlUtil } from "./util/ya
 
 const settings = new Settings()
 const jsyamladapter = new JsYamlAdapter()
-const vscodeadapter = new VsCodeAdapter()
+const outterVscodeadapter = new VsCodeAdapter()
 const yamlutil = new YamlUtil()
 
 export class Controller {
@@ -72,7 +72,7 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
       jsyamladapter.validateYaml(text)
     } catch (e) {
       if (e instanceof Error) {
-        vscodeadapter.showMessage(Severity.ERROR, e.message)
+        outterVscodeadapter.showMessage(Severity.ERROR, e.message)
       }
       return [] as TextEdit[]
     }
@@ -106,7 +106,7 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
     if (activeEditor.selection.isEmpty && settings.getUseLeadingDashes()) {
       newText = `---\n${newText}`
     }
-    vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
+    outterVscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
     return updateText(activeEditor, newText)
   }
   return [] as TextEdit[]

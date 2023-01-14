@@ -1,4 +1,4 @@
-import { deepEqual } from "assert"
+import { deepEqual, equal } from "assert"
 import { Schema, DEFAULT_SCHEMA, CORE_SCHEMA, JSON_SCHEMA, FAILSAFE_SCHEMA} from "js-yaml"
 import { Settings } from "../../settings"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
@@ -107,5 +107,27 @@ suite("Test Settings - getJsYamlSchemaFromString()", () => {
 
     test("when a non-valid schema is input return DEFAULT_SCHEMA", () => {
         deepEqual(Settings.getJsYamlSchemaFromString("DEFAULT_SCHEMA"), DEFAULT_SCHEMA)
+    })
+})
+
+suite("Test Settings - doSortOnSave()", () => {
+    const settings: Settings = new Settings()
+
+    test("when sortOnSave is 0 should return true", () => {
+        settings.getSortOnSave = function () {
+            return 0
+        }
+        equal(settings.doSortOnSave(), true)
+    })
+
+    test("when sortOnSave is not in 1, 2, 3 should return false", () => {
+        settings.getSortOnSave = function () {
+            return -1
+        }
+        equal(settings.doSortOnSave(), false)
+        settings.getSortOnSave = function () {
+            return 4
+        }
+        equal(settings.doSortOnSave(), false)
     })
 })

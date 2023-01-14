@@ -15,7 +15,7 @@ export class SortUtil {
     const indexB = sortOrder.indexOf(b)
 
     if (indexA > -1 && indexB > -1) {
-      return this.compare(indexA, indexB)
+      return SortUtil.compare(indexA, indexB)
     }
     if (indexA !== -1 && indexB === -1) {
       return -1
@@ -26,7 +26,7 @@ export class SortUtil {
     return this.localeSort(a, b)
   }
 
-  compare(a: number, b: number) {
+  static compare(a: number, b: number) {
     if (a > b) {
       return 1
     }

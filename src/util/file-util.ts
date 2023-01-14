@@ -1,4 +1,3 @@
-import { throws } from "assert"
 import { readFileSync, writeFileSync } from "fs"
 import { sync } from "glob"
 import { Settings } from "../settings"
