@@ -131,6 +131,23 @@ suite("Test CommentUtil - applyComment()", () => {
   })
 })
 
+suite("Test CommentUtil - append()", () => {
+  test("should append newline and text to a given text", () => {
+    const text = "lorem ipsum"
+    const commentutil = new CommentUtil(text)
+
+    commentutil.append("# comment")
+
+    const expected =
+      "lorem ipsum\n" +
+      "# comment"
+
+    equal(commentutil.text, expected)
+  })
+})
+
+// TODO: add suit for insertCommentBetween
+
 suite("Test CommentUtil - getIndexOfString()", () => {
   test("should return index of line", () => {
     const line = 'dolor sit'
@@ -141,5 +158,78 @@ suite("Test CommentUtil - getIndexOfString()", () => {
     const commentutil = new CommentUtil(text)
 
     equal(commentutil.getIndexOfString(line), 12)
+  })
+})
+
+// TODO: Add suite for search, searchExactMatch, searchFuzzyForTrimmedText, searchFuzzyForKeyword
+
+suite("Test CommentUtil - isCommentFound()", () => {
+  test("when index is -1 should return true", () => {
+    equal(CommentUtil.isCommentFound(-1), false)
+    equal(CommentUtil.isCommentFound(0), true)
+  })
+})
+
+suite("Test CommentUtil - Issue 45", () => {
+  // https://github.com/pascalre/vscode-yaml-sort/issues/45#issuecomment-1329161613
+  test("should fuzzy find comments", () => {
+    const text =
+      '#begin comment\n' +
+      'params:\n' +
+      '  logon: test\n' +
+      '  #variable meta data\n' +
+      '  variableMetadata: env\\config_dev.yaml\n' +
+      '  logFile: log-test.log\n' +
+      '  logLevel: DEBUG\n' +
+      '  chunkSize: 1000\n' +
+      '  jobSize: 20\n' +
+      '  schema: test\n' +
+      '  #end comment'
+    const commentutil = new CommentUtil(text)
+
+    commentutil.findComments()
+    const textWithoutComments =
+      "params:\n" +
+      "  chunkSize: 1000\n" +
+      "  jobSize: 20\n" +
+      "  logFile: 'log-test.log'\n" +
+      "  logLevel: 'DEBUG'\n" +
+      "  logon: 'test'\n" +
+      "  schema: 'test'\n" +
+      "  variableMetadata: 'env\\config_dev.yaml'"
+    commentutil.applyComments(textWithoutComments)
+
+    const expected =
+      "#begin comment\n" +
+      "params:\n" +
+      "  chunkSize: 1000\n" +
+      "  jobSize: 20\n" +
+      "  logFile: 'log-test.log'\n" +
+      "  logLevel: 'DEBUG'\n" +
+      "  logon: 'test'\n" +
+      "  schema: 'test'\n" +
+      "  #variable meta data\n" +
+      "  variableMetadata: 'env\\config_dev.yaml'\n" +
+      "  #end comment"
+
+    equal(commentutil.text, expected)
+  })
+
+
+  test("should work with trailing newline", () => {
+    const text =
+      'schema: test\n' +
+      '#end comment\n'
+    const commentutil = new CommentUtil(text)
+
+    commentutil.findComments()
+    const textWithoutComments = 'schema: test'
+    commentutil.applyComments(textWithoutComments)
+
+    const expected =
+      'schema: test\n' +
+      '#end comment'
+
+    equal(commentutil.text, expected)
   })
 })

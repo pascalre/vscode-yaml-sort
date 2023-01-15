@@ -9,7 +9,7 @@ export class CommentUtil {
   lines: string[]
 
   constructor(text: string, settings = new Settings()) {
-    this.text = text
+    this.text = text.trim()
     this.lines = this.text.split("\n")
     this.settings = settings
     this.jsyamladapter = new JsYamlAdapter(settings)
@@ -53,13 +53,27 @@ export class CommentUtil {
   }
 
   applyComment(comment: string[]) {
-    const indexOfComment = this.getIndexOfString(comment[1])
-    if (comment[1] !== "vscode-yaml-sort.lastLine") {
-      const textBefore = this.text.slice(0, indexOfComment)
-      const textAfter = this.text.slice(indexOfComment)
-      this.text = `${textBefore}${comment[0]}\n${textAfter}`
+    if (comment[1] === "vscode-yaml-sort.lastLine") {
+      this.append(comment[0])
     } else {
-      this.text = `${this.text}\n${comment[0]}`
+      this.insertCommentBetween(comment)
+    }
+  }
+
+  append(line: string) {
+    this.text = `${this.text}\n${line}`
+  }
+
+  insertCommentBetween(comment: string[]) {
+    const indexOfComment = this.getIndexOfString(comment[1])
+    if (CommentUtil.isCommentFound(indexOfComment)) {
+      const textAfter = this.text.slice(indexOfComment)
+      if (textAfter.trim() === "") {
+        this.append(comment[0])
+      } else {
+        const textBefore = this.text.slice(0, indexOfComment)
+        this.text = `${textBefore}${comment[0]}\n${textAfter}`
+      }
     }
   }
 
@@ -67,7 +81,37 @@ export class CommentUtil {
     if (text === "vscode-yaml-sort.lastLine") {
       return this.text.length
     } else {
-      return this.text.search(text)
+      return this.search(text)
     }
+  }
+
+  search(text: string) {
+    let result = this.searchExactMatch(text)
+    if (CommentUtil.isCommentFound(result)) {
+      return result
+    }
+
+    result = this.searchFuzzyForTrimmedText(text)
+    if (CommentUtil.isCommentFound(result)) {
+      return result
+    }
+
+    return this.searchFuzzyForKeyword(text)
+  }
+
+  searchExactMatch(text: string): number {
+    return this.text.lastIndexOf(text)
+  }
+
+  searchFuzzyForTrimmedText(text: string): number {
+    return this.text.lastIndexOf(text.trim())
+  }
+
+  searchFuzzyForKeyword(text: string): number {
+    return this.text.lastIndexOf(text.split(":")[0])
+  }
+
+  static isCommentFound(index: number): boolean {
+    return index !== -1
   }
 }
