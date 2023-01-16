@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.3 - January 16, 2023
+* (refs [#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)) Fix issues with keeping comments while sorting
+* Update dependencies to latest versions
+
 ## 6.0.2 - January 4, 2023
 * (refs [#48](https://github.com/pascalre/vscode-yaml-sort/issues/48)) error in Recursively sort
 * New configuration `extensions` enables recursive sorting of files with unusual extension
