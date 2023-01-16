@@ -146,7 +146,41 @@ suite("Test CommentUtil - append()", () => {
   })
 })
 
-// TODO: add suit for insertCommentBetween
+suite("Test CommentUtil - insert()", () => {
+  test("when comment is found should insert", () => {
+    const text =
+      'lorem ipsum\n' +
+      'dolor sit\n' +
+      'amet, consetetur'
+    const commentutil = new CommentUtil(text)
+    const comment = ['#foo', 'dolor sit']
+
+    commentutil.insert(comment)
+    
+    const expected =
+      'lorem ipsum\n' +
+      '#foo\n' +
+      'dolor sit\n' +
+      'amet, consetetur'
+    equal(commentutil.text, expected)
+  })
+  test("when comment is not found should do nothing", () => {
+    const text =
+      'lorem ipsum\n' +
+      'dolor sit\n' +
+      'amet, consetetur'
+    const commentutil = new CommentUtil(text)
+    const comment = ['#foo', 'do not find']
+
+    commentutil.insert(comment)
+    
+    const expected =
+      'lorem ipsum\n' +
+      'dolor sit\n' +
+      'amet, consetetur'
+    equal(commentutil.text, expected)
+  })
+})
 
 suite("Test CommentUtil - getIndexOfString()", () => {
   test("should return index of line", () => {
@@ -158,10 +192,63 @@ suite("Test CommentUtil - getIndexOfString()", () => {
     const commentutil = new CommentUtil(text)
 
     equal(commentutil.getIndexOfString(line), 12)
+    equal(commentutil.getIndexOfString("vscode-yaml-sort.lastLine"), commentutil.text.length)
   })
 })
 
-// TODO: Add suite for search, searchExactMatch, searchFuzzyForTrimmedText, searchFuzzyForKeyword
+suite("Test CommentUtil - search()", () => {
+  test("should return last index of text", () => {
+    const text =
+      'foo: lorem ipsum\n' +
+      'bar: dolor sit\n' +
+      'baz: amet, consetetur'
+    const commentutil = new CommentUtil(text)
+
+    equal(commentutil.search('foo: lorem ipsum'), 0)
+    equal(commentutil.search('  bar: dolor sit  '), 17)
+    equal(commentutil.search('baz: "amet, consetetur"'), 32)
+  })
+})
+
+suite("Test CommentUtil - searchExactMatch()", () => {
+  test("should return last index of text", () => {
+    const line = 'bar: dolor sit'
+    const text =
+      'foo: lorem ipsum\n' +
+      `${line}\n` +
+      `${line}\n` +
+      'baz: amet, consetetur'
+    const commentutil = new CommentUtil(text)
+
+    equal(commentutil.searchExactMatch(line), 32)
+  })
+})
+
+suite("Test CommentUtil - searchFuzzyForTrimmedText()", () => {
+  test("should return last index of keyword", () => {
+    const line = '  bar: dolor sit  '
+    const text =
+      'foo: lorem ipsum\n' +
+      `${line.trim()}\n` +
+      'baz: amet, consetetur'
+    const commentutil = new CommentUtil(text)
+
+    equal(commentutil.searchFuzzyForTrimmedText(line), 17)
+  })
+})
+
+suite("Test CommentUtil - searchFuzzyForKeyword()", () => {
+  test("should return last index of keyword", () => {
+    const line = 'bar: dolor sit'
+    const text =
+      'foo: lorem ipsum\n' +
+      `${line}\n` +
+      'baz: amet, consetetur'
+    const commentutil = new CommentUtil(text)
+
+    equal(commentutil.searchFuzzyForKeyword(line), 17)
+  })
+})
 
 suite("Test CommentUtil - isCommentFound()", () => {
   test("when index is -1 should return true", () => {

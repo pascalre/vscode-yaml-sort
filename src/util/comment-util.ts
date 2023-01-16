@@ -56,7 +56,7 @@ export class CommentUtil {
     if (comment[1] === "vscode-yaml-sort.lastLine") {
       this.append(comment[0])
     } else {
-      this.insertCommentBetween(comment)
+      this.insert(comment)
     }
   }
 
@@ -64,16 +64,12 @@ export class CommentUtil {
     this.text = `${this.text}\n${line}`
   }
 
-  insertCommentBetween(comment: string[]) {
+  insert(comment: string[]) {
     const indexOfComment = this.getIndexOfString(comment[1])
     if (CommentUtil.isCommentFound(indexOfComment)) {
       const textAfter = this.text.slice(indexOfComment)
-      if (textAfter.trim() === "") {
-        this.append(comment[0])
-      } else {
-        const textBefore = this.text.slice(0, indexOfComment)
-        this.text = `${textBefore}${comment[0]}\n${textAfter}`
-      }
+      const textBefore = this.text.slice(0, indexOfComment)
+      this.text = `${textBefore}${comment[0]}\n${textAfter.trimEnd()}`
     }
   }
 
@@ -104,11 +100,11 @@ export class CommentUtil {
   }
 
   searchFuzzyForTrimmedText(text: string): number {
-    return this.text.lastIndexOf(text.trim())
+    return this.searchExactMatch(text.trim())
   }
 
   searchFuzzyForKeyword(text: string): number {
-    return this.text.lastIndexOf(text.split(":")[0])
+    return this.searchExactMatch(text.split(":")[0])
   }
 
   static isCommentFound(index: number): boolean {
