@@ -10,14 +10,6 @@ export class JsYamlAdapter {
     this.settings = settings
   }
 
-  getLoadOptions() {
-    return { schema: this.settings.getSchema() }
-  }
-
-  load(text: string) {
-    return load(text, this.getLoadOptions())
-  }
-
   /**
    * Validates a yaml document
    * @param text Yaml document
@@ -30,6 +22,13 @@ export class JsYamlAdapter {
     return true
   }
 
+  load(text: string) {
+    return load(text, this.getLoadOptions())
+  }
+
+  getLoadOptions() {
+    return { schema: this.settings.getSchema() }
+  }
 
   /**
    * Dumps a yaml with the user specific settings.
@@ -38,7 +37,6 @@ export class JsYamlAdapter {
    * @returns {string}           Clean yaml document.
    */
   dumpYaml(text: string, sortKeys: boolean, custom: number): string {
-
     if (Object.keys(text).length === 0) {
       return ""
     }
@@ -63,5 +61,4 @@ export class JsYamlAdapter {
 
     return yaml
   }
-
 }

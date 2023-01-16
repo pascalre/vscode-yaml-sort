@@ -92,4 +92,8 @@ export class Settings {
                 return DEFAULT_SCHEMA
         }
     }
+
+    doSortOnSave(): boolean {
+        return (this.getSortOnSave() >= 0 && this.getSortOnSave() <= 3)
+    }
 }

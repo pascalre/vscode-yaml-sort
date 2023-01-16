@@ -1,5 +1,4 @@
-import { TextEdit, Uri, window } from "vscode"
-import { readFileSync, writeFileSync } from "fs"
+import { TextEditor, TextEdit, Uri, window } from "vscode"
 import { JsYamlAdapter } from "./adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "./adapter/vs-code-adapter"
 import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "./lib"
@@ -9,8 +8,57 @@ import { getDelimiters, splitYaml, validateTextRange, YamlUtil } from "./util/ya
 
 const settings = new Settings()
 const jsyamladapter = new JsYamlAdapter()
-const vscodeadapter = new VsCodeAdapter()
+const outterVscodeadapter = new VsCodeAdapter()
 const yamlutil = new YamlUtil()
+
+export class Controller {
+  editor: TextEditor | undefined
+  fileutil: FileUtil
+  vscodeadapter: VsCodeAdapter
+
+  constructor(fileutil = new FileUtil(), vscodeadapter = new VsCodeAdapter()) {
+    this.editor = window.activeTextEditor
+    this.fileutil = fileutil
+    this.vscodeadapter = vscodeadapter
+  }
+
+  validateYamlWrapper(): boolean {
+    if (this.editor) {
+      const text = VsCodeAdapter.getActiveDocument(this.editor)
+      try {
+        jsyamladapter.validateYaml(text)
+        this.vscodeadapter.showMessage(Severity.INFO, "YAML is valid.")
+        return true
+      } catch (e) {
+        if (e instanceof Error) {
+          this.vscodeadapter.showMessage(Severity.INFO, `YAML is invalid. ${e.message}`)
+        }
+      }
+    }
+    return false
+  }
+
+  /**
+   * Sorts all yaml files in a directory
+   * @param {Uri} uri Base URI
+   */
+  sortYamlFiles(uri: Uri) {
+    const files = this.fileutil.getFiles(uri.fsPath)
+    files.forEach((file: string) => {
+      this.sortFile(file)
+    })
+  }
+
+  sortFile(file: string) {
+    try {
+      this.fileutil.sortFile(file)
+    } catch (e) {
+      if (e instanceof Error) {
+        this.vscodeadapter.showMessage(Severity.ERROR, e.message)
+      }
+    }
+  }
+}
 
 export function sortYamlWrapper(customSort = 0): TextEdit[] {
   const activeEditor = window.activeTextEditor
@@ -24,12 +72,10 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
       jsyamladapter.validateYaml(text)
     } catch (e) {
       if (e instanceof Error) {
-        vscodeadapter.showMessage(Severity.ERROR, e.message)
+        outterVscodeadapter.showMessage(Severity.ERROR, e.message)
       }
       return [] as TextEdit[]
     }
-
-    let numberOfLeadingSpaces = 0
 
     let delimiters = getDelimiters(text, activeEditor.selection.isEmpty, settings.getUseLeadingDashes())
     // remove yaml metadata tags
@@ -49,8 +95,8 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
       if (sortedYaml) {
         if (!activeEditor.selection.isEmpty) {
           // get number of leading whitespaces, these whitespaces will be used for indentation
-          numberOfLeadingSpaces = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
-          sortedYaml = prependWhitespacesOnEachLine(sortedYaml, numberOfLeadingSpaces)
+          const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
+          sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
         }
         newText += delimiters.shift() + sortedYaml
       } else {
@@ -60,38 +106,23 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
     if (activeEditor.selection.isEmpty && settings.getUseLeadingDashes()) {
       newText = `---\n${newText}`
     }
-
-    const edits = VsCodeAdapter.getEdits(activeEditor, newText)
-    vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
-    VsCodeAdapter.applyEdits([edits])
-    return [edits]
+    outterVscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
+    return updateText(activeEditor, newText)
   }
   return [] as TextEdit[]
 }
 
-export function validateYamlWrapper(): boolean {
-  const activeEditor = window.activeTextEditor
-
-  if (activeEditor) {
-    const text = VsCodeAdapter.getActiveDocument(activeEditor)
-    try {
-      jsyamladapter.validateYaml(text)
-      vscodeadapter.showMessage(Severity.INFO, "YAML is valid.")
-      return true
-    } catch (e) {
-      if (e instanceof Error) {
-        vscodeadapter.showMessage(Severity.INFO, `YAML is invalid. ${e.message}`)
-      }
-    }
-  }
-  return false
+export function updateText(editor: TextEditor, text: string) {
+  const edits = VsCodeAdapter.getEdits(editor, text)
+  VsCodeAdapter.applyEdits([edits])
+  return [edits]
 }
 
 export function formatYamlWrapper(): TextEdit[] {
   const activeEditor = window.activeTextEditor
 
   if (activeEditor) {
-    let doc = activeEditor.document.getText()
+    let doc = VsCodeAdapter.getActiveDocument(activeEditor)
     let delimiters = getDelimiters(doc, true, settings.getUseLeadingDashes())
     // remove yaml metadata tags
     const matchMetadata = /^%.*\n/gm
@@ -117,33 +148,7 @@ export function formatYamlWrapper(): TextEdit[] {
     if (settings.getUseLeadingDashes()) {
       newText = `---\n${newText}`
     }
-    const edits = VsCodeAdapter.getEdits(activeEditor, newText)
-    VsCodeAdapter.applyEdits([edits])
-    return [edits]
+    return updateText(activeEditor, newText)
   }
   return []
-}
-
-/**
- * Sorts all yaml files in a directory
- * @param {Uri} uri Base URI
- */
-export function sortYamlFiles(uri: Uri): boolean {
-  const files = new FileUtil().getFilesWithExtensions(uri.fsPath)
-  files.forEach((file: string) => {
-    const yaml = readFileSync(file, 'utf-8').toString()
-    const sortedYaml = yamlutil.sortYaml(yaml, 0)
-
-    if (sortedYaml) {
-      try {
-        writeFileSync(file, sortedYaml)
-      } catch (e) {
-        /* istanbul ignore next */
-        vscodeadapter.showMessage(Severity.ERROR, `File ${file} could not be sorted`)
-      }
-    } else {
-      vscodeadapter.showMessage(Severity.ERROR, `File ${file} could not be sorted`)
-    }
-  })
-  return true
 }

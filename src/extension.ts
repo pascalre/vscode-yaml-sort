@@ -1,9 +1,7 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import { ExtensionContext, DocumentFormattingEditProvider, commands, Uri, TextEdit } from "vscode"
 import { Settings } from "./settings"
 import { VsCodeAdapter } from "./adapter/vs-code-adapter"
-import { formatYamlWrapper, sortYamlFiles, sortYamlWrapper, validateYamlWrapper } from "./controller"
+import { formatYamlWrapper, sortYamlWrapper, Controller } from "./controller"
 
 const settings = new Settings()
 const vscodeadapter = new VsCodeAdapter()
@@ -14,7 +12,7 @@ export function activate(context: ExtensionContext) {
 
   const formatter: DocumentFormattingEditProvider = {
     provideDocumentFormattingEdits(): TextEdit[] {
-      if (settings.sortOnSave >= 0 && settings.sortOnSave <= 3) {
+      if (settings.doSortOnSave()) {
         return sortYamlWrapper(settings.sortOnSave)
       } else {/* istanbul ignore next */
         return formatYamlWrapper()
@@ -33,7 +31,7 @@ export function activate(context: ExtensionContext) {
       sortYamlWrapper()
     }),
     commands.registerCommand("vscode-yaml-sort.validateYaml", () => {
-      validateYamlWrapper()
+      new Controller().validateYamlWrapper()
     }),
     commands.registerCommand("vscode-yaml-sort.formatYaml", () => {
       formatYamlWrapper()
@@ -50,7 +48,7 @@ export function activate(context: ExtensionContext) {
       sortYamlWrapper(3)
     }),
     commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: Uri) => {
-      sortYamlFiles(uri)
+      new Controller().sortYamlFiles(uri)
     })
   )
 }
