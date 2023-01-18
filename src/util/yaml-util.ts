@@ -2,8 +2,6 @@ import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, repla
 import { Settings } from "../settings"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
-import { CommentProcessor } from "../processor/comment-processor"
-import { HelmProcessor } from "../processor/helm-processor"
 import { Processor } from "../processor/processor"
 
 export class YamlUtil {

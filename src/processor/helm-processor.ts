@@ -32,7 +32,7 @@ export class HelmProcessor {
   }
 
   replaceSubstituteWithValue(substitue: string, value: string) {
-    const match = new RegExp("('|\")?" + substitue + "('|\")?")
+    const match = new RegExp(`('|")?${substitue}('|")?`)
     this.text = this.text.replace(match, value)
   }
 }
