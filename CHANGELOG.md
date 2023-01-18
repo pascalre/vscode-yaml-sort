@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.1.0 - January 18, 2023
+* (refs [#27](https://github.com/pascalre/vscode-yaml-sort/issues/27)) Add support for Helm charts
+
 ## 6.0.3 - January 16, 2023
 * (refs [#45](https://github.com/pascalre/vscode-yaml-sort/issues/45)) Fix issues with keeping comments while sorting
 * Update dependencies to latest versions
