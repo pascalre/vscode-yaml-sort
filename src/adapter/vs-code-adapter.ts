@@ -33,9 +33,13 @@ export class VsCodeAdapter {
     if (severity === Severity.ERROR) {
       window.showErrorMessage(message)
     } else {
-      if (this.settings.getNotifySuccess()) {
-        window.showInformationMessage(message)
-      }
+      this.notify(message)
+    }
+  }
+
+  notify(message: string) {
+    if (this.settings.getNotifySuccess()) {
+      window.showInformationMessage(message)
     }
   }
 

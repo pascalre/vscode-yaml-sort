@@ -2,7 +2,7 @@ import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, repla
 import { Settings } from "../settings"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
-import { CommentUtil } from "./comment-util"
+import { Processor } from "../processor/processor"
 
 export class YamlUtil {
   settings: Settings
@@ -35,9 +35,12 @@ export class YamlUtil {
 
   sortYaml(unsortedYaml: string, customSort = 0): string | null {
     try {
-      const unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.getIndent())
-      const commentutil = new CommentUtil(unsortedYamlWithoutTabs)
-      commentutil.findComments()
+      let unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.getIndent())
+
+      const processor = new Processor(unsortedYamlWithoutTabs)
+      processor.preprocess()
+      unsortedYamlWithoutTabs = processor.text
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
       let sortedYaml = ""
@@ -67,7 +70,8 @@ export class YamlUtil {
         sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.getEmptyLinesUntilLevel(), this.settings.getIndent(), sortedYaml)
       }
 
-      sortedYaml = commentutil.applyComments(sortedYaml)
+      processor.postprocess(sortedYaml)
+      sortedYaml = processor.text
 
       return sortedYaml
     } catch (e) {
@@ -85,16 +89,15 @@ export class YamlUtil {
    */
   formatYaml(yaml: string, useLeadingDashes: boolean): string | null {
     try {
-      const commentutil = new CommentUtil(yaml)
-      commentutil.findComments()
-      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(yaml) as string, false, 0)
-      doc = commentutil.applyComments(doc)
+      const processor = new Processor(yaml)
+      processor.preprocess()
+      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text) as string, false, 0)
+      processor.postprocess(doc)
+      doc = processor.text
       if (useLeadingDashes) {
         doc = `---\n${doc}`
       }
-      if (this.settings.getNotifySuccess()) {
-        new VsCodeAdapter().showMessage(Severity.INFO, "Yaml formatted successfully")
-      }
+      new VsCodeAdapter().showMessage(Severity.INFO, "Yaml formatted successfully")
       return doc
     } catch (e) {
       if (e instanceof Error) {
