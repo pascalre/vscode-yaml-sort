@@ -1,18 +1,11 @@
-import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
-import { Settings } from "../settings"
-
-export class CommentUtil {
-  settings: Settings
-  jsyamladapter: JsYamlAdapter
+export class CommentProcessor {
   comments: string[][] = []
   text: string
   lines: string[]
 
-  constructor(text: string, settings = new Settings()) {
+  constructor(text: string) {
     this.text = text.trim()
     this.lines = this.text.split("\n")
-    this.settings = settings
-    this.jsyamladapter = new JsYamlAdapter(settings)
   }
 
   /**
@@ -21,7 +14,7 @@ export class CommentUtil {
    */
   findComments() {
     this.lines.forEach((line, index) => {
-      if (CommentUtil.isLineComment(line)) {
+      if (CommentProcessor.isLineComment(line)) {
         this.addLineToComments(index)
       }
     })
@@ -66,7 +59,7 @@ export class CommentUtil {
 
   insert(comment: string[]) {
     const indexOfComment = this.getIndexOfString(comment[1])
-    if (CommentUtil.isCommentFound(indexOfComment)) {
+    if (CommentProcessor.isCommentFound(indexOfComment)) {
       const textAfter = this.text.slice(indexOfComment)
       const textBefore = this.text.slice(0, indexOfComment)
       this.text = `${textBefore}${comment[0]}\n${textAfter.trimEnd()}`
@@ -83,12 +76,12 @@ export class CommentUtil {
 
   search(text: string) {
     let result = this.searchExactMatch(text)
-    if (CommentUtil.isCommentFound(result)) {
+    if (CommentProcessor.isCommentFound(result)) {
       return result
     }
 
     result = this.searchFuzzyForTrimmedText(text)
-    if (CommentUtil.isCommentFound(result)) {
+    if (CommentProcessor.isCommentFound(result)) {
       return result
     }
 

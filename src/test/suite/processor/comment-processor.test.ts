@@ -1,7 +1,7 @@
 import { deepStrictEqual, equal } from "assert"
-import { CommentUtil } from "../../../util/comment-util"
+import { CommentProcessor } from "../../../processor/comment-processor"
 
-suite("Test CommentUtil - findComments()", () => {
+suite("Test CommentProcessor - findComments()", () => {
   test("should add all comments to array 'comments'", () => {
     const text =
       '#foo\n' +
@@ -12,38 +12,38 @@ suite("Test CommentUtil - findComments()", () => {
       '  # foo\n' +
       'amet, consetetur\n' +
       '# baz'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    commentutil.findComments()
+    commentprocessor.findComments()
 
-    equal(commentutil.comments.length, 5)
-    deepStrictEqual(commentutil.comments[0], ["#foo", "#bar"])
-    deepStrictEqual(commentutil.comments[1], ["#bar", "lorem ipsum"])
-    deepStrictEqual(commentutil.comments[2], ["#foo", "dolor sit"])
-    deepStrictEqual(commentutil.comments[3], ["  # foo", "amet, consetetur"])
-    deepStrictEqual(commentutil.comments[4], ["# baz", "vscode-yaml-sort.lastLine"])
+    equal(commentprocessor.comments.length, 5)
+    deepStrictEqual(commentprocessor.comments[0], ["#foo", "#bar"])
+    deepStrictEqual(commentprocessor.comments[1], ["#bar", "lorem ipsum"])
+    deepStrictEqual(commentprocessor.comments[2], ["#foo", "dolor sit"])
+    deepStrictEqual(commentprocessor.comments[3], ["  # foo", "amet, consetetur"])
+    deepStrictEqual(commentprocessor.comments[4], ["# baz", "vscode-yaml-sort.lastLine"])
   })
 })
 
-suite("Test CommentUtil - isLineComment()", () => {
+suite("Test CommentProcessor - isLineComment()", () => {
   test("when input is '# comment' should return true", () => {
-    equal(CommentUtil.isLineComment("# comment"), true)
+    equal(CommentProcessor.isLineComment("# comment"), true)
   })
   test("when input is '  # comment' should return true", () => {
-    equal(CommentUtil.isLineComment("  # comment"), true)
+    equal(CommentProcessor.isLineComment("  # comment"), true)
   })
   test("when input is 'text # comment' should return false", () => {
-    equal(CommentUtil.isLineComment("text # comment"), false)
+    equal(CommentProcessor.isLineComment("text # comment"), false)
   })
   test("when input is 'text' should return false", () => {
-    equal(CommentUtil.isLineComment("text"), false)
+    equal(CommentProcessor.isLineComment("text"), false)
   })
   test("when input is an empty string should return false", () => {
-    equal(CommentUtil.isLineComment(""), false)
+    equal(CommentProcessor.isLineComment(""), false)
   })
 })
 
-suite("Test CommentUtil - addLineToComments()", () => {
+suite("Test CommentProcessor - addLineToComments()", () => {
   test("should add comments to array 'comments'", () => {
     const text =
       '#foo\n' +
@@ -51,36 +51,36 @@ suite("Test CommentUtil - addLineToComments()", () => {
       'lorem ipsum\n' +
       'dolor sit\n' +
       '#foo'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    equal(commentutil.lines.length, 5)
+    equal(commentprocessor.lines.length, 5)
 
-    commentutil.addLineToComments(0)
+    commentprocessor.addLineToComments(0)
     const expected: string[][] = []
     expected.push(["#foo", "#bar"])
-    deepStrictEqual(commentutil.comments, expected)
+    deepStrictEqual(commentprocessor.comments, expected)
 
-    commentutil.addLineToComments(1)
+    commentprocessor.addLineToComments(1)
     expected.push(["#bar", "lorem ipsum"])
-    deepStrictEqual(commentutil.comments, expected)
+    deepStrictEqual(commentprocessor.comments, expected)
 
-    commentutil.addLineToComments(4)
+    commentprocessor.addLineToComments(4)
     expected.push(["#foo", "vscode-yaml-sort.lastLine"])
-    deepStrictEqual(commentutil.comments, expected)
+    deepStrictEqual(commentprocessor.comments, expected)
   })
 })
 
-suite("Test CommentUtil - applyComments()", () => {
+suite("Test CommentProcessor - applyComments()", () => {
   test("should apply all comments to a text", () => {
     const text =
       "lorem ipsum\n" +
       "dolor sit\n" +
       "amet, consetetur"
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    commentutil.comments.push(["#foo", "#bar"])
-    commentutil.comments.push(["#bar", "lorem ipsum"])
-    commentutil.comments.push(["#foo", "vscode-yaml-sort.lastLine"])
+    commentprocessor.comments.push(["#foo", "#bar"])
+    commentprocessor.comments.push(["#bar", "lorem ipsum"])
+    commentprocessor.comments.push(["#foo", "vscode-yaml-sort.lastLine"])
 
     const expected =
       "#foo\n" +
@@ -90,36 +90,36 @@ suite("Test CommentUtil - applyComments()", () => {
       "amet, consetetur\n" +
       "#foo"
 
-    equal(commentutil.applyComments(text), expected)
+    equal(commentprocessor.applyComments(text), expected)
   })
 })
 
-suite("Test CommentUtil - reverseComments()", () => {
+suite("Test CommentProcessor - reverseComments()", () => {
   test("should reverse entrys in comments", () => {
-    const commentutil = new CommentUtil("")
-    commentutil.comments.push(["key1", "value1"])
-    commentutil.comments.push(["key2", "value2"])
-    commentutil.comments.push(["key3", "value3"])
+    const commentprocessor = new CommentProcessor("")
+    commentprocessor.comments.push(["key1", "value1"])
+    commentprocessor.comments.push(["key2", "value2"])
+    commentprocessor.comments.push(["key3", "value3"])
     const expected: string[][] = []
     expected.push(["key3", "value3"])
     expected.push(["key2", "value2"])
     expected.push(["key1", "value1"])
 
-    commentutil.reverseComments()
+    commentprocessor.reverseComments()
 
-    deepStrictEqual(commentutil.comments, expected)
+    deepStrictEqual(commentprocessor.comments, expected)
   })
 })
 
-suite("Test CommentUtil - applyComment()", () => {
+suite("Test CommentProcessor - applyComment()", () => {
   test("should apply a comment at correct position", () => {
     const text =
       "lorem ipsum\n" +
       "dolor sit\n" +
       "amet, consetetur"
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    commentutil.applyComment(["#foo", "dolor sit"])
+    commentprocessor.applyComment(["#foo", "dolor sit"])
 
     const expected =
       "lorem ipsum\n" +
@@ -127,90 +127,90 @@ suite("Test CommentUtil - applyComment()", () => {
       "dolor sit\n" +
       "amet, consetetur"
 
-    equal(commentutil.text, expected)
+    equal(commentprocessor.text, expected)
   })
 })
 
-suite("Test CommentUtil - append()", () => {
+suite("Test CommentProcessor - append()", () => {
   test("should append newline and text to a given text", () => {
     const text = "lorem ipsum"
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    commentutil.append("# comment")
+    commentprocessor.append("# comment")
 
     const expected =
       "lorem ipsum\n" +
       "# comment"
 
-    equal(commentutil.text, expected)
+    equal(commentprocessor.text, expected)
   })
 })
 
-suite("Test CommentUtil - insert()", () => {
+suite("Test CommentProcessor - insert()", () => {
   test("when comment is found should insert", () => {
     const text =
       'lorem ipsum\n' +
       'dolor sit\n' +
       'amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
     const comment = ['#foo', 'dolor sit']
 
-    commentutil.insert(comment)
+    commentprocessor.insert(comment)
     
     const expected =
       'lorem ipsum\n' +
       '#foo\n' +
       'dolor sit\n' +
       'amet, consetetur'
-    equal(commentutil.text, expected)
+    equal(commentprocessor.text, expected)
   })
   test("when comment is not found should do nothing", () => {
     const text =
       'lorem ipsum\n' +
       'dolor sit\n' +
       'amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
     const comment = ['#foo', 'do not find']
 
-    commentutil.insert(comment)
+    commentprocessor.insert(comment)
     
     const expected =
       'lorem ipsum\n' +
       'dolor sit\n' +
       'amet, consetetur'
-    equal(commentutil.text, expected)
+    equal(commentprocessor.text, expected)
   })
 })
 
-suite("Test CommentUtil - getIndexOfString()", () => {
+suite("Test CommentProcessor - getIndexOfString()", () => {
   test("should return index of line", () => {
     const line = 'dolor sit'
     const text =
       'lorem ipsum\n' +
       `${line}\n` +
       'amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    equal(commentutil.getIndexOfString(line), 12)
-    equal(commentutil.getIndexOfString("vscode-yaml-sort.lastLine"), commentutil.text.length)
+    equal(commentprocessor.getIndexOfString(line), 12)
+    equal(commentprocessor.getIndexOfString("vscode-yaml-sort.lastLine"), commentprocessor.text.length)
   })
 })
 
-suite("Test CommentUtil - search()", () => {
+suite("Test CommentProcessor - search()", () => {
   test("should return last index of text", () => {
     const text =
       'foo: lorem ipsum\n' +
       'bar: dolor sit\n' +
       'baz: amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    equal(commentutil.search('foo: lorem ipsum'), 0)
-    equal(commentutil.search('  bar: dolor sit  '), 17)
-    equal(commentutil.search('baz: "amet, consetetur"'), 32)
+    equal(commentprocessor.search('foo: lorem ipsum'), 0)
+    equal(commentprocessor.search('  bar: dolor sit  '), 17)
+    equal(commentprocessor.search('baz: "amet, consetetur"'), 32)
   })
 })
 
-suite("Test CommentUtil - searchExactMatch()", () => {
+suite("Test CommentProcessor - searchExactMatch()", () => {
   test("should return last index of text", () => {
     const line = 'bar: dolor sit'
     const text =
@@ -218,46 +218,46 @@ suite("Test CommentUtil - searchExactMatch()", () => {
       `${line}\n` +
       `${line}\n` +
       'baz: amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    equal(commentutil.searchExactMatch(line), 32)
+    equal(commentprocessor.searchExactMatch(line), 32)
   })
 })
 
-suite("Test CommentUtil - searchFuzzyForTrimmedText()", () => {
+suite("Test CommentProcessor - searchFuzzyForTrimmedText()", () => {
   test("should return last index of keyword", () => {
     const line = '  bar: dolor sit  '
     const text =
       'foo: lorem ipsum\n' +
       `${line.trim()}\n` +
       'baz: amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    equal(commentutil.searchFuzzyForTrimmedText(line), 17)
+    equal(commentprocessor.searchFuzzyForTrimmedText(line), 17)
   })
 })
 
-suite("Test CommentUtil - searchFuzzyForKeyword()", () => {
+suite("Test CommentProcessor - searchFuzzyForKeyword()", () => {
   test("should return last index of keyword", () => {
     const line = 'bar: dolor sit'
     const text =
       'foo: lorem ipsum\n' +
       `${line}\n` +
       'baz: amet, consetetur'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    equal(commentutil.searchFuzzyForKeyword(line), 17)
+    equal(commentprocessor.searchFuzzyForKeyword(line), 17)
   })
 })
 
-suite("Test CommentUtil - isCommentFound()", () => {
+suite("Test CommentProcessor - isCommentFound()", () => {
   test("when index is -1 should return true", () => {
-    equal(CommentUtil.isCommentFound(-1), false)
-    equal(CommentUtil.isCommentFound(0), true)
+    equal(CommentProcessor.isCommentFound(-1), false)
+    equal(CommentProcessor.isCommentFound(0), true)
   })
 })
 
-suite("Test CommentUtil - Issue 45", () => {
+suite("Test CommentProcessor - Issue 45", () => {
   // https://github.com/pascalre/vscode-yaml-sort/issues/45#issuecomment-1329161613
   test("should fuzzy find comments", () => {
     const text =
@@ -272,9 +272,9 @@ suite("Test CommentUtil - Issue 45", () => {
       '  jobSize: 20\n' +
       '  schema: test\n' +
       '  #end comment'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    commentutil.findComments()
+    commentprocessor.findComments()
     const textWithoutComments =
       "params:\n" +
       "  chunkSize: 1000\n" +
@@ -284,7 +284,7 @@ suite("Test CommentUtil - Issue 45", () => {
       "  logon: 'test'\n" +
       "  schema: 'test'\n" +
       "  variableMetadata: 'env\\config_dev.yaml'"
-    commentutil.applyComments(textWithoutComments)
+    commentprocessor.applyComments(textWithoutComments)
 
     const expected =
       "#begin comment\n" +
@@ -299,7 +299,7 @@ suite("Test CommentUtil - Issue 45", () => {
       "  variableMetadata: 'env\\config_dev.yaml'\n" +
       "  #end comment"
 
-    equal(commentutil.text, expected)
+    equal(commentprocessor.text, expected)
   })
 
 
@@ -307,16 +307,16 @@ suite("Test CommentUtil - Issue 45", () => {
     const text =
       'schema: test\n' +
       '#end comment\n'
-    const commentutil = new CommentUtil(text)
+    const commentprocessor = new CommentProcessor(text)
 
-    commentutil.findComments()
+    commentprocessor.findComments()
     const textWithoutComments = 'schema: test'
-    commentutil.applyComments(textWithoutComments)
+    commentprocessor.applyComments(textWithoutComments)
 
     const expected =
       'schema: test\n' +
       '#end comment'
 
-    equal(commentutil.text, expected)
+    equal(commentprocessor.text, expected)
   })
 })
