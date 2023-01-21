@@ -21,7 +21,7 @@ suite("Test HelmProcessor - preprocess()", () => {
   })
 })
 
-suite("Test HelmProcessor - findHelmValues()", () => {
+suite("Test HelmProcessor - findMatches()", () => {
   test("should return all matches of helm values", () => {
     const text =
       "apiVersion: keycloak.org/v1alpha1\n" +
@@ -32,7 +32,7 @@ suite("Test HelmProcessor - findHelmValues()", () => {
       "name: {{ .Values.ui.environment.keycloakClientId }}\n" +
       "namespace: {{ required 'Keycloak namespace required' .Values.keycloak.namespace }}\n"
     const helmprocessor = new HelmProcessor(text)
-    const helmValues = helmprocessor.findHelmValues()
+    const helmValues = helmprocessor.findMatches()
 
     equal(helmValues?.length, 2)
     equal(helmValues?.at(0), "{{ .Values.ui.environment.keycloakClientId }}")
