@@ -1,6 +1,6 @@
 export class HelmProcessor {
   filter = "helm"
-  matcher = /{{.*}}/g
+  matcher = /{{([^{]*)}}/g
   store: Map<string, string> = new Map()
   text: string
 
