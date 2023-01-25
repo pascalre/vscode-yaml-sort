@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.0 - January 26, 2023
+* (refs [#27](https://github.com/pascalre/vscode-yaml-sort/issues/36)) Add support for single line arrays
+* Update dependencies to latest versions
+
 ## 6.1.0 - January 18, 2023
 * (refs [#27](https://github.com/pascalre/vscode-yaml-sort/issues/27)) Add support for Helm charts
 
