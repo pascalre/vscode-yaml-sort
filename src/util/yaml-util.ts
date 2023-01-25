@@ -2,7 +2,7 @@ import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, repla
 import { Settings } from "../settings"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
-import { Processor } from "../processor/processor"
+import { ProcessorController } from "../controller/processor-controller"
 
 export class YamlUtil {
   settings: Settings
@@ -26,18 +26,18 @@ export class YamlUtil {
   }
 
   transformMultilineValue(text: string) {
-    let result = prependWhitespacesOnEachLine(text, this.settings.getIndent())
+    let result = prependWhitespacesOnEachLine(text, this.settings.indent)
     if (text.endsWith("\n")) {
-      result = removeTrailingCharacters(result, this.settings.getIndent())
+      result = removeTrailingCharacters(result, this.settings.indent)
     }
     return result
   }
 
   sortYaml(unsortedYaml: string, customSort = 0): string | null {
     try {
-      let unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.getIndent())
+      let unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.indent)
 
-      const processor = new Processor(unsortedYamlWithoutTabs)
+      const processor = new ProcessorController(unsortedYamlWithoutTabs)
       processor.preprocess()
       unsortedYamlWithoutTabs = processor.text
 
@@ -45,7 +45,7 @@ export class YamlUtil {
       const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
       let sortedYaml = ""
 
-      if (customSort > 0 && !this.settings.getUseCustomSortRecursively()) {
+      if (customSort > 0 && !this.settings.useCustomSortRecursively) {
         const keywords = this.settings.getCustomSortKeywords(customSort)
 
         keywords.forEach(key => {
@@ -66,11 +66,12 @@ export class YamlUtil {
       // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
       sortedYaml += this.jsyamladapter.dumpYaml(doc, true, customSort)
 
-      if (this.settings.getEmptyLinesUntilLevel() > 0) {
-        sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.getEmptyLinesUntilLevel(), this.settings.getIndent(), sortedYaml)
+      if (this.settings.emptyLinesUntilLevel > 0) {
+        sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.emptyLinesUntilLevel, this.settings.indent, sortedYaml)
       }
 
-      processor.postprocess(sortedYaml)
+      processor.text = sortedYaml
+      processor.postprocess()
       sortedYaml = processor.text
 
       return sortedYaml
@@ -89,10 +90,11 @@ export class YamlUtil {
    */
   formatYaml(yaml: string, useLeadingDashes: boolean): string | null {
     try {
-      const processor = new Processor(yaml)
+      const processor = new ProcessorController(yaml)
       processor.preprocess()
       let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text) as string, false, 0)
-      processor.postprocess(doc)
+      processor.text = doc
+      processor.postprocess()
       doc = processor.text
       if (useLeadingDashes) {
         doc = `---\n${doc}`

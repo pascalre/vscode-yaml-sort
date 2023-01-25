@@ -16,12 +16,12 @@ suite("Test CommentProcessor - findComments()", () => {
 
     commentprocessor.findComments()
 
-    equal(commentprocessor.comments.length, 5)
-    deepStrictEqual(commentprocessor.comments[0], ["#foo", "#bar"])
-    deepStrictEqual(commentprocessor.comments[1], ["#bar", "lorem ipsum"])
-    deepStrictEqual(commentprocessor.comments[2], ["#foo", "dolor sit"])
-    deepStrictEqual(commentprocessor.comments[3], ["  # foo", "amet, consetetur"])
-    deepStrictEqual(commentprocessor.comments[4], ["# baz", "vscode-yaml-sort.lastLine"])
+    equal(commentprocessor.store.length, 5)
+    deepStrictEqual(commentprocessor.store[0], ["#foo", "#bar"])
+    deepStrictEqual(commentprocessor.store[1], ["#bar", "lorem ipsum"])
+    deepStrictEqual(commentprocessor.store[2], ["#foo", "dolor sit"])
+    deepStrictEqual(commentprocessor.store[3], ["  # foo", "amet, consetetur"])
+    deepStrictEqual(commentprocessor.store[4], ["# baz", "vscode-yaml-sort.lastLine"])
   })
 })
 
@@ -58,15 +58,15 @@ suite("Test CommentProcessor - addLineToComments()", () => {
     commentprocessor.addLineToComments(0)
     const expected: string[][] = []
     expected.push(["#foo", "#bar"])
-    deepStrictEqual(commentprocessor.comments, expected)
+    deepStrictEqual(commentprocessor.store, expected)
 
     commentprocessor.addLineToComments(1)
     expected.push(["#bar", "lorem ipsum"])
-    deepStrictEqual(commentprocessor.comments, expected)
+    deepStrictEqual(commentprocessor.store, expected)
 
     commentprocessor.addLineToComments(4)
     expected.push(["#foo", "vscode-yaml-sort.lastLine"])
-    deepStrictEqual(commentprocessor.comments, expected)
+    deepStrictEqual(commentprocessor.store, expected)
   })
 })
 
@@ -78,9 +78,10 @@ suite("Test CommentProcessor - applyComments()", () => {
       "amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
 
-    commentprocessor.comments.push(["#foo", "#bar"])
-    commentprocessor.comments.push(["#bar", "lorem ipsum"])
-    commentprocessor.comments.push(["#foo", "vscode-yaml-sort.lastLine"])
+    commentprocessor.store.push(["#foo", "#bar"])
+    commentprocessor.store.push(["#bar", "lorem ipsum"])
+    commentprocessor.store.push(["#foo", "vscode-yaml-sort.lastLine"])
+    commentprocessor.text = text
 
     const expected =
       "#foo\n" +
@@ -90,16 +91,16 @@ suite("Test CommentProcessor - applyComments()", () => {
       "amet, consetetur\n" +
       "#foo"
 
-    equal(commentprocessor.applyComments(text), expected)
+    equal(commentprocessor.postprocess(), expected)
   })
 })
 
 suite("Test CommentProcessor - reverseComments()", () => {
   test("should reverse entrys in comments", () => {
     const commentprocessor = new CommentProcessor("")
-    commentprocessor.comments.push(["key1", "value1"])
-    commentprocessor.comments.push(["key2", "value2"])
-    commentprocessor.comments.push(["key3", "value3"])
+    commentprocessor.store.push(["key1", "value1"])
+    commentprocessor.store.push(["key2", "value2"])
+    commentprocessor.store.push(["key3", "value3"])
     const expected: string[][] = []
     expected.push(["key3", "value3"])
     expected.push(["key2", "value2"])
@@ -107,7 +108,7 @@ suite("Test CommentProcessor - reverseComments()", () => {
 
     commentprocessor.reverseComments()
 
-    deepStrictEqual(commentprocessor.comments, expected)
+    deepStrictEqual(commentprocessor.store, expected)
   })
 })
 
@@ -284,7 +285,8 @@ suite("Test CommentProcessor - Issue 45", () => {
       "  logon: 'test'\n" +
       "  schema: 'test'\n" +
       "  variableMetadata: 'env\\config_dev.yaml'"
-    commentprocessor.applyComments(textWithoutComments)
+    commentprocessor.text = textWithoutComments
+    commentprocessor.postprocess()
 
     const expected =
       "#begin comment\n" +
@@ -310,8 +312,8 @@ suite("Test CommentProcessor - Issue 45", () => {
     const commentprocessor = new CommentProcessor(text)
 
     commentprocessor.findComments()
-    const textWithoutComments = 'schema: test'
-    commentprocessor.applyComments(textWithoutComments)
+    commentprocessor.text = 'schema: test'
+    commentprocessor.postprocess()
 
     const expected =
       'schema: test\n' +

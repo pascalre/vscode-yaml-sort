@@ -44,14 +44,14 @@ export class JsYamlAdapter {
     const sort = new SortUtil(this.settings, custom)
 
     let yaml = dump(text, {
-      indent: this.settings.getIndent(),
-      forceQuotes: this.settings.getForceQuotes(),
-      lineWidth: this.settings.getLineWidth(),
-      noArrayIndent: this.settings.getNoArrayIndent(),
-      noCompatMode: this.settings.getNoCompatMode(),
+      indent: this.settings.indent,
+      forceQuotes: this.settings.forceQuotes,
+      lineWidth: this.settings.lineWidth,
+      noArrayIndent: this.settings.noArrayIndent,
+      noCompatMode: this.settings.noCompatMode,
       quotingType: this.settings.getQuotingType(),
       schema: this.settings.getSchema(),
-      sortKeys: (!(custom > 0 && this.settings.getUseCustomSortRecursively()) ? sortKeys : (a: string, b: string) => {
+      sortKeys: (!(custom > 0 && this.settings.useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
         return sort.customSort(a, b)
       })
     })

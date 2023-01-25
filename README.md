@@ -7,7 +7,7 @@ YAML Sort extends VS Code to sort, format and validate YAML files.
 ## Preview
 ![Preview](images/preview.gif)
 
-# Commands
+# 💬 Commands
 This extension contributes the following commands:
 
 | Command                                        | Description                                                                                                           |
@@ -20,7 +20,7 @@ This extension contributes the following commands:
 | `Sort YAML`                                    | Sorts a given YAML. You can either sort the whole YAML document or sort only a selection of the text.                 |
 | `Validate YAML`                                | Validates a given YAML.                                                                                               |
 
-# Configuration
+# ⚙️ Configuration
 This extension contributes the following settings:
 
 | Setting                    | Description                                                                                                                                                      | Default          |
@@ -43,8 +43,11 @@ This extension contributes the following settings:
 | `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                                              | `false`          |
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                                                    | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                                                        | `true`           |
+| `useArrayProcessor`        | When `true`, will activate ArrayProcessor.                                                                                                                       | `true`           |
+| `useCommentProcessor`      | When `true`, will activate CommentProcessor.                                                                                                                     | `true`           |
+| `useHelmProcessor`         | When `true`, will activate HelmProcessor.                                                                                                                        | `true`           |
 
-# FAQ
+# ❓ FAQ
 ## How to sort on save?
 Register this extension as VS Code formatter. Also configure VS Code to format files on save. Caution: This setting will apply for all files. Changes will require a restart of VS Code. If you wish to also sort (not only format) the file on saving, set `sortOnSave` to `0`. Use `1`, `2` or `3` for custom sort.
 
@@ -57,7 +60,33 @@ Register this extension as VS Code formatter. Also configure VS Code to format f
 }
 ```
 
-# Support
+## What are the processors doing and how do I use them?
+There are different types of processors. If you experience any issues with them, or just don't want to use them, you can turn them off.
+### CommentProcessor
+An activated CommentProcessor will keep comments while sorting.
+
+### HelmProcessor
+The HelmProcessor makes the extension compatible with Helm charts.
+
+### ArrayProcessor
+The ArrayProcessor will not add linebreaks to single-line array structures. Example:
+```
+test: [ "CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]
+```
+
+If `useArrayProcessor` is set to `false` will output:
+```
+test:
+- "CMD"
+- "pg_isready"
+- "-q"
+- "-d"
+- "${DB_NAME}"
+- "-U"
+- "${DB_USER}"
+```
+
+# 🎉 Support
 
 If you like YAML Sort, please feel free to [rate it](https://marketplace.visualstudio.com/items?itemName=PascalReitermann93.vscode-yaml-sort&ssr=false#review-details) on the marketplace.
 
@@ -69,6 +98,6 @@ Check [open issues](https://github.com/pascalre/vscode-yaml-sort/issues) on GitH
 
 Be careful with anchors and references, these don't work very well in this extension.
 
-# License
+# 📝 License
 
 YAML Sort is licensed under the [MIT License](https://raw.githubusercontent.com/pascalre/vscode-yaml-sort/master/LICENSE).

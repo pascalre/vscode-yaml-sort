@@ -4,77 +4,57 @@ import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 
 export class Settings {
+    filter = "vscode-yaml-sort"
     workspace = workspace
+
+    getBoolean(name: string) {
+        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as boolean
+    }
+
+    getNumber(name: string) {
+        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as number
+    }
+
+    getString(name: string) {
+        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as string
+    }
 
     getCustomSortKeywords(index: number): string[] {
         if ([1, 2, 3].includes(index))
-            return this.workspace.getConfiguration().get(`vscode-yaml-sort.customSortKeywords_${index}`) as string[]
+            return this.workspace.getConfiguration().get(`${this.filter}.customSortKeywords_${index}`) as string[]
         return []
     }
-    getEmptyLinesUntilLevel(): number {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.emptyLinesUntilLevel") as number
-    }
     getExtensions(): string[] {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.extensions") as string[]
-    }
-    getForceQuotes(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.forceQuotes") as boolean
-    }
-    getIndent(): number {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.indent") as number
-    }
-    getLineWidth(): number {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.lineWidth") as number
-    }
-    getLocale(): string {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.locale") as string
-    }
-    getNoArrayIndent(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.noArrayIndent") as boolean
-    }
-    getNoCompatMode(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.noCompatMode") as boolean
-    }
-    getNotifySuccess(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.notifySuccess") as boolean
+        return this.workspace.getConfiguration().get(`${this.filter}.extensions`) as string[]
     }
     getQuotingType(): "'" | "\"" {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.quotingType") as "'" | "\""
+        return this.workspace.getConfiguration().get(`${this.filter}.quotingType`) as "'" | "\""
     }
     getSchema(): Schema {
-        const schema = this.workspace.getConfiguration().get("vscode-yaml-sort.schema") as string
+        const schema = this.workspace.getConfiguration().get(`${this.filter}.schema`) as string
         return Settings.getJsYamlSchemaFromString(schema)
-    }
-    getSortOnSave(): number {
-        return this.workspace.getConfiguration().get('vscode-yaml-sort.sortOnSave') as number
-    }
-    getUseCustomSortRecursively(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.useCustomSortRecursively") as boolean
-    }
-    getUseAsFormatter(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.useAsFormatter") as boolean
-    }
-    getUseLeadingDashes(): boolean {
-        return this.workspace.getConfiguration().get("vscode-yaml-sort.useLeadingDashes") as boolean
     }
 
     customSortKeywords1 = this.getCustomSortKeywords(1)
     customSortKeywords2 = this.getCustomSortKeywords(2)
     customSortKeywords3 = this.getCustomSortKeywords(3)
-    emptyLinesUntilLevel = this.getEmptyLinesUntilLevel()
-    forceQuotes = this.getForceQuotes()
-    indent = this.getIndent()
-    lineWidth = this.getLineWidth()
-    locale = this.getLocale()
-    noArrayIndent = this.getNoArrayIndent()
-    noCompatMode = this.getNoCompatMode()
-    notifySuccess = this.getNotifySuccess()
+    emptyLinesUntilLevel = this.getNumber("emptyLinesUntilLevel")
+    forceQuotes = this.getBoolean("forceQuotes")
+    indent = this.getNumber("indent")
+    lineWidth = this.getNumber("lineWidth")
+    locale = this.getString("locale")
+    noArrayIndent = this.getBoolean("noArrayIndent")
+    noCompatMode = this.getBoolean("noCompatMode")
+    notifySuccess = this.getBoolean("notifySuccess")
     quotingType = this.getQuotingType()
     schema = this.getSchema()
-    sortOnSave = this.getSortOnSave()
-    useAsFormatter = this.getUseAsFormatter()
-    useCustomSortRecursively = this.getUseCustomSortRecursively()
-    useLeadingDashes = this.getUseLeadingDashes()
+    sortOnSave = this.getNumber("sortOnSave")
+    useAsFormatter = this.getBoolean("useAsFormatter")
+    useCustomSortRecursively = this.getBoolean("useCustomSortRecursively")
+    useLeadingDashes = this.getBoolean("useLeadingDashes")
+    useArrayProcessor = this.getBoolean("useArrayProcessor")
+    useCommentProcessor = this.getBoolean("useCommentProcessor")
+    useHelmProcessor = this.getBoolean("useHelmProcessor")
 
     static getJsYamlSchemaFromString(schema: string): Schema {
         switch (schema) {
@@ -94,6 +74,6 @@ export class Settings {
     }
 
     doSortOnSave(): boolean {
-        return (this.getSortOnSave() >= 0 && this.getSortOnSave() <= 3)
+        return (this.sortOnSave >= 0 && this.sortOnSave <= 3)
     }
 }

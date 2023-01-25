@@ -21,7 +21,7 @@ export class VsCodeAdapter {
   // on a configuration setting
   registerFormatter(formatter: DocumentFormattingEditProvider) {
     let registration: Disposable | undefined
-    const useAsFormatter = this.settings.getUseAsFormatter()
+    const useAsFormatter = this.settings.useAsFormatter
     if (useAsFormatter && !registration) {
       languages.registerDocumentFormattingEditProvider('yaml', formatter)
     } else if (!useAsFormatter && registration) {
@@ -38,7 +38,7 @@ export class VsCodeAdapter {
   }
 
   notify(message: string) {
-    if (this.settings.getNotifySuccess()) {
+    if (this.settings.notifySuccess) {
       window.showInformationMessage(message)
     }
   }

@@ -1,5 +1,5 @@
 export class CommentProcessor {
-  comments: string[][] = []
+  store: string[][] = []
   text: string
   lines: string[]
 
@@ -26,23 +26,22 @@ export class CommentProcessor {
 
   addLineToComments(index: number) {
     if (index < this.lines.length-1) {
-      this.comments.push([this.lines[index], this.lines[index+1]])
+      this.store.push([this.lines[index], this.lines[index+1]])
     } else {
-      this.comments.push([this.lines[index], 'vscode-yaml-sort.lastLine'])
+      this.store.push([this.lines[index], 'vscode-yaml-sort.lastLine'])
     }
   }
 
-  applyComments(text: string): string {
-    this.text = text
+  postprocess(): string {
     this.reverseComments()
-    this.comments.forEach(comment => {
+    this.store.forEach(comment => {
       this.applyComment(comment)
     })
     return this.text
   }
 
   reverseComments() {
-    this.comments.reverse()
+    this.store.reverse()
   }
 
   applyComment(comment: string[]) {

@@ -5,18 +5,14 @@ import { SortUtil } from "../../../util/sort-util"
 suite("Test Sort - localeSort()", () => {
   test("when `locale` is `sv` and a is `ä` and b is `z` should return 1", () => {
     const settings = new Settings()
-    settings.getLocale = function () {
-      return "sv"
-    }
+    settings.locale = "sv"
     const sort = new SortUtil(settings)
     strictEqual(sort.localeSort("ä", "z"), 1)
   })
 
   test("when `locale` is `en` and a is `ä` and b is `z` should return -1", () => {
     const settings = new Settings()
-    settings.getLocale = function () {
-      return "en"
-    }
+    settings.locale = "en"
     const sort = new SortUtil(settings)
     strictEqual(sort.localeSort("ä", "z"), -1)
   })
