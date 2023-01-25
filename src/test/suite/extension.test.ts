@@ -4,7 +4,7 @@ import { resolve } from "path"
 
 import { Settings } from "../../settings"
 import { hasTextYamlKeys, isSelectionInvalid, splitYaml } from "../../util/yaml-util"
-import { sortYamlWrapper } from "../../controller"
+import { sortYamlWrapper } from "../../controller/controller"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {

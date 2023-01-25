@@ -30,9 +30,7 @@ suite("Test dumpYaml", () => {
       'keyword2: value'
 
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
+    settings.useCustomSortRecursively = true
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
@@ -47,12 +45,8 @@ suite("Test dumpYaml", () => {
       'z: value'
 
     const settings = new Settings()
-    settings.getLocale = function () {
-      return "en"
-    }
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
+    settings.locale = "en"
+    settings.useCustomSortRecursively = true
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
@@ -67,9 +61,7 @@ suite("Test dumpYaml", () => {
       'ä: value'
 
     const settings = new Settings()
-    settings.getLocale = function () {
-      return "sv"
-    }
+    settings.locale = "sv"
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
@@ -84,9 +76,7 @@ suite("Test dumpYaml", () => {
       'completeTask: value'
 
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
+    settings.useCustomSortRecursively = true
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
@@ -118,9 +108,7 @@ suite("Test dumpYaml", () => {
       'keyword2: value'
   
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
+    settings.useCustomSortRecursively = true
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
@@ -134,9 +122,7 @@ suite("Test dumpYaml", () => {
       'z: value'
   
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
+    settings.useCustomSortRecursively = true
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   
@@ -144,9 +130,7 @@ suite("Test dumpYaml", () => {
       'z: value\n' +
       'ä: value'
   
-    yamlutil.settings.getLocale = function () {
-      return "sv"
-    }
+    yamlutil.settings.locale = "sv"
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
   test("should ignore case when sorting", () => {
@@ -159,9 +143,7 @@ suite("Test dumpYaml", () => {
       'completeTask: value'
   
     const settings = new Settings()
-    settings.getUseCustomSortRecursively = function () {
-      return true
-    }
+    settings.useCustomSortRecursively = true
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
@@ -294,9 +276,7 @@ suite("Test sortYaml", () => {
       'spec: value'
   
     const settings = new Settings()
-    settings.getEmptyLinesUntilLevel = function () {
-      return 2
-    }
+    settings.emptyLinesUntilLevel = 2
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
@@ -334,15 +314,11 @@ suite("Test sortYaml", () => {
     settings.getSchema = function () {
       return CLOUDFORMATION_SCHEMA
     }
-    settings.getForceQuotes = function () {
-      return true
-    }
+    settings.forceQuotes = true
     settings.getQuotingType = function () {
       return "\""
     }
-    settings.getEmptyLinesUntilLevel = function () {
-      return 2
-    }
+    settings.emptyLinesUntilLevel = 2
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
@@ -358,9 +334,7 @@ suite("Test sortYaml", () => {
       '  "on": foo'
   
     const settings = new Settings()
-    settings.getNoCompatMode = function () {
-      return false
-    }
+    settings.noCompatMode = false
     settings.getQuotingType = function () {
       return "\""
     }
@@ -371,9 +345,7 @@ suite("Test sortYaml", () => {
       'key:\n' +
       '  off: egg\n' +
       '  on: foo'
-    yamlutil.settings.getNoCompatMode = function () {
-      return true
-    }
+    yamlutil.settings.noCompatMode = true
     strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
 })
@@ -399,9 +371,7 @@ suite("Test formatYaml", () => {
       '    age: 3'
 
     const settings = new Settings()
-    settings.getUseLeadingDashes = function () {
-      return false
-    }
+    settings.useLeadingDashes = false
     let yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.formatYaml(actual, false), expected)
 
@@ -444,9 +414,7 @@ suite("Test YamlUtil - isValueMultiline", () => {
 
 suite("Test YamlUtil - transformMultilineValue()", () => {
   const yamlutil = new YamlUtil()
-  yamlutil.settings.getIndent = function () {
-    return 2
-  }
+  yamlutil.settings.indent = 2
   test("Should prepend spaces on each line", () => {
     const text =
       '- foo: bar\n' +

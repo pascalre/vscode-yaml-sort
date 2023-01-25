@@ -37,6 +37,6 @@ export class SortUtil {
   }
 
   localeSort(a: string, b: string): number {
-    return a.localeCompare(b, this.settings.getLocale())
+    return a.localeCompare(b, this.settings.locale)
   }
 }

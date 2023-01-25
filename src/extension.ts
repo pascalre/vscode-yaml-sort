@@ -1,7 +1,7 @@
 import { ExtensionContext, DocumentFormattingEditProvider, commands, Uri, TextEdit } from "vscode"
 import { Settings } from "./settings"
 import { VsCodeAdapter } from "./adapter/vs-code-adapter"
-import { formatYamlWrapper, sortYamlWrapper, Controller } from "./controller"
+import { formatYamlWrapper, sortYamlWrapper, Controller } from "./controller/controller"
 
 const settings = new Settings()
 const vscodeadapter = new VsCodeAdapter()

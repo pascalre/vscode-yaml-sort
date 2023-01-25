@@ -20,35 +20,35 @@ suite("Test Settings - getter", () => {
     })
 
     test("default value of emptyLinesUntilLevel is set to `0`", () => {
-        deepEqual(settings.getEmptyLinesUntilLevel(), 0)
+        deepEqual(settings.emptyLinesUntilLevel, 0)
     })
 
     test("default value of forceQuotes is set to `false`", () => {
-        deepEqual(settings.getForceQuotes(), false)
+        deepEqual(settings.forceQuotes, false)
     })
 
     test("default value of indent is set to `2`", () => {
-        deepEqual(settings.getIndent(), 2)
+        deepEqual(settings.indent, 2)
     })
 
     test("default value of lineWidth is set to `500`", () => {
-        deepEqual(settings.getLineWidth(), 500)
+        deepEqual(settings.lineWidth, 500)
     })
 
     test("default value of locale is set to `en`", () => {
-        deepEqual(settings.getLocale(), "en")
+        deepEqual(settings.locale, "en")
     })
 
     test("default value of noArrayIndent is set to `false`", () => {
-        deepEqual(settings.getNoArrayIndent(), false)
+        deepEqual(settings.noArrayIndent, false)
     })
 
     test("default value of noCompatMode is set to `false`", () => {
-        deepEqual(settings.getNoCompatMode(), false)
+        deepEqual(settings.noCompatMode, false)
     })
 
     test("default value of notifySuccess is set to `true`", () => {
-        deepEqual(settings.getNotifySuccess(), true)
+        deepEqual(settings.notifySuccess, true)
     })
 
     test("default value of quotingType is set to `'`", () => {
@@ -60,19 +60,19 @@ suite("Test Settings - getter", () => {
     })
 
     test("default value of sortOnSave is set to `0`", () => {
-        deepEqual(settings.getSortOnSave(), 0)
+        deepEqual(settings.sortOnSave, 0)
     })
 
     test("default value of useAsFormatter is set to `false`", () => {
-        deepEqual(settings.getUseAsFormatter(), false)
+        deepEqual(settings.useAsFormatter, false)
     })
 
     test("default value of useCustomSortRecursively is set to `false`", () => {
-        deepEqual(settings.getUseCustomSortRecursively(), false)
+        deepEqual(settings.useCustomSortRecursively, false)
     })
 
     test("default value of useLeadingDashes is set to `true`", () => {
-        deepEqual(settings.getUseLeadingDashes(), true)
+        deepEqual(settings.useLeadingDashes, true)
     })
 })
 
@@ -114,20 +114,14 @@ suite("Test Settings - doSortOnSave()", () => {
     const settings: Settings = new Settings()
 
     test("when sortOnSave is 0 should return true", () => {
-        settings.getSortOnSave = function () {
-            return 0
-        }
+        settings.sortOnSave = 0
         equal(settings.doSortOnSave(), true)
     })
 
     test("when sortOnSave is not in 1, 2, 3 should return false", () => {
-        settings.getSortOnSave = function () {
-            return -1
-        }
+        settings.sortOnSave = -1
         equal(settings.doSortOnSave(), false)
-        settings.getSortOnSave = function () {
-            return 4
-        }
+        settings.sortOnSave = 4
         equal(settings.doSortOnSave(), false)
     })
 })

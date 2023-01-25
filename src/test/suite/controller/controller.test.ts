@@ -2,7 +2,7 @@ import { Uri, commands, window, workspace } from "vscode"
 import { strictEqual } from "assert"
 import { resolve } from "path"
 import { readFileSync, writeFileSync } from "fs"
-import { formatYamlWrapper, Controller } from "../../controller"
+import { formatYamlWrapper, Controller } from "../../../controller/controller"
 
 suite("Test sortYamlFiles", () => {
   test("should sort all yaml files in directory", async () => {

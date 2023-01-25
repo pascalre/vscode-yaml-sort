@@ -179,6 +179,21 @@
           "type": "boolean",
           "default": true,
           "description": "Define if sorted YAML files should begin with leading dashes."
+        },
+        "vscode-yaml-sort.useArrayProcessor": {
+          "type": "boolean",
+          "default": true,
+          "description": "When `true`, will activate ArrayProcessor"
+        },
+        "vscode-yaml-sort.useCommentProcessor": {
+          "type": "boolean",
+          "default": true,
+          "description": "When `true`, will activate CommentProcessor"
+        },
+        "vscode-yaml-sort.useHelmProcessor": {
+          "type": "boolean",
+          "default": true,
+          "description": "When `true`, will activate HelmProcessor"
         }
       }
     },

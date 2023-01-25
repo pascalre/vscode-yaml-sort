@@ -1,10 +1,10 @@
 import { TextEditor, TextEdit, Uri, window } from "vscode"
-import { JsYamlAdapter } from "./adapter/js-yaml-adapter"
-import { Severity, VsCodeAdapter } from "./adapter/vs-code-adapter"
-import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "./lib"
-import { Settings } from "./settings"
-import { FileUtil } from "./util/file-util"
-import { getDelimiters, splitYaml, validateTextRange, YamlUtil } from "./util/yaml-util"
+import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
+import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
+import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "../lib"
+import { Settings } from "../settings"
+import { FileUtil } from "../util/file-util"
+import { getDelimiters, splitYaml, validateTextRange, YamlUtil } from "../util/yaml-util"
 
 const settings = new Settings()
 const jsyamladapter = new JsYamlAdapter()
@@ -77,7 +77,7 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
       return [] as TextEdit[]
     }
 
-    let delimiters = getDelimiters(text, activeEditor.selection.isEmpty, settings.getUseLeadingDashes())
+    let delimiters = getDelimiters(text, activeEditor.selection.isEmpty, settings.useLeadingDashes)
     // remove yaml metadata tags
     const matchMetadata = /^%.*\n/gm
     // set metadata tags, if there is no metadata tag it should be an emtpy array
@@ -103,7 +103,7 @@ export function sortYamlWrapper(customSort = 0): TextEdit[] {
         return [] as TextEdit[]
       }
     })
-    if (activeEditor.selection.isEmpty && settings.getUseLeadingDashes()) {
+    if (activeEditor.selection.isEmpty && settings.useLeadingDashes) {
       newText = `---\n${newText}`
     }
     outterVscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
@@ -123,7 +123,7 @@ export function formatYamlWrapper(): TextEdit[] {
 
   if (activeEditor) {
     let doc = VsCodeAdapter.getActiveDocument(activeEditor)
-    let delimiters = getDelimiters(doc, true, settings.getUseLeadingDashes())
+    let delimiters = getDelimiters(doc, true, settings.useLeadingDashes)
     // remove yaml metadata tags
     const matchMetadata = /^%.*\n/gm
     // set metadata tags, if there is no metadata tag it should be an emtpy array
@@ -145,7 +145,7 @@ export function formatYamlWrapper(): TextEdit[] {
         return []
       }
     }
-    if (settings.getUseLeadingDashes()) {
+    if (settings.useLeadingDashes) {
       newText = `---\n${newText}`
     }
     return updateText(activeEditor, newText)
