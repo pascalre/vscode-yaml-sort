@@ -23,7 +23,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
   })
 
   test("test setting useArrayProcessor = true", () => {
-    const text = 'test: [ "CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]'
+    const text = 'test: [ "CMD", "pg_isready", "-q", "-d", "DB_NAME", "-U", "DB_USER" ]'
     const processor = new ProcessorController(text)
 
     processor.preprocess()
@@ -31,7 +31,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
     equal(processor.arrayprocessor.store.size, 1)
   })
   test("test setting useArrayProcessor = false", () => {
-    let text = 'test: [ "CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]'
+    let text = 'test: [ "CMD", "pg_isready", "-q", "-d", "DB_NAME", "-U", "DB_USER" ]'
     const processor = new ProcessorController(text)
     processor.settings.useArrayProcessor = false
 
