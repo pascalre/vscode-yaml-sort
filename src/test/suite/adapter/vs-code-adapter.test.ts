@@ -1,7 +1,8 @@
-import { strictEqual, fail } from "assert"
+import { strictEqual, fail, equal } from "assert"
 import path = require("path")
 import { Uri, workspace, window } from "vscode"
-import { VsCodeAdapter } from "../../../adapter/vs-code-adapter"
+import { spy } from "sinon"
+import { Severity, VsCodeAdapter } from "../../../adapter/vs-code-adapter"
 
 suite("Test VsCodeAdapter - getProperty()", () => {
   const vscodeadapter = new VsCodeAdapter()
@@ -40,5 +41,37 @@ suite("Test VsCodeAdapter - getActiveDocument()", () => {
     } else {
       fail("window.activeTextEditor is not set")
     }
+  })
+})
+
+suite("Test VsCodeAdapter - showMessage()", () => {
+  const vscodeadapter = new VsCodeAdapter()
+  test("when Severity.ERROR should show error message", () => {
+    const spyError = spy(window, "showErrorMessage")
+    equal(spyError.called, false)
+    vscodeadapter.showMessage(Severity.ERROR, "Test message")
+    equal(spyError.called, true)
+  })
+
+  test("when Severity.INFO should show info message", () => {
+    const spyNotify = spy(vscodeadapter, "notify")
+    equal(spyNotify.called, false)
+    vscodeadapter.showMessage(Severity.INFO, "Test message")
+    equal(spyNotify.called, true)
+  })
+})
+
+suite("Test VsCodeAdapter - notify()", () => {
+  test("when notifySuccess should show info message", () => {
+    const vscodeadapter = new VsCodeAdapter()
+    const spyObject = spy(window, "showInformationMessage")
+
+    vscodeadapter.settings.notifySuccess = false
+    vscodeadapter.notify("Test message")
+    equal(spyObject.called, false)
+
+    vscodeadapter.settings.notifySuccess = true
+    vscodeadapter.notify("Test message")
+    equal(spyObject.called, true)
   })
 })

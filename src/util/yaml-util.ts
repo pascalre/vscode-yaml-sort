@@ -3,10 +3,12 @@ import { Settings } from "../settings"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { ProcessorController } from "../controller/processor-controller"
+import { ErrorUtil } from "./error-util"
 
 export class YamlUtil {
   settings: Settings
   jsyamladapter: JsYamlAdapter
+  errorutil = new ErrorUtil()
 
   constructor(settings = new Settings()) {
     this.settings = settings
@@ -75,10 +77,8 @@ export class YamlUtil {
       sortedYaml = processor.text
 
       return sortedYaml
-    } catch (e) {
-      if (e instanceof Error) {
-        new VsCodeAdapter().showMessage(Severity.ERROR, `Keys could not be resorted: ${e.message}`)
-      }
+    } catch (error) {
+      this.errorutil.handleError(error)
       return null
     }
   }
@@ -101,20 +101,56 @@ export class YamlUtil {
       }
       new VsCodeAdapter().showMessage(Severity.INFO, "Yaml formatted successfully")
       return doc
-    } catch (e) {
-      if (e instanceof Error) {
-        new VsCodeAdapter().showMessage(Severity.ERROR, `Yaml could not be formatted: ${e.message}`)
-      }
+    } catch (error) {
+      this.errorutil.handleError(error)
       return null
     }
   }
-}
 
-export function hasTextYamlKeys(text: string) {
-  if (Object.keys(text).length === 0) {
-    return false
+  /**
+   * Returns all delimiters with comments.
+   * @param   {string}  multipleYamls String which contains multiple yaml documents.
+   * @param   {boolean} isSelectionEmpty Specify if the text is an selection
+   * @param   {boolean} useLeadingDashes Specify if the documents should have a leading delimiter.
+   *                                   If set to false, it will add an empty array element at the beginning of the output.
+   * @returns {[string]} Array of yaml delimiters.
+   */
+  getDelimiters(yamls: string, isSelectionEmpty: boolean): RegExpMatchArray {
+    // remove empty lines
+    let multipleYamls = yamls.trim()
+    multipleYamls = multipleYamls.replace(/^\n/, "")
+    let delimiters = multipleYamls.match(/^---.*/gm)
+    if (!delimiters) {
+      return [""]
+    }
+
+    // append line break to every delimiter
+    delimiters = delimiters.map((delimiter) => `\n${delimiter}\n`) as RegExpMatchArray
+
+    if (delimiters) {
+      if (isSelectionEmpty) {
+        if (!this.settings.useLeadingDashes && multipleYamls.startsWith("---")) {
+          delimiters.shift()
+          delimiters.unshift("")
+        } else if (this.settings.useLeadingDashes && !multipleYamls.startsWith("---")) {
+          delimiters.unshift("---\n")
+        } else {
+          delimiters.unshift("")
+        }
+      } else {
+        if (!multipleYamls.startsWith("---")) {
+          delimiters.unshift("")
+        } else {
+          let firstDelimiter = delimiters.shift()
+          if (firstDelimiter) {
+            firstDelimiter = firstDelimiter.replace(/^\n/, "")
+            delimiters.unshift(firstDelimiter)
+          }
+        }
+      }
+    }
+    return delimiters
   }
-  return true
 }
 
 /**
@@ -128,29 +164,6 @@ export function removeTrailingCharacters(text: string, count = 1): string {
     return text.substring(0, text.length - count)
   } else {
     throw new Error("The count parameter is not in a valid range")
-  }
-}
-
-/**
- * Checks if a text ends with a character which suggests, that the selection is missing something.
- * @param   {string}        text Text which should represent a valid yaml selection to sort.
- * @returns {boolean} true, if selection is missing something
- */
-export function isSelectionInvalid(selection: string): boolean {
-  // remove trailing whitespaces, to check for things like 'text:  '
-  const text = selection.trim()
-  const notValidEndingCharacters = [":", "|", ">"]
-  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
-    return true
-  }
-  try {
-    new JsYamlAdapter().validateYaml(text)
-    return false
-  } catch (e) {
-    if (e instanceof Error) {
-      new VsCodeAdapter().showMessage(Severity.ERROR, e.message)
-    }
-    return true
   }
 }
 
@@ -170,49 +183,4 @@ export function validateTextRange(textRange: string) {
  */
 export function splitYaml(multipleYamls: string): [string] {
   return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
-}
-
-/**
- * Returns all delimiters with comments.
- * @param   {string}  multipleYamls String which contains multiple yaml documents.
- * @param   {boolean} isSelectionEmpty Specify if the text is an selection
- * @param   {boolean} useLeadingDashes Specify if the documents should have a leading delimiter.
- *                                   If set to false, it will add an empty array element at the beginning of the output.
- * @returns {[string]} Array of yaml delimiters.
- */
-export function getDelimiters(yamls: string, isSelectionEmpty: boolean, useLeadingDashes: boolean): RegExpMatchArray {
-  // remove empty lines
-  let multipleYamls = yamls.trim()
-  multipleYamls = multipleYamls.replace(/^\n/, "")
-  let delimiters = multipleYamls.match(/^---.*/gm)
-  if (!delimiters) {
-    return [""]
-  }
-
-  // append line break to every delimiter
-  delimiters = delimiters.map((delimiter) => `\n${delimiter}\n`) as RegExpMatchArray
-
-  if (delimiters) {
-    if (isSelectionEmpty) {
-      if (!useLeadingDashes && multipleYamls.startsWith("---")) {
-        delimiters.shift()
-        delimiters.unshift("")
-      } else if (useLeadingDashes && !multipleYamls.startsWith("---")) {
-        delimiters.unshift("---\n")
-      } else {
-        delimiters.unshift("")
-      }
-    } else {
-      if (!multipleYamls.startsWith("---")) {
-        delimiters.unshift("")
-      } else {
-        let firstDelimiter = delimiters.shift()
-        if (firstDelimiter) {
-          firstDelimiter = firstDelimiter.replace(/^\n/, "")
-          delimiters.unshift(firstDelimiter)
-        }
-      }
-    }
-  }
-  return delimiters
 }

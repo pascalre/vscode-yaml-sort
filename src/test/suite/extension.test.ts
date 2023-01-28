@@ -3,8 +3,8 @@ import { Uri, workspace, window, commands, Position, Range, Selection } from "vs
 import { resolve } from "path"
 
 import { Settings } from "../../settings"
-import { hasTextYamlKeys, isSelectionInvalid, splitYaml } from "../../util/yaml-util"
-import { sortYamlWrapper } from "../../controller/controller"
+import { splitYaml } from "../../util/yaml-util"
+import { Controller } from "../../controller/controller"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -24,18 +24,6 @@ suite("Test getCustomSortKeywords", () => {
     deepStrictEqual(new Settings().getCustomSortKeywords(4), [])
     deepStrictEqual(new Settings().getCustomSortKeywords(-1), [])
     deepStrictEqual(new Settings().getCustomSortKeywords(1.5), [])
-  })
-})
-
-suite("Test isSelectionInvalid", () => {
-  test("should return `true` when `text` is passed", () => {
-    strictEqual(isSelectionInvalid("text"), false)
-  })
-  test("should return `false` when a string with trailing colon is passed", () => {
-    strictEqual(isSelectionInvalid("text:"), true)
-  })
-  test("should return `false` when a string with trailing colon and whitespaces is passed", () => {
-    strictEqual(isSelectionInvalid("text: "), true)
   })
 })
 
@@ -95,7 +83,7 @@ suite("Test sortYamlWrapper", () => {
           new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      notDeepStrictEqual(sortYamlWrapper(), [])
+      notDeepStrictEqual(new Controller().sortYamlWrapper(), [])
     } else {
       strictEqual(true, false)
     }
@@ -119,7 +107,7 @@ suite("Test sortYamlWrapper", () => {
         actual))
 
       activeEditor.selection = new Selection(0, 0, 0, 4)
-      deepStrictEqual(sortYamlWrapper(), [])
+      deepStrictEqual(new Controller().sortYamlWrapper(), [])
     } else {
       strictEqual(true, false)
     }
@@ -179,18 +167,6 @@ suite("Test sortYamlWrapper", () => {
     }
   })
 })
-
-
-suite("Test hasTextYamlKeys", () => {
-  test("when a text with no yaml keys is passed, `false` is returned", () => {
-    equal(hasTextYamlKeys(""), false)
-  })
-
-  test("when a text with yaml keys is passed, `true` is returned", () => {
-    equal(hasTextYamlKeys("api: v1"), true)
-  })
-})
-
 
 suite("Test splitYaml", () => {
   test("should return the input string, when the input does not contain `---`", () => {

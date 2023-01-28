@@ -28,15 +28,7 @@
     "Formatters"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:vscode-yaml-sort.sortYaml",
-    "onCommand:vscode-yaml-sort.sortYamlFilesInDirectory",
-    "onCommand:vscode-yaml-sort.validateYaml",
-    "onCommand:vscode-yaml-sort.formatYaml",
-    "onCommand:vscode-yaml-sort.customSortYaml_1",
-    "onCommand:vscode-yaml-sort.customSortYaml_2",
-    "onCommand:vscode-yaml-sort.customSortYaml_3",
-    "onLanguage:yaml"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -256,6 +248,7 @@
   "devDependencies": {
     "@types/mocha": "10.0.1",
     "@types/node": "18.11.18",
+    "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "coveralls": "3.1.1",
@@ -264,6 +257,7 @@
     "jsdoc": "4.0.0",
     "mocha": "^10.2.0",
     "nyc": "15.1.0",
+    "sinon": "^15.0.1",
     "sonarqube-scanner": "^3.0.0",
     "ts-node": "10.9.1",
     "typescript": "4.9.4",

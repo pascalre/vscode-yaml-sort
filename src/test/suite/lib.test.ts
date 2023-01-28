@@ -1,11 +1,11 @@
-import { strictEqual, throws, equal, deepStrictEqual, deepEqual } from "assert"
+import { strictEqual, throws} from "assert"
 import {
   addNewLineBeforeKeywordsUpToLevelN,
   addNewLineBeforeRootKeywords,
   prependWhitespacesOnEachLine,
   replaceTabsWithSpaces
 } from "../../lib"
-import { getDelimiters, removeTrailingCharacters } from "../../util/yaml-util"
+import { removeTrailingCharacters } from "../../util/yaml-util"
 
 suite("Test removeTrailingCharacters", () => {
   const actual = "text"
@@ -50,73 +50,6 @@ suite("Test prependWhitespacesOnEachLine", () => {
   const actual2 = "text\n"
   test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
     strictEqual(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
-  })
-})
-
-suite("Test getDelimiters", () => {
-  let doc = `
-yaml: data
-spec: spec
-`
-  test("should return `` when the input string does not contain a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
-    equal(getDelimiters(doc, true, false), "")
-  })
-  test("should return all delimiters except the first (return an empty string instead) when the input document starts with a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
-    doc = `
---- text
-yaml: data
----  #comment
-spec: spec
-`
-    const actual = getDelimiters(doc, true, false)
-    deepStrictEqual(actual, ["", "\n---  #comment\n"])
-  })
-  test("should add leading dashes when useLeadingDashes=true and given document does not have leading dashes", () => {
-    doc = `
-foo: bar
----
-foo2: baz
-`
-    const actual = getDelimiters(doc, true, true)
-    deepStrictEqual(actual, ["---\n", "\n---\n"])
-  })
-  test("Get each delimiter (empty selection, leading linebreak)", () => {
-    doc = `
-
---- text
-yaml: data
----  #comment
-spec: spec---
-
-`
-    const actual = getDelimiters(doc, true, false)
-    deepStrictEqual(actual, ["", "\n---  #comment\n"])
-  })
-  test("Get each delimiter (empty selection, leading text)", () => {
-    doc = `
-bla
---- text
-test: bla
-`
-    const actual = getDelimiters(doc, true, false)
-    deepStrictEqual(actual, ["", "\n--- text\n"])
-  })
-  test("Get each delimiter (with selection, leading delimiter)", () => {
-    doc = `
---- text
-test: bla
-`
-    const actual = getDelimiters(doc, false, false)
-    deepEqual(actual, ["--- text\n"])
-  })
-  test("Get each delimiter (with selection, leading text)", () => {
-    doc = `
-bla
---- text
-test: bla
-`
-    const actual = getDelimiters(doc, false, false)
-    deepEqual(actual, ["", "\n--- text\n"])
   })
 })
 

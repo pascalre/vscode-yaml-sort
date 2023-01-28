@@ -2,7 +2,7 @@ import { Uri, commands, window, workspace } from "vscode"
 import { strictEqual } from "assert"
 import { resolve } from "path"
 import { readFileSync, writeFileSync } from "fs"
-import { formatYamlWrapper, Controller } from "../../../controller/controller"
+import { Controller } from "../../../controller/controller"
 
 suite("Test sortYamlFiles", () => {
   test("should sort all yaml files in directory", async () => {
@@ -48,7 +48,7 @@ suite("Test formatYamlWrapper", () => {
         'key:\n' +
         '  key2: value'
 
-      strictEqual(formatYamlWrapper()[0].newText, expected)
+      strictEqual(new Controller().formatYamlWrapper()[0].newText, expected)
     } else {
       strictEqual(true, false)
     }
@@ -66,7 +66,7 @@ suite("Test formatYamlWrapper", () => {
         '---\n' +
         'key2: value'
 
-      strictEqual(formatYamlWrapper()[0].newText, expected)
+      strictEqual(new Controller().formatYamlWrapper()[0].newText, expected)
     } else {
       strictEqual(true, false)
     }

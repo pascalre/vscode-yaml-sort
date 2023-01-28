@@ -1,4 +1,4 @@
-import { equal, strictEqual } from "assert"
+import { deepEqual, deepStrictEqual, equal, strictEqual } from "assert"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import jsyaml = require("js-yaml")
 import { Settings } from "../../../settings"
@@ -432,5 +432,79 @@ suite("Test YamlUtil - transformMultilineValue()", () => {
       '  - foo: bar\n' +
       '    bar: baz\n'
     strictEqual(yamlutil.transformMultilineValue(text), expected)
+  })
+})
+
+suite("Test YamlUtil - getDelimiters()", () => {
+  test("should return `` when the input string does not contain a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
+    const doc =
+      'yaml: data\n' +
+      'spec: spec'
+
+    equal(new YamlUtil().getDelimiters(doc, true), "")
+  })
+  test("should return all delimiters except the first (return an empty string instead) when the input document starts with a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
+    const doc =
+      '--- text\n' +
+      'yaml: data\n' +
+      '---  #comment\n' +
+      'spec: spec'
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+    const actual = yamlutil.getDelimiters(doc, true)
+
+    deepStrictEqual(actual, ["", "\n---  #comment\n"])
+  })
+  test("should add leading dashes when useLeadingDashes=true and given document does not have leading dashes", () => {
+    const doc =
+      'foo: bar\n' +
+      '---\n' +
+      'foo2: baz'
+    const actual = new YamlUtil().getDelimiters(doc, true)
+
+    deepStrictEqual(actual, ["---\n", "\n---\n"])
+  })
+  test("Get each delimiter (empty selection, leading linebreak)", () => {
+    const doc = 
+      '\n' +
+      '--- text\n' +
+      'yaml: data\n' +
+      '---  #comment\n' +
+      'spec: spec---\n' +
+      '\n'
+
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+    const actual = yamlutil.getDelimiters(doc, true)
+    deepStrictEqual(actual, ["", "\n---  #comment\n"])
+  })
+  test("Get each delimiter (empty selection, leading text)", () => {
+    const doc = 
+      'bla\n' +
+      '--- text\n' +
+      'test: bla'
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+    const actual = yamlutil.getDelimiters(doc, true)
+    deepStrictEqual(actual, ["", "\n--- text\n"])
+  })
+  test("Get each delimiter (with selection, leading delimiter)", () => {
+    const doc = 
+      '--- text\n' +
+      'test: bla'
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+    const actual = yamlutil.getDelimiters(doc, false)
+    deepEqual(actual, ["--- text\n"])
+  })
+  test("Get each delimiter (with selection, leading text)", () => {
+    const doc = 
+      'bla\n' +
+      '--- text\n' +
+      'test: bla'
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+    const actual = yamlutil.getDelimiters(doc, false)
+    deepEqual(actual, ["", "\n--- text\n"])
   })
 })
