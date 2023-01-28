@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual, notDeepStrictEqual, equal } from "assert"
+import { deepStrictEqual, strictEqual, notDeepStrictEqual } from "assert"
 import { Uri, workspace, window, commands, Position, Range, Selection } from "vscode"
 import { resolve } from "path"
 
