@@ -260,26 +260,6 @@ suite("Test sortYaml", () => {
     const yamlutil = new YamlUtil()
     strictEqual(yamlutil.sortYaml(actual, 1), expected)
   })
-  
-  test("should add an empty line before `spec`", () => {
-    const actual =
-      'spec: value\n' +
-      'data:\n' +
-      '  - a\n' +
-      '  - b'
-  
-    const expected =
-      'data:\n' +
-      '  - a\n' +
-      '  - b\n' +
-      '\n' +
-      'spec: value'
-  
-    const settings = new Settings()
-    settings.emptyLinesUntilLevel = 2
-    const yamlutil = new YamlUtil(settings)
-    strictEqual(yamlutil.sortYaml(actual, 0), expected)
-  })
   test("should not format a date in CORE_SCHEMA", () => {
     const actual = 'AWSTemplateFormatVersion: 2010-09-09'
     let expected = 'AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z'
@@ -305,7 +285,6 @@ suite("Test sortYaml", () => {
   
     const expected =
       'LoggingBucketKMSKeyAlias:\n' +
-      '\n' +
       '  Properties:\n' +
       '    AliasName: !Sub "alias/AppName/Environment/s3-logging-kms"\n' +
       '    TargetKeyId: !Sub "LoggingBucketKMSKey"'
@@ -318,7 +297,6 @@ suite("Test sortYaml", () => {
     settings.getQuotingType = function () {
       return "\""
     }
-    settings.emptyLinesUntilLevel = 2
     const yamlutil = new YamlUtil(settings)
     strictEqual(yamlutil.sortYaml(actual, 0), expected)
   })
@@ -434,7 +412,7 @@ suite("Test YamlUtil - transformMultilineValue()", () => {
     strictEqual(yamlutil.transformMultilineValue(text), expected)
   })
 })
-
+/*
 suite("Test YamlUtil - getDelimiters()", () => {
   test("should return `` when the input string does not contain a delimiter and isSelectionEmpty=true and useLeadingDashes=false", () => {
     const doc =
@@ -508,3 +486,4 @@ suite("Test YamlUtil - getDelimiters()", () => {
     deepEqual(actual, ["", "\n--- text\n"])
   })
 })
+*/

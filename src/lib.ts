@@ -51,29 +51,3 @@ export function replaceTabsWithSpaces(text: string, count: number): string {
 export function addNewLineBeforeRootKeywords(text: string): string {
   return text.replace(/\n[^\s]*:/g, "\n$&")
 }
-
-/**
- * Add a new line before each keyword up to level n
- * @param   {number} n Last level to add new lines
- * @param   {number} indent Indentation of yaml
- * @param   {string} text Text to be processed
- * @returns {string} text with new lines
- */
-export function addNewLineBeforeKeywordsUpToLevelN(n: number, indent: number, text: string): string {
-  let level = 0;
-  let result = text;
-
-  while (level < n) {
-    if (level === 0) {
-      result = result.replace(/\n[^\s].*:/g, "\n$&")
-    } else {
-      let spaces = " ".repeat(indent)
-      spaces = spaces.repeat(level)
-      const regex = new RegExp(`\n${spaces}[\\w-]*:`, "g")
-      result = result.replace(regex, "\n$&")
-    }
-    level++;
-  }
-
-  return result;
-}

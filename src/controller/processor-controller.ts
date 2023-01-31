@@ -1,12 +1,14 @@
 import { ArrayProcessor } from "../processor/array-processor"
 import { CommentProcessor } from "../processor/comment-processor"
 import { HelmProcessor } from "../processor/helm-processor"
+import { SpacingProcessor } from "../processor/spacing-processor"
 import { Settings } from "../settings"
 
 export class ProcessorController {
   arrayprocessor!: ArrayProcessor
   commentprocessor!: CommentProcessor
   helmprocessor!: HelmProcessor
+  spacingprocessor!: SpacingProcessor
   text: string
   settings: Settings
 
@@ -53,5 +55,9 @@ export class ProcessorController {
       this.arrayprocessor.postprocess()
       this.text = this.arrayprocessor.text
     }
+
+    this.spacingprocessor = new SpacingProcessor(this.text)
+    this.spacingprocessor.postprocess()
+    this.text = this.spacingprocessor.text
   }
 }

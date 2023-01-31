@@ -1,6 +1,5 @@
 import { strictEqual, throws} from "assert"
 import {
-  addNewLineBeforeKeywordsUpToLevelN,
   addNewLineBeforeRootKeywords,
   prependWhitespacesOnEachLine,
   replaceTabsWithSpaces
@@ -86,66 +85,5 @@ spec: value
 spec: value
 `
     strictEqual(addNewLineBeforeRootKeywords(actual), expected)
-  })
-})
-
-suite("Test addNewLineBeforeKeywordsUpToLevelN", () => {
-  test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
-    const actual = `data:
-  key:
-    key: value
-spec: value
-`
-    let expected = `data:
-  key:
-    key: value
-
-spec: value
-`
-    strictEqual(addNewLineBeforeKeywordsUpToLevelN(1, 2, actual), expected)
-
-    expected = `data:
-
-  key:
-    key: value
-
-spec: value
-`
-    strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
-  })
-
-  test("should recognize keywords containing the char -", () => {
-    const actual = `data:
-  key:
-    key: value
-  sp-ec: value
-`
-    const expected = `data:
-
-  key:
-    key: value
-
-  sp-ec: value
-`
-
-    strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
-  })
-
-  test("should recognize keywords containing spaces", () => {
-    const actual = 
-      'data:\n' +
-      '  key:\n' +
-      '    key: value\n' +
-      'foo bar: value'
-
-    const expected = 
-    'data:\n' +
-    '\n' +
-    '  key:\n' +
-    '    key: value\n' +
-    '\n' +
-    'foo bar: value'
-
-    strictEqual(addNewLineBeforeKeywordsUpToLevelN(2, 2, actual), expected)
   })
 })

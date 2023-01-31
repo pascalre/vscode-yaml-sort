@@ -1,4 +1,4 @@
-import { addNewLineBeforeKeywordsUpToLevelN, prependWhitespacesOnEachLine, replaceTabsWithSpaces } from "../lib"
+import { prependWhitespacesOnEachLine, replaceTabsWithSpaces } from "../lib"
 import { Settings } from "../settings"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
@@ -68,15 +68,10 @@ export class YamlUtil {
       // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
       sortedYaml += this.jsyamladapter.dumpYaml(doc, true, customSort)
 
-      if (this.settings.emptyLinesUntilLevel > 0) {
-        sortedYaml = addNewLineBeforeKeywordsUpToLevelN(this.settings.emptyLinesUntilLevel, this.settings.indent, sortedYaml)
-      }
-
       processor.text = sortedYaml
       processor.postprocess()
-      sortedYaml = processor.text
 
-      return sortedYaml
+      return processor.text
     } catch (error) {
       this.errorutil.handleError(error)
       return null
