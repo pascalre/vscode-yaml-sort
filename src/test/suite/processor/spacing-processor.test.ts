@@ -1,8 +1,16 @@
-import { equal } from "assert"
+import { deepEqual, equal } from "assert"
 import { SpacingProcessor } from "../../../processor/spacing-processor"
 
-suite("Test SpacingProcessor - postprocess()", () => {
-  
+suite("Test SpacingProcessor - getMatcher()", () => {
+  test("should return regex with correct number of spaces", () => {
+    const spacingprocessor = new SpacingProcessor("")
+    const actual = /\n {4}[\w-]*:/g
+    const expected = spacingprocessor.getMatcher(2)
+    deepEqual(actual, expected)
+  })
+})
+
+suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
   test("should add an empty line before `spec`", () => {
     const text =
       'spec: value\n' +

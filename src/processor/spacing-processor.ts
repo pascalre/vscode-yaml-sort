@@ -20,14 +20,17 @@ export class SpacingProcessor {
       if (level === 0) {
         result = result.replace(/\n[^\s].*:/g, "\n$&")
       } else {
-        let spaces = " ".repeat(this.settings.indent)
-        spaces = spaces.repeat(level)
-        const matcher = new RegExp(`\n${spaces}[\\w-]*:`, "g")
+        const matcher = this.getMatcher(level)
         result = result.replace(matcher, "\n$&")
       }
       level++;
     }
 
     return result;
+  }
+
+  getMatcher(level: number) {
+    const spaces = this.settings.indent * level
+    return new RegExp(`\\n {${spaces}}[\\w-]*:`, "g")
   }
 }

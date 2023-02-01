@@ -1,4 +1,4 @@
-import { deepEqual, deepStrictEqual, equal, strictEqual } from "assert"
+import { equal, strictEqual } from "assert"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import jsyaml = require("js-yaml")
 import { Settings } from "../../../settings"
