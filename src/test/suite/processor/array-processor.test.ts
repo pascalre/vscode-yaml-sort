@@ -1,8 +1,8 @@
 import { equal } from "assert"
 import { ArrayProcessor } from "../../../processor/array-processor"
 
-suite("Test HelmProcessor - preprocess()", () => {
-  test("should replace all helm values", () => {
+suite("Test ArrayProcessor - preprocess()", () => {
+  test("should find all array values", () => {
     const text = 'test: [ "CMD", "pg_isready", "-q", "-d", "DB_NAME", "-U", "DB_USER" ]'
     const arrayprocessor = new ArrayProcessor(text)
 

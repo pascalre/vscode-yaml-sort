@@ -46,6 +46,7 @@ This extension contributes the following settings:
 | `useArrayProcessor`        | When `true`, will activate ArrayProcessor.                                                                                                                       | `true`           |
 | `useCommentProcessor`      | When `true`, will activate CommentProcessor.                                                                                                                     | `true`           |
 | `useHelmProcessor`         | When `true`, will activate HelmProcessor.                                                                                                                        | `true`           |
+| `useOctalProcessor`        | When `true`, will activate OctalProcessor.                                                                                                                       | `true`           |
 
 # ❓ FAQ
 ## How to sort on save?

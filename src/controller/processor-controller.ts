@@ -1,6 +1,7 @@
 import { ArrayProcessor } from "../processor/array-processor"
 import { CommentProcessor } from "../processor/comment-processor"
 import { HelmProcessor } from "../processor/helm-processor"
+import { OctalProcessor } from "../processor/octal-processor"
 import { SpacingProcessor } from "../processor/spacing-processor"
 import { Settings } from "../settings"
 
@@ -8,6 +9,7 @@ export class ProcessorController {
   arrayprocessor!: ArrayProcessor
   commentprocessor!: CommentProcessor
   helmprocessor!: HelmProcessor
+  octalprocessor!: OctalProcessor
   spacingprocessor!: SpacingProcessor
   text: string
   settings: Settings
@@ -30,6 +32,12 @@ export class ProcessorController {
       this.text = this.helmprocessor.text
     }
 
+    if (this.settings.useOctalProcessor) {
+      this.octalprocessor = new OctalProcessor(this.text)
+      this.octalprocessor.preprocess()
+      this.text = this.octalprocessor.text
+    }
+
     if (this.settings.useCommentProcessor) {
       this.commentprocessor = new CommentProcessor(this.text)
       this.commentprocessor.findComments()
@@ -42,6 +50,12 @@ export class ProcessorController {
       this.commentprocessor.text = this.text
       this.commentprocessor.postprocess()
       this.text = this.commentprocessor.text
+    }
+
+    if (this.settings.useOctalProcessor) {
+      this.octalprocessor = new OctalProcessor(this.text)
+      this.octalprocessor.postprocess()
+      this.text = this.octalprocessor.text
     }
 
     if (this.settings.useHelmProcessor) {

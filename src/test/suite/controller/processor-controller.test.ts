@@ -100,4 +100,32 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
 
     equal(processor.text, text)
   })
+
+  test("test setting useHelmProcessor = true", () => {
+    const text =
+      'foo: {{ .Value }}\n' +
+      'bar: baz'
+    const processor = new ProcessorController(text)
+
+    processor.preprocess()
+
+    equal(processor.helmprocessor.store.size, 1)
+  })
+
+  test("test setting useOctalProcessor = false", () => {
+    let text = 'foo: 0644'
+    const processor = new ProcessorController(text)
+    processor.settings.useOctalProcessor = false
+
+    processor.preprocess()
+
+    equal(processor.octalprocessor, undefined)
+
+    text = "foo: vscode-yaml-sort.octal.0"
+    processor.text = text
+
+    processor.postprocess()
+
+    equal(processor.text, text)
+  })
 })

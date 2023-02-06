@@ -186,6 +186,11 @@
           "type": "boolean",
           "default": true,
           "description": "When `true`, will activate HelmProcessor"
+        },
+        "vscode-yaml-sort.useOctalProcessor": {
+          "type": "boolean",
+          "default": true,
+          "description": "When `true`, will activate OctalProcessor"
         }
       }
     },

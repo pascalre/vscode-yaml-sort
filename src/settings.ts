@@ -55,6 +55,7 @@ export class Settings {
     useArrayProcessor = this.getBoolean("useArrayProcessor")
     useCommentProcessor = this.getBoolean("useCommentProcessor")
     useHelmProcessor = this.getBoolean("useHelmProcessor")
+    useOctalProcessor = this.getBoolean("useOctalProcessor")
 
     static getJsYamlSchemaFromString(schema: string): Schema {
         switch (schema) {
