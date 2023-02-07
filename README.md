@@ -69,6 +69,9 @@ An activated CommentProcessor will keep comments while sorting.
 ### HelmProcessor
 The HelmProcessor makes the extension compatible with Helm charts.
 
+### OctalProcessor
+The OctalProcessor makes the extension keeping octal value like 0744. If `useOctalProcessor` is set to `false` this number will become 744.
+
 ### ArrayProcessor
 The ArrayProcessor will not add linebreaks to single-line array structures. Example:
 ```
