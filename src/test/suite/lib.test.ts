@@ -1,8 +1,7 @@
 import { strictEqual, throws} from "assert"
 import {
   addNewLineBeforeRootKeywords,
-  prependWhitespacesOnEachLine,
-  replaceTabsWithSpaces
+  prependWhitespacesOnEachLine
 } from "../../lib"
 import { removeTrailingCharacters } from "../../util/yaml-util"
 
@@ -49,27 +48,6 @@ suite("Test prependWhitespacesOnEachLine", () => {
   const actual2 = "text\n"
   test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
     strictEqual(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
-  })
-})
-
-suite("Test replaceTabsWithSpaces", () => {
-    const actual = `
-a-1:
-\tb:
-\t\td: g
-\tc:
-\t\td: g`
-    const expected = `
-a-1:
-  b:
-    d: g
-  c:
-    d: g`
-  test("should replace all tabs with spaces", () => {
-    strictEqual(replaceTabsWithSpaces(actual, 2), expected)
-  })
-  test("should throw error when count is smaller than `1`", () => {
-    throws(() => replaceTabsWithSpaces(actual, 0))
   })
 })
 

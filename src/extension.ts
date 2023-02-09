@@ -21,7 +21,7 @@ export function activate(context: ExtensionContext) {
   }
 
   // register at activate-time
-  vscodeadapter.registerFormatter(formatter)
+  VsCodeAdapter.registerFormatter(formatter)
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand

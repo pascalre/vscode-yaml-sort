@@ -15,7 +15,7 @@ This extension contributes the following commands:
 | `Custom Sort 1`                                | This command will sort a given YAML with custom order. If some of the keys of `customSortKeywords_1` will be found at the top level of the YAML, these will be put at the beginning of the YAML file (in the given order). You can use this e. g. to sort Kubernetes configmaps. |
 | `Custom Sort 2`                                | Same as `Custom Sort 1`                                                                                               |
 | `Custom Sort 3`                                | Same as `Custom Sort 1`                                                                                               |
-| `Format Document`                              | Formats a yaml document without sorting it. Also possible using the shortcut (e. g. `SHIFT` + `OPTION` + `F` on Mac). |
+| `Format Document`                              | Formats a yaml document without sorting it. Also possible using the shortcut (⇧⌥F on Mac). |
 | `Recursively sort YAML files`                  | Sorts all `.yaml` and `.yml` files in a directory and all its subdirectories.                                         |
 | `Sort YAML`                                    | Sorts a given YAML. You can either sort the whole YAML document or sort only a selection of the text.                 |
 | `Validate YAML`                                | Validates a given YAML.                                                                                               |
@@ -39,7 +39,7 @@ This extension contributes the following settings:
 | `notifySuccess`            | When `true`, will notify on successfully performed tasks.                                                                                                        | `true`           |
 | `quotingType`              | Strings will be quoted using this quoting style. If you specify single quotes, double quotes will still be used for non-printable characters.                    | `'`              |
 | `schema`                   | Schema to use. Possible values are `HOMEASSISTANT_SCHEMA`, `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.           | `DEFAULT_SCHEMA` |
-| `sortOnSave`               | When `0`, will sort files when saving document. When `1`, `2` or `3`, will use customSortKeywords. Set to negative value to disable sortOnSave. Only works in combination with `editor.formatOnSave` and `vscode-yaml-sort.useAsFormatter` both set to `true`. | `0`           |
+| `sortOnSave`               | When `0`, will sort files when saving document. When `1`, `2` or `3`, will use customSortKeywords. Set to negative value to disable sortOnSave. Only works in combination with `editor.formatOnSave` set to `true`. | `0`           |
 | `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                                              | `false`          |
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                                                    | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                                                        | `true`           |
@@ -56,8 +56,7 @@ Register this extension as VS Code formatter. Also configure VS Code to format f
 ```json
 {    
     "editor.formatOnSave": true,
-    "vscode-yaml-sort.sortOnSave": 0,
-    "vscode-yaml-sort.useAsFormatter": true
+    "vscode-yaml-sort.sortOnSave": 0
 }
 ```
 
