@@ -28,19 +28,15 @@ export function activate(context: ExtensionContext) {
     commands.registerCommand("vscode-yaml-sort.formatYaml", () => {
       new Controller().formatYamlWrapper()
     }),
-    commands.registerCommand("vscode-yaml-sort.customSortYaml_1", () => {
-      new Controller().sortYamlWrapper(1)
-    }),
-    commands.registerCommand("vscode-yaml-sort.customSortYaml_2", () => {
-      /* istanbul ignore next */
-      new Controller().sortYamlWrapper(2)
-    }),
-    commands.registerCommand("vscode-yaml-sort.customSortYaml_3", () => {
-      /* istanbul ignore next */
-      new Controller().sortYamlWrapper(3)
-    }),
     commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: Uri) => {
       new Controller().sortYamlFiles(uri)
     })
   )
+  for (const index of [1, 2, 3]) {
+    context.subscriptions.push(
+      commands.registerCommand(`vscode-yaml-sort.customSortYaml_${index}`, () => {
+        new Controller().sortYamlWrapper(index)
+      })
+    )
+  }
 }
