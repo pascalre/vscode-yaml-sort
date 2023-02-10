@@ -1,4 +1,4 @@
-import { workspace, TextEditor, Range, Position, Selection, TextEdit, WorkspaceEdit, window, DocumentFormattingEditProvider, languages, Disposable }  from "vscode"
+import { workspace, TextEditor, Range, Position, Selection, TextEdit, WorkspaceEdit, window, DocumentFormattingEditProvider, languages }  from "vscode"
 import { Settings } from "../settings"
 
 export enum Severity {
