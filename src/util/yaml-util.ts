@@ -1,9 +1,26 @@
-import { prependWhitespacesOnEachLine, replaceTabsWithSpaces } from "../lib"
+import { prependWhitespacesOnEachLine } from "../lib"
 import { Settings } from "../settings"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { ProcessorController } from "../controller/processor-controller"
 import { ErrorUtil } from "./error-util"
+
+const sortNestedArrays = (obj: unknown) => {
+  if (!obj || typeof obj !== 'object') {
+      return
+  } else if (Array.isArray(obj)) {
+      obj.sort()
+  }
+  Object.keys(obj).forEach(key => {
+    const object = obj[key as keyof unknown]
+    if (typeof object === 'object') {
+        if (Array.isArray(object)) {
+          Object.entries(object).sort()
+        }
+        sortNestedArrays(object)
+    }
+  })
+}
 
 export class YamlUtil {
   settings: Settings
@@ -37,14 +54,13 @@ export class YamlUtil {
 
   sortYaml(unsortedYaml: string, customSort = 0): string | null {
     try {
-      let unsortedYamlWithoutTabs = replaceTabsWithSpaces(unsortedYaml, this.settings.indent)
-
-      const processor = new ProcessorController(unsortedYamlWithoutTabs)
+      const processor = new ProcessorController(unsortedYaml)
       processor.preprocess()
-      unsortedYamlWithoutTabs = processor.text
+      const unsortedYamlWithoutTabs = processor.text
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
+      sortNestedArrays(doc)
       let sortedYaml = ""
 
       if (customSort > 0 && !this.settings.useCustomSortRecursively) {

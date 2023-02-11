@@ -63,10 +63,6 @@ suite("Test Settings - getter", () => {
         deepEqual(settings.sortOnSave, 0)
     })
 
-    test("default value of useAsFormatter is set to `false`", () => {
-        deepEqual(settings.useAsFormatter, false)
-    })
-
     test("default value of useCustomSortRecursively is set to `false`", () => {
         deepEqual(settings.useCustomSortRecursively, false)
     })

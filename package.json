@@ -157,11 +157,6 @@
           "default": 0,
           "description": "When `0`, will sort files when saving. When `1`, `2` or `3`, will use customSortKeywords. Set to negative value to disable sortOnSave."
         },
-        "vscode-yaml-sort.useAsFormatter": {
-          "type": "boolean",
-          "default": false,
-          "description": "When true, will enable default YAML formatter (requires restart)."
-        },
         "vscode-yaml-sort.useCustomSortRecursively": {
           "type": "boolean",
           "default": false,

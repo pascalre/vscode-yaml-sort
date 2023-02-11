@@ -1,4 +1,4 @@
-import { workspace, TextEditor, Range, Position, Selection, TextEdit, WorkspaceEdit, window, DocumentFormattingEditProvider, languages, Disposable }  from "vscode"
+import { workspace, TextEditor, Range, Position, Selection, TextEdit, WorkspaceEdit, window, DocumentFormattingEditProvider, languages }  from "vscode"
 import { Settings } from "../settings"
 
 export enum Severity {
@@ -17,18 +17,6 @@ export class VsCodeAdapter {
     return workspace.getConfiguration().get(`${this.section}.${property}`)
   }
 
-  // have a function that adds/removes the formatter based
-  // on a configuration setting
-  registerFormatter(formatter: DocumentFormattingEditProvider) {
-    let registration: Disposable | undefined
-    const useAsFormatter = this.settings.useAsFormatter
-    if (useAsFormatter && !registration) {
-      languages.registerDocumentFormattingEditProvider('yaml', formatter)
-    } else if (!useAsFormatter && registration) {
-      registration.dispose()
-    }
-  }
-
   showMessage(severity: Severity, message: string) {
     if (severity === Severity.ERROR) {
       window.showErrorMessage(message)
@@ -41,6 +29,10 @@ export class VsCodeAdapter {
     if (this.settings.notifySuccess) {
       window.showInformationMessage(message)
     }
+  }
+
+  static registerFormatter(formatter: DocumentFormattingEditProvider) {
+    languages.registerDocumentFormattingEditProvider('yaml', formatter)
   }
 
   static getText(textEditor: TextEditor, range: Range) {

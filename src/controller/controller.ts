@@ -7,16 +7,14 @@ import { ErrorUtil } from "../util/error-util"
 import { FileUtil } from "../util/file-util"
 import { splitYaml, validateTextRange, YamlUtil } from "../util/yaml-util"
 
-const settings = new Settings()
-const jsyamladapter = new JsYamlAdapter()
-const outteryamlutil = new YamlUtil()
-
 export class Controller {
   editor: TextEditor
   fileutil = new FileUtil()
   yamlutil = new YamlUtil()
+  jsyamladapter = new JsYamlAdapter()
   vscodeadapter = new VsCodeAdapter()
   errorutil = new ErrorUtil()
+  settings = new Settings()
 
   constructor() {
     if (window.activeTextEditor) {
@@ -29,7 +27,7 @@ export class Controller {
   validateYamlWrapper(): boolean {
     const text = VsCodeAdapter.getActiveDocument(this.editor)
     try {
-      jsyamladapter.validateYaml(text)
+      this.jsyamladapter.validateYaml(text)
       this.vscodeadapter.showMessage(Severity.INFO, "YAML is valid.")
       return true
     } catch (error) {
@@ -73,14 +71,14 @@ export class Controller {
     const yamls = splitYaml(doc)
     let newText = ""
     for (const unformattedYaml of yamls) {
-      const formattedYaml = outteryamlutil.formatYaml(unformattedYaml, false)
+      const formattedYaml = this.yamlutil.formatYaml(unformattedYaml, false)
       if (formattedYaml) {
         newText += delimiters.shift() + formattedYaml
       } else {
         return []
       }
     }
-    if (settings.useLeadingDashes) {
+    if (this.settings.useLeadingDashes) {
       newText = `---\n${newText}`
     }
     return this.applyEdits(newText)
@@ -98,7 +96,7 @@ export class Controller {
 
     try {
       validateTextRange(text)
-      jsyamladapter.validateYaml(text)
+      this.jsyamladapter.validateYaml(text)
     } catch (error) {
       this.errorutil.handleError(error)
       return [] as TextEdit[]
@@ -118,7 +116,7 @@ export class Controller {
     // sort yaml
     let newText = ""
     splitYaml(text).forEach((unsortedYaml) => {
-      let sortedYaml = outteryamlutil.sortYaml(unsortedYaml, customSort)
+      let sortedYaml = this.yamlutil.sortYaml(unsortedYaml, customSort)
       if (sortedYaml) {
         if (!this.editor.selection.isEmpty) {
           // get number of leading whitespaces, these whitespaces will be used for indentation
@@ -130,7 +128,7 @@ export class Controller {
         return [] as TextEdit[]
       }
     })
-    if (this.editor.selection.isEmpty && settings.useLeadingDashes) {
+    if (this.editor.selection.isEmpty && this.settings.useLeadingDashes) {
       newText = `---\n${newText}`
     }
     this.vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")

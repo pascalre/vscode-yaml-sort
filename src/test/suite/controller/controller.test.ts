@@ -18,12 +18,6 @@ suite("Test sortYamlFiles", () => {
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")
   })
-  /*
-  test("should return `true` on invalid yaml", () => {
-    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/folder2"))
-    strictEqual(new Controller().sortYamlFiles(uri), true)
-  })
-  */
 })
 
 suite("Test validateYamlWrapper", () => {
