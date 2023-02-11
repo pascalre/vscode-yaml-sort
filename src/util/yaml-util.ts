@@ -5,7 +5,7 @@ import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { ProcessorController } from "../controller/processor-controller"
 import { ErrorUtil } from "./error-util"
 
-const sortNestedArrays = (obj: unknown) => {
+const sortArrays = (obj: unknown) => {
   if (!obj || typeof obj !== 'object') {
       return
   } else if (Array.isArray(obj)) {
@@ -17,7 +17,7 @@ const sortNestedArrays = (obj: unknown) => {
         if (Array.isArray(object)) {
           Object.entries(object).sort()
         }
-        sortNestedArrays(object)
+        sortArrays(object)
     }
   })
 }
@@ -60,9 +60,12 @@ export class YamlUtil {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
-      sortNestedArrays(doc)
-      let sortedYaml = ""
 
+      if (this.settings.sortArrays) {
+        sortArrays(doc)
+      }
+
+      let sortedYaml = ""
       if (customSort > 0 && !this.settings.useCustomSortRecursively) {
         const keywords = this.settings.getCustomSortKeywords(customSort)
 

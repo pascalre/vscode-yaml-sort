@@ -48,6 +48,7 @@ export class Settings {
     notifySuccess = this.getBoolean("notifySuccess")
     quotingType = this.getQuotingType()
     schema = this.getSchema()
+    sortArrays = this.getBoolean("sortArrays")
     sortOnSave = this.getNumber("sortOnSave")
     useCustomSortRecursively = this.getBoolean("useCustomSortRecursively")
     useLeadingDashes = this.getBoolean("useLeadingDashes")
