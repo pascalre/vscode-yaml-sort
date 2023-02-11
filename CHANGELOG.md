@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.4.0 - February 11, 2023
+* (refs [#51](https://github.com/pascalre/vscode-yaml-sort/issues/51)) Add support for sorting arrays
+* Add setting `sortArrays`
+* Update dependencies to latest versions
+
 ## 6.3.0 - February 6, 2023
 * (refs [#27](https://github.com/pascalre/vscode-yaml-sort/issues/36)) Add support for octal values
 * Update dependencies to latest versions
