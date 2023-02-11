@@ -18,6 +18,13 @@ suite("Test sortArrays", () => {
 
   test("when sortArrays is set to true, should sort arrays", () => {
     yamlutil.settings.sortArrays = true
+    const actual = yamlutil.sortYaml('foo')
+    const expected = 'foo'
+    equal(actual, expected)
+  })
+
+  test("when sortArrays is set to true, should sort arrays", () => {
+    yamlutil.settings.sortArrays = true
     const actual = yamlutil.sortYaml(text)
     const expected = 
       'array:\n' +
