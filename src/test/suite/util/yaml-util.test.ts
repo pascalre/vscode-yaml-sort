@@ -4,6 +4,45 @@ import jsyaml = require("js-yaml")
 import { Settings } from "../../../settings"
 import { YamlUtil } from "../../../util/yaml-util"
 
+suite("Test sortArrays", () => {
+  const yamlutil = new YamlUtil()
+  const text = 
+    'array:\n' +
+    '  - python\n' +
+    '  - perl'
+
+  test("when sortArrays is set to false, should not sort arrays", () => {
+    const actual = yamlutil.sortYaml(text)
+    equal(actual, text)
+  })
+
+  test("when sortArrays is set to true, should sort arrays", () => {
+    yamlutil.settings.sortArrays = true
+    const actual = yamlutil.sortYaml(text)
+    const expected = 
+      'array:\n' +
+      '  - perl\n' +
+      '  - python'
+    equal(actual, expected)
+  })
+
+  test("when sortArrays is set to true, should sort nested arrays", () => {
+    yamlutil.settings.sortArrays = true
+    const text = 
+      'foo:\n' +
+      '  array:\n' +
+      '    - python\n' +
+      '    - perl'
+    const actual = yamlutil.sortYaml(text)
+    const expected = 
+      'foo:\n' +
+      '  array:\n' +
+      '    - perl\n' +
+      '    - python'
+    equal(actual, expected)
+  })
+})
+
 suite("Test dumpYaml", () => {
 
   test("when useCustomSortRecursively is set to `true` should recursively use customSort", () => {
