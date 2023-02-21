@@ -1,4 +1,4 @@
-import { strictEqual, fail, equal } from "assert"
+import { fail, equal } from "assert"
 import path = require("path")
 import { Uri, workspace, window } from "vscode"
 import { spy } from "sinon"
@@ -8,7 +8,7 @@ suite("Test VsCodeAdapter - getProperty()", () => {
   const vscodeadapter = new VsCodeAdapter()
 
   test("when property is locale should return en", () => {
-    strictEqual(vscodeadapter.getProperty("locale"), "en")
+    equal(vscodeadapter.getProperty("locale"), "en")
   })
 })
 /*
@@ -37,7 +37,7 @@ suite("Test VsCodeAdapter - getActiveDocument()", () => {
         'key:\n' +
         '  key2: value'
 
-      strictEqual(VsCodeAdapter.getActiveDocument(window.activeTextEditor), expected)
+      equal(VsCodeAdapter.getActiveDocument(window.activeTextEditor), expected)
     } else {
       fail("window.activeTextEditor is not set")
     }

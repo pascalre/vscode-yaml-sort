@@ -1,4 +1,4 @@
-import { strictEqual, throws } from "assert"
+import { equal, throws } from "assert"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import jsyaml = require("js-yaml")
@@ -18,7 +18,7 @@ suite("Test JsYamlAdapter - validateYaml()", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    strictEqual(jsyamladapter.validateYaml(actual), true)
+    equal(jsyamladapter.validateYaml(actual), true)
   })
 
   test("when text are two seperated valid yaml documents should return true", () => {
@@ -32,7 +32,7 @@ suite("Test JsYamlAdapter - validateYaml()", () => {
       '  kitty:\n' +
       '    age: 3'
 
-    strictEqual(jsyamladapter.validateYaml(actual), true)
+    equal(jsyamladapter.validateYaml(actual), true)
   })
 
   test("when text is an invalid yaml document should throw YAMLException", () => {
@@ -72,7 +72,7 @@ suite("Test JsYamlAdapter - validateYaml()", () => {
       return CLOUDFORMATION_SCHEMA
     }
     
-    strictEqual(jsyamladapter.validateYaml(actual), true)
+    equal(jsyamladapter.validateYaml(actual), true)
   })
   test("when text is a yaml document using HOMEASSISTANT_SCHEMA and schema is CORE_SCHEMA should throw YAMLException", () => {
     const actual = "password: !env_var PASSWORD default_password"
@@ -88,7 +88,7 @@ suite("Test JsYamlAdapter - validateYaml()", () => {
       return HOMEASSISTANT_SCHEMA
     }
 
-    strictEqual(jsyamladapter.validateYaml(actual), true)
+    equal(jsyamladapter.validateYaml(actual), true)
   })
 })
 

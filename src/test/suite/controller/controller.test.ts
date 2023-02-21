@@ -1,5 +1,5 @@
 import { Uri, commands, window, workspace } from "vscode"
-import { strictEqual } from "assert"
+import { equal } from "assert"
 import { resolve } from "path"
 import { readFileSync, writeFileSync } from "fs"
 import { Controller } from "../../../controller/controller"
@@ -11,9 +11,9 @@ suite("Test sortYamlFiles", () => {
     await commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
 
     let sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", 'utf-8').toString()
-    strictEqual(sortedFile, "akey: value\nkey: value")
+    equal(sortedFile, "akey: value\nkey: value")
     sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", 'utf-8').toString()
-    strictEqual(sortedFile, "akey: value\nkey: value")
+    equal(sortedFile, "akey: value\nkey: value")
 
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")
@@ -25,7 +25,7 @@ suite("Test validateYamlWrapper", () => {
     const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
-    strictEqual(new Controller().validateYamlWrapper(), true)
+    equal(new Controller().validateYamlWrapper(), true)
   })
 })
 
@@ -42,9 +42,9 @@ suite("Test formatYamlWrapper", () => {
         'key:\n' +
         '  key2: value'
 
-      strictEqual(new Controller().formatYamlWrapper()[0].newText, expected)
+      equal(new Controller().formatYamlWrapper()[0].newText, expected)
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
   test("should format multiple yaml in one file", async () => {
@@ -60,9 +60,9 @@ suite("Test formatYamlWrapper", () => {
         '---\n' +
         'key2: value'
 
-      strictEqual(new Controller().formatYamlWrapper()[0].newText, expected)
+      equal(new Controller().formatYamlWrapper()[0].newText, expected)
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
   test("should fail on invalid yaml", async () => {
@@ -72,9 +72,9 @@ suite("Test formatYamlWrapper", () => {
 
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
-      strictEqual(undefined, undefined)
+      equal(undefined, undefined)
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
 })

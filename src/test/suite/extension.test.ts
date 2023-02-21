@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual, notDeepStrictEqual } from "assert"
+import { deepEqual, equal, notDeepEqual } from "assert"
 import { Uri, workspace, window, commands, Position, Range, Selection } from "vscode"
 import { resolve } from "path"
 
@@ -12,18 +12,18 @@ suite("Test getCustomSortKeywords", () => {
     settings.getCustomSortKeywords = function () {
       return ["apiVersion", "kind", "metadata", "spec", "data"]
     }
-    deepStrictEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
+    deepEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
   })
   test("should return `[]` for custom keywords 2 and 3", () => {
-    deepStrictEqual(new Settings().getCustomSortKeywords(2), [])
-    deepStrictEqual(new Settings().getCustomSortKeywords(3), [])
+    deepEqual(new Settings().getCustomSortKeywords(2), [])
+    deepEqual(new Settings().getCustomSortKeywords(3), [])
   })
 
   test("should return [] when parameter is not in [1, 2, 3]", () => {
-    deepStrictEqual(new Settings().getCustomSortKeywords(0), [])
-    deepStrictEqual(new Settings().getCustomSortKeywords(4), [])
-    deepStrictEqual(new Settings().getCustomSortKeywords(-1), [])
-    deepStrictEqual(new Settings().getCustomSortKeywords(1.5), [])
+    deepEqual(new Settings().getCustomSortKeywords(0), [])
+    deepEqual(new Settings().getCustomSortKeywords(4), [])
+    deepEqual(new Settings().getCustomSortKeywords(-1), [])
+    deepEqual(new Settings().getCustomSortKeywords(1.5), [])
   })
 })
 
@@ -58,9 +58,9 @@ suite("Test sortYamlWrapper", () => {
           new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      deepStrictEqual(sortYamlWrapper(), [])
+      deepEqual(sortYamlWrapper(), [])
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
 
     await settings.update("quotingType", "'", ConfigurationTarget.Global)
@@ -83,9 +83,9 @@ suite("Test sortYamlWrapper", () => {
           new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      notDeepStrictEqual(new Controller().sortYamlWrapper(), [])
+      notDeepEqual(new Controller().sortYamlWrapper(), [])
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
 
@@ -107,9 +107,9 @@ suite("Test sortYamlWrapper", () => {
         actual))
 
       activeEditor.selection = new Selection(0, 0, 0, 4)
-      deepStrictEqual(new Controller().sortYamlWrapper(), [])
+      deepEqual(new Controller().sortYamlWrapper(), [])
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
   test("should ignore line if selection ends on a lines first character", async () => {
@@ -129,9 +129,9 @@ suite("Test sortYamlWrapper", () => {
       await commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
       await new Promise(r => setTimeout(r, 2000));
-      strictEqual(activeEditor.document.getText(), expected)
+      equal(activeEditor.document.getText(), expected)
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
   test("should remove yaml metadata tags (directives)", async () => {
@@ -161,9 +161,9 @@ suite("Test sortYamlWrapper", () => {
       await commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
       // await new Promise(r => setTimeout(r, 2000));
-      strictEqual(activeEditor.document.getText(), expected)
+      equal(activeEditor.document.getText(), expected)
     } else {
-      strictEqual(true, false)
+      equal(true, false)
     }
   })
 })
@@ -173,14 +173,14 @@ suite("Test splitYaml", () => {
     const actual = `\
 - Orange
 - Apple`
-    deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple"])
+    deepEqual(splitYaml(actual), ["- Orange\n- Apple"])
   })
   test("should return the input document without the delimiters", () => {
     const actual = `\
 ---
 - Orange
 - Apple`
-    deepStrictEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
+    deepEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
   })
   test("should return an array with the yaml documents", () => {
     const actual = `\
@@ -189,7 +189,7 @@ suite("Test splitYaml", () => {
 ---
 - Orange
 - Apple`
-    deepStrictEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
+    deepEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Split multiple yaml documents with leading dashes", () => {
     const actual = `\
@@ -200,7 +200,7 @@ suite("Test splitYaml", () => {
 - Orange
 - Apple`
 
-    deepStrictEqual(splitYaml(actual),
+    deepEqual(splitYaml(actual),
       ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
   test("Split multiple yaml documents with text behind delimiter", () => {
@@ -211,7 +211,7 @@ suite("Test splitYaml", () => {
 --- text
 - Orange
 - Apple`
-    deepStrictEqual(splitYaml(actual),
+    deepEqual(splitYaml(actual),
       ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })

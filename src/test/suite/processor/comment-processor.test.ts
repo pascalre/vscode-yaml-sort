@@ -1,4 +1,4 @@
-import { deepStrictEqual, equal } from "assert"
+import { deepEqual, equal } from "assert"
 import { CommentProcessor } from "../../../processor/comment-processor"
 
 suite("Test CommentProcessor - findComments()", () => {
@@ -17,11 +17,11 @@ suite("Test CommentProcessor - findComments()", () => {
     commentprocessor.findComments()
 
     equal(commentprocessor.store.length, 5)
-    deepStrictEqual(commentprocessor.store[0], ["#foo", "#bar"])
-    deepStrictEqual(commentprocessor.store[1], ["#bar", "lorem ipsum"])
-    deepStrictEqual(commentprocessor.store[2], ["#foo", "dolor sit"])
-    deepStrictEqual(commentprocessor.store[3], ["  # foo", "amet, consetetur"])
-    deepStrictEqual(commentprocessor.store[4], ["# baz", "vscode-yaml-sort.lastLine"])
+    deepEqual(commentprocessor.store[0], ["#foo", "#bar"])
+    deepEqual(commentprocessor.store[1], ["#bar", "lorem ipsum"])
+    deepEqual(commentprocessor.store[2], ["#foo", "dolor sit"])
+    deepEqual(commentprocessor.store[3], ["  # foo", "amet, consetetur"])
+    deepEqual(commentprocessor.store[4], ["# baz", "vscode-yaml-sort.lastLine"])
   })
 })
 
@@ -58,15 +58,15 @@ suite("Test CommentProcessor - addLineToComments()", () => {
     commentprocessor.addLineToComments(0)
     const expected: string[][] = []
     expected.push(["#foo", "#bar"])
-    deepStrictEqual(commentprocessor.store, expected)
+    deepEqual(commentprocessor.store, expected)
 
     commentprocessor.addLineToComments(1)
     expected.push(["#bar", "lorem ipsum"])
-    deepStrictEqual(commentprocessor.store, expected)
+    deepEqual(commentprocessor.store, expected)
 
     commentprocessor.addLineToComments(4)
     expected.push(["#foo", "vscode-yaml-sort.lastLine"])
-    deepStrictEqual(commentprocessor.store, expected)
+    deepEqual(commentprocessor.store, expected)
   })
 })
 
@@ -108,7 +108,7 @@ suite("Test CommentProcessor - reverseComments()", () => {
 
     commentprocessor.reverseComments()
 
-    deepStrictEqual(commentprocessor.store, expected)
+    deepEqual(commentprocessor.store, expected)
   })
 })
 
