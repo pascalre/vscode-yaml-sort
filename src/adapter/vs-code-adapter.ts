@@ -33,7 +33,7 @@ export class VsCodeAdapter {
   }
 
   static registerFormatter(formatter: DocumentFormattingEditProvider) {
-    languages.registerDocumentFormattingEditProvider('yaml', formatter)
+    languages.registerDocumentFormattingEditProvider("yaml", formatter)
   }
 
   static getText(textEditor: TextEditor, range: Range) {

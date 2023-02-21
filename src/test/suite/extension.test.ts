@@ -75,8 +75,8 @@ suite("Test sortYamlWrapper", () => {
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
-        'key:\n' +
-        ' key2: value'
+        "key:\n" +
+        " key2: value"
 
       activeEditor.edit((builder) => builder.replace(
         new Range(
@@ -98,8 +98,8 @@ suite("Test sortYamlWrapper", () => {
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
-        'key:\n' +
-        '  key2: value'
+        "key:\n" +
+        "  key2: value"
 
       activeEditor.edit((builder) => builder.replace(
         new Range(
@@ -121,10 +121,10 @@ suite("Test sortYamlWrapper", () => {
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const expected =
-        'key:\n' +
-        '  key2: value\n' +
-        '  key3: value\n' +
-        'key4: value'
+        "key:\n" +
+        "  key2: value\n" +
+        "  key3: value\n" +
+        "key4: value"
 
       activeEditor.selection = new Selection(0, 0, 3, 0)
       await commands.executeCommand("vscode-yaml-sort.sortYaml")
@@ -145,13 +145,13 @@ suite("Test sortYamlWrapper", () => {
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
-        '%YAML 1.1' +
-        '---\n' +
-        'key:\n' +
-        '  key2: value'
+        "%YAML 1.1" +
+        "---\n" +
+        "key:\n" +
+        "  key2: value"
       const expected =
-        'key:\n' +
-        '  key2: value'
+        "key:\n" +
+        "  key2: value"
 
       activeEditor.edit((builder) => builder.replace(
         new Range(

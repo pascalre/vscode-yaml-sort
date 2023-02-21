@@ -12,9 +12,9 @@ suite("Test sortYamlFiles", () => {
 
     await commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
 
-    let sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", 'utf-8').toString()
+    let sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "utf-8").toString()
     equal(sortedFile, "akey: value\nkey: value")
-    sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", 'utf-8').toString()
+    sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "utf-8").toString()
     equal(sortedFile, "akey: value\nkey: value")
 
     writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
@@ -40,9 +40,9 @@ suite("Test formatYamlWrapper", () => {
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const expected =
-        '---\n' +
-        'key:\n' +
-        '  key2: value'
+        "---\n" +
+        "key:\n" +
+        "  key2: value"
 
       equal(new Controller().formatYamlWrapper()[0].newText, expected)
     } else {
@@ -57,10 +57,10 @@ suite("Test formatYamlWrapper", () => {
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const expected =
-        '---\n' +
-        'key1: value\n' +
-        '---\n' +
-        'key2: value'
+        "---\n" +
+        "key1: value\n" +
+        "---\n" +
+        "key2: value"
 
       equal(new Controller().formatYamlWrapper()[0].newText, expected)
     } else {

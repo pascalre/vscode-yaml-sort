@@ -5,14 +5,14 @@ import { CommentProcessor } from "../../../processor/comment-processor"
 suite("Test CommentProcessor - findComments()", () => {
   test("should add all comments to array 'comments'", () => {
     const text =
-      '#foo\n' +
-      '#bar\n' +
-      'lorem ipsum\n' +
-      '#foo\n' +
-      'dolor sit\n' +
-      '  # foo\n' +
-      'amet, consetetur\n' +
-      '# baz'
+      "#foo\n" +
+      "#bar\n" +
+      "lorem ipsum\n" +
+      "#foo\n" +
+      "dolor sit\n" +
+      "  # foo\n" +
+      "amet, consetetur\n" +
+      "# baz"
     const commentprocessor = new CommentProcessor(text)
 
     commentprocessor.findComments()
@@ -47,11 +47,11 @@ suite("Test CommentProcessor - isLineComment()", () => {
 suite("Test CommentProcessor - addLineToComments()", () => {
   test("should add comments to array 'comments'", () => {
     const text =
-      '#foo\n' +
-      '#bar\n' +
-      'lorem ipsum\n' +
-      'dolor sit\n' +
-      '#foo'
+      "#foo\n" +
+      "#bar\n" +
+      "lorem ipsum\n" +
+      "dolor sit\n" +
+      "#foo"
     const commentprocessor = new CommentProcessor(text)
 
     equal(commentprocessor.lines.length, 5)
@@ -151,46 +151,46 @@ suite("Test CommentProcessor - append()", () => {
 suite("Test CommentProcessor - insert()", () => {
   test("when comment is found should insert", () => {
     const text =
-      'lorem ipsum\n' +
-      'dolor sit\n' +
-      'amet, consetetur'
+      "lorem ipsum\n" +
+      "dolor sit\n" +
+      "amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
-    const comment = ['#foo', 'dolor sit']
+    const comment = ["#foo", "dolor sit"]
 
     commentprocessor.insert(comment)
     
     const expected =
-      'lorem ipsum\n' +
-      '#foo\n' +
-      'dolor sit\n' +
-      'amet, consetetur'
+      "lorem ipsum\n" +
+      "#foo\n" +
+      "dolor sit\n" +
+      "amet, consetetur"
     equal(commentprocessor.text, expected)
   })
   test("when comment is not found should do nothing", () => {
     const text =
-      'lorem ipsum\n' +
-      'dolor sit\n' +
-      'amet, consetetur'
+      "lorem ipsum\n" +
+      "dolor sit\n" +
+      "amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
-    const comment = ['#foo', 'do not find']
+    const comment = ["#foo", "do not find"]
 
     commentprocessor.insert(comment)
     
     const expected =
-      'lorem ipsum\n' +
-      'dolor sit\n' +
-      'amet, consetetur'
+      "lorem ipsum\n" +
+      "dolor sit\n" +
+      "amet, consetetur"
     equal(commentprocessor.text, expected)
   })
 })
 
 suite("Test CommentProcessor - getIndexOfString()", () => {
   test("should return index of line", () => {
-    const line = 'dolor sit'
+    const line = "dolor sit"
     const text =
-      'lorem ipsum\n' +
+      "lorem ipsum\n" +
       `${line}\n` +
-      'amet, consetetur'
+      "amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
 
     equal(commentprocessor.getIndexOfString(line), 12)
@@ -201,25 +201,25 @@ suite("Test CommentProcessor - getIndexOfString()", () => {
 suite("Test CommentProcessor - search()", () => {
   test("should return last index of text", () => {
     const text =
-      'foo: lorem ipsum\n' +
-      'bar: dolor sit\n' +
-      'baz: amet, consetetur'
+      "foo: lorem ipsum\n" +
+      "bar: dolor sit\n" +
+      "baz: amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
 
-    equal(commentprocessor.search('foo: lorem ipsum'), 0)
-    equal(commentprocessor.search('  bar: dolor sit  '), 17)
-    equal(commentprocessor.search('baz: "amet, consetetur"'), 32)
+    equal(commentprocessor.search("foo: lorem ipsum"), 0)
+    equal(commentprocessor.search("  bar: dolor sit  "), 17)
+    equal(commentprocessor.search("baz: \"amet, consetetur\""), 32)
   })
 })
 
 suite("Test CommentProcessor - searchExactMatch()", () => {
   test("should return last index of text", () => {
-    const line = 'bar: dolor sit'
+    const line = "bar: dolor sit"
     const text =
-      'foo: lorem ipsum\n' +
+      "foo: lorem ipsum\n" +
       `${line}\n` +
       `${line}\n` +
-      'baz: amet, consetetur'
+      "baz: amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
 
     equal(commentprocessor.searchExactMatch(line), 32)
@@ -228,11 +228,11 @@ suite("Test CommentProcessor - searchExactMatch()", () => {
 
 suite("Test CommentProcessor - searchFuzzyForTrimmedText()", () => {
   test("should return last index of keyword", () => {
-    const line = '  bar: dolor sit  '
+    const line = "  bar: dolor sit  "
     const text =
-      'foo: lorem ipsum\n' +
+      "foo: lorem ipsum\n" +
       `${line.trim()}\n` +
-      'baz: amet, consetetur'
+      "baz: amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
 
     equal(commentprocessor.searchFuzzyForTrimmedText(line), 17)
@@ -241,11 +241,11 @@ suite("Test CommentProcessor - searchFuzzyForTrimmedText()", () => {
 
 suite("Test CommentProcessor - searchFuzzyForKeyword()", () => {
   test("should return last index of keyword", () => {
-    const line = 'bar: dolor sit'
+    const line = "bar: dolor sit"
     const text =
-      'foo: lorem ipsum\n' +
+      "foo: lorem ipsum\n" +
       `${line}\n` +
-      'baz: amet, consetetur'
+      "baz: amet, consetetur"
     const commentprocessor = new CommentProcessor(text)
 
     equal(commentprocessor.searchFuzzyForKeyword(line), 17)
@@ -263,17 +263,17 @@ suite("Test CommentProcessor - Issue 45", () => {
   // https://github.com/pascalre/vscode-yaml-sort/issues/45#issuecomment-1329161613
   test("should fuzzy find comments", () => {
     const text =
-      '#begin comment\n' +
-      'params:\n' +
-      '  logon: test\n' +
-      '  #variable meta data\n' +
-      '  variableMetadata: env\\config_dev.yaml\n' +
-      '  logFile: log-test.log\n' +
-      '  logLevel: DEBUG\n' +
-      '  chunkSize: 1000\n' +
-      '  jobSize: 20\n' +
-      '  schema: test\n' +
-      '  #end comment'
+      "#begin comment\n" +
+      "params:\n" +
+      "  logon: test\n" +
+      "  #variable meta data\n" +
+      "  variableMetadata: env\\config_dev.yaml\n" +
+      "  logFile: log-test.log\n" +
+      "  logLevel: DEBUG\n" +
+      "  chunkSize: 1000\n" +
+      "  jobSize: 20\n" +
+      "  schema: test\n" +
+      "  #end comment"
     const commentprocessor = new CommentProcessor(text)
 
     commentprocessor.findComments()
@@ -308,17 +308,17 @@ suite("Test CommentProcessor - Issue 45", () => {
 
   test("should work with trailing newline", () => {
     const text =
-      'schema: test\n' +
-      '#end comment\n'
+      "schema: test\n" +
+      "#end comment\n"
     const commentprocessor = new CommentProcessor(text)
 
     commentprocessor.findComments()
-    commentprocessor.text = 'schema: test'
+    commentprocessor.text = "schema: test"
     commentprocessor.postprocess()
 
     const expected =
-      'schema: test\n' +
-      '#end comment'
+      "schema: test\n" +
+      "#end comment"
 
     equal(commentprocessor.text, expected)
   })

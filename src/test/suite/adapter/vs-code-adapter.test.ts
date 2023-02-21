@@ -36,8 +36,8 @@ suite("Test VsCodeAdapter - getActiveDocument()", () => {
 
     if (window.activeTextEditor) {
       const expected =
-        'key:\n' +
-        '  key2: value'
+        "key:\n" +
+        "  key2: value"
 
       equal(VsCodeAdapter.getActiveDocument(window.activeTextEditor), expected)
     } else {

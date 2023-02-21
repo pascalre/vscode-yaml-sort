@@ -4,18 +4,18 @@ import { TabsToSpacesProcessor } from "../../../processor/tabs-to-spaces-process
 
 suite("Test TabsToSpacesPreprocessor - preprocess()", () => {
   const text = 
-    'a-1:\n' +
-    '\tb:\n' +
-    '\t\td: g\n' +
-    '\tc:\n' +
-    '\t\td: g'
+    "a-1:\n" +
+    "\tb:\n" +
+    "\t\td: g\n" +
+    "\tc:\n" +
+    "\t\td: g"
 
   const expected =
-    'a-1:\n' +
-    '  b:\n' +
-    '    d: g\n' +
-    '  c:\n' +
-    '    d: g'
+    "a-1:\n" +
+    "  b:\n" +
+    "    d: g\n" +
+    "  c:\n" +
+    "    d: g"
 
   const tabstospacespreprocessor = new TabsToSpacesProcessor(text)
 

@@ -22,12 +22,12 @@ suite("Test FileUtil - getFiles()", () => {
 
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
     const expected = [
-      './src/test/files/getYamlFilesInDirectory/file.yaml',
-      './src/test/files/getYamlFilesInDirectory/file2.yaml',
-      './src/test/files/getYamlFilesInDirectory/folder1/file.yaml',
-      './src/test/files/getYamlFilesInDirectory/folder1/file2.yaml',
-      './src/test/files/getYamlFilesInDirectory/folder2/file.yaml',
-      './src/test/files/getYamlFilesInDirectory/file.yml'
+      "./src/test/files/getYamlFilesInDirectory/file.yaml",
+      "./src/test/files/getYamlFilesInDirectory/file2.yaml",
+      "./src/test/files/getYamlFilesInDirectory/folder1/file.yaml",
+      "./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml",
+      "./src/test/files/getYamlFilesInDirectory/folder2/file.yaml",
+      "./src/test/files/getYamlFilesInDirectory/file.yml"
     ]
     deepEqual(fileutil.getFiles("./src/test/files/getYamlFilesInDirectory"), expected)
   })

@@ -28,7 +28,7 @@ export class CommentProcessor {
     if (index < this.lines.length-1) {
       this.store.push([this.lines[index], this.lines[index+1]])
     } else {
-      this.store.push([this.lines[index], 'vscode-yaml-sort.lastLine'])
+      this.store.push([this.lines[index], "vscode-yaml-sort.lastLine"])
     }
   }
 

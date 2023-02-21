@@ -22,7 +22,7 @@ suite("Test Sort - localeSort()", () => {
 suite("Test Sort - customSort()", () => {
   const settings = new Settings()
   settings.getCustomSortKeywords = function () {
-    return ['kind', 'data']
+    return ["kind", "data"]
   }
   const sort = new SortUtil(settings)
   sort.custom = 1

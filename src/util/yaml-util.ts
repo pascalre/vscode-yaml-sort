@@ -6,14 +6,14 @@ import { prependWhitespacesOnEachLine } from "../lib"
 import { Settings } from "../settings"
 
 const sortArrays = (obj: unknown) => {
-  if (!obj || typeof obj !== 'object') {
+  if (!obj || typeof obj !== "object") {
       return
   } else if (Array.isArray(obj)) {
       obj.sort()
   }
   Object.keys(obj).forEach(key => {
     const object = obj[key as keyof unknown]
-    if (typeof object === 'object') {
+    if (typeof object === "object") {
         if (Array.isArray(object)) {
           Object.entries(object).sort()
         }

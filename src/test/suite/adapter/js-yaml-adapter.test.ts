@@ -12,27 +12,27 @@ suite("Test JsYamlAdapter - validateYaml()", () => {
 
   test("when text is a valid yaml document should return true", () => {
     const actual =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3'
+      "persons:\n" +
+      "  bob:\n" +
+      "    place: Germany\n" +
+      "    age: 23\n" +
+      "animals:\n" +
+      "  kitty:\n" +
+      "    age: 3"
 
     equal(jsyamladapter.validateYaml(actual), true)
   })
 
   test("when text are two seperated valid yaml documents should return true", () => {
     const actual =
-      'persons:\n' +
-      '  bob:\n' +
-      '    place: Germany\n' +
-      '    age: 23\n' +
-      '---\n' +
-      'animals:\n' +
-      '  kitty:\n' +
-      '    age: 3'
+      "persons:\n" +
+      "  bob:\n" +
+      "    place: Germany\n" +
+      "    age: 23\n" +
+      "---\n" +
+      "animals:\n" +
+      "  kitty:\n" +
+      "    age: 3"
 
     equal(jsyamladapter.validateYaml(actual), true)
   })
