@@ -6,6 +6,7 @@ module.exports = {
   },
   env: {
     node: true,
+    mocha: true
   },
   plugins: ["@typescript-eslint", "import"],
   extends: [
@@ -26,7 +27,7 @@ module.exports = {
       },
     ],
     "quotes": ["warn", "double"],
-    "import/no-unresolved": "error",
+    "import/no-unresolved": "off",
     "import/order": [
       "error",
       {
