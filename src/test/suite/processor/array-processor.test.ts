@@ -1,4 +1,5 @@
 import { equal } from "assert"
+
 import { ArrayProcessor } from "../../../processor/array-processor"
 
 suite("Test ArrayProcessor - preprocess()", () => {

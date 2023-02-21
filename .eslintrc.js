@@ -50,6 +50,10 @@ module.exports = {
       typescript: {
         project: './tsconfig.json',
       },
+      node: {
+        paths: [ 'src' ],
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
+      }
     },
   },
 };

@@ -1,7 +1,9 @@
-import { fail, equal } from "assert"
+import { equal, fail } from "assert"
 import path = require("path")
-import { Uri, workspace, window } from "vscode"
+
 import { spy } from "sinon"
+import { Uri, window, workspace } from "vscode"
+
 import { Severity, VsCodeAdapter } from "../../../adapter/vs-code-adapter"
 
 suite("Test VsCodeAdapter - getProperty()", () => {

@@ -1,7 +1,7 @@
-import { Schema, CORE_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, DEFAULT_SCHEMA } from "js-yaml"
-import { workspace } from "vscode"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
+import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema } from "js-yaml"
+import { workspace } from "vscode"
 
 export class Settings {
     filter = "vscode-yaml-sort"

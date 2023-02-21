@@ -1,4 +1,5 @@
 import { deepEqual, equal } from "assert"
+
 import { CommentProcessor } from "../../../processor/comment-processor"
 
 suite("Test CommentProcessor - findComments()", () => {

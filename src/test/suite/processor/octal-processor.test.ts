@@ -1,4 +1,5 @@
 import { equal } from "assert"
+
 import { OctalProcessor } from "../../../processor/octal-processor"
 
 suite("Test OctalProcessor - preprocess()", () => {

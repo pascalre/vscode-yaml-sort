@@ -1,4 +1,5 @@
 import { deepEqual, equal } from "assert"
+
 import { SpacingProcessor } from "../../../processor/spacing-processor"
 
 suite("Test SpacingProcessor - getMatcher()", () => {

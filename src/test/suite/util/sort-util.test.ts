@@ -1,4 +1,5 @@
 import { equal } from "assert"
+
 import { Settings } from "../../../settings"
 import { SortUtil } from "../../../util/sort-util"
 

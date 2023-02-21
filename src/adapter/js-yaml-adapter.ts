@@ -1,5 +1,6 @@
+import { dump, load } from "js-yaml"
+
 import { Settings } from "../settings"
-import { load, dump } from "js-yaml"
 import { SortUtil } from "../util/sort-util"
 import { removeTrailingCharacters, splitYaml } from "../util/yaml-util"
 

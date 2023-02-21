@@ -1,4 +1,5 @@
 import { equal } from "assert"
+
 import { TabsToSpacesProcessor } from "../../../processor/tabs-to-spaces-processor"
 
 suite("Test TabsToSpacesPreprocessor - preprocess()", () => {

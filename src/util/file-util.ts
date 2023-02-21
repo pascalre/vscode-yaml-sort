@@ -1,7 +1,9 @@
 import { readFileSync, writeFileSync } from "fs"
+
 import { sync } from "glob"
-import { Settings } from "../settings"
+
 import { YamlUtil } from "./yaml-util"
+import { Settings } from "../settings"
 
 export class FileUtil {
   settings: Settings

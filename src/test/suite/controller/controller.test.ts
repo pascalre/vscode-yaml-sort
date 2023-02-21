@@ -1,7 +1,9 @@
-import { Uri, commands, window, workspace } from "vscode"
 import { equal } from "assert"
-import { resolve } from "path"
 import { readFileSync, writeFileSync } from "fs"
+import { resolve } from "path"
+
+import { Uri, commands, window, workspace } from "vscode"
+
 import { Controller } from "../../../controller/controller"
 
 suite("Test sortYamlFiles", () => {

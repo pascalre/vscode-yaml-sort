@@ -1,7 +1,8 @@
-import { ExtensionContext, DocumentFormattingEditProvider, commands, Uri, TextEdit } from "vscode"
-import { Settings } from "./settings"
+import { DocumentFormattingEditProvider, ExtensionContext, TextEdit, Uri, commands } from "vscode"
+
 import { VsCodeAdapter } from "./adapter/vs-code-adapter"
 import { Controller } from "./controller/controller"
+import { Settings } from "./settings"
 
 export function activate(context: ExtensionContext) {
 

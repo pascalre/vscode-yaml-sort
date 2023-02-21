@@ -1,4 +1,5 @@
 import { equal, notEqual } from "assert"
+
 import { ProcessorController } from "../../../controller/processor-controller"
 
 suite("Test ProcessorController - preprocess() & postprocess()", () => {

@@ -1,6 +1,8 @@
 import { equal } from "assert"
+
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import jsyaml = require("js-yaml")
+
 import { Settings } from "../../../settings"
 import { YamlUtil } from "../../../util/yaml-util"
 

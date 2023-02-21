@@ -1,9 +1,10 @@
 import { deepEqual, equal, notDeepEqual } from "assert"
-import { Uri, workspace, window, commands, Position, Range, Selection } from "vscode"
 import { resolve } from "path"
 
-import { Settings } from "../../settings"
+import { Position, Range, Selection, Uri, commands, window, workspace } from "vscode"
+
 import { Controller } from "../../controller/controller"
+import { Settings } from "../../settings"
 import { splitYaml } from "../../util/yaml-util"
 
 suite("Test getCustomSortKeywords", () => {

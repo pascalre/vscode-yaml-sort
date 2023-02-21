@@ -1,6 +1,8 @@
-import { ErrorUtil } from "../../../util/error-util"
-import { spy } from "sinon"
 import { equal } from "assert"
+
+import { spy } from "sinon"
+
+import { ErrorUtil } from "../../../util/error-util"
 
 suite("Test ErrorUtil - handleError()", () => {
   test("when input is of type error, should execute showMessage function", () => {

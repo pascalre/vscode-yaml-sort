@@ -1,4 +1,5 @@
-import { equal, throws, deepEqual, doesNotThrow } from "assert"
+import { deepEqual, doesNotThrow, equal, throws } from "assert"
+
 import { Settings } from "../../../settings"
 import { FileUtil } from "../../../util/file-util"
 

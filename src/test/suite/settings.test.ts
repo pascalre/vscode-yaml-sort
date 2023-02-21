@@ -1,8 +1,10 @@
 import { deepEqual, equal } from "assert"
-import { Schema, DEFAULT_SCHEMA, CORE_SCHEMA, JSON_SCHEMA, FAILSAFE_SCHEMA} from "js-yaml"
-import { Settings } from "../../settings"
+
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
+import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema} from "js-yaml"
+
+import { Settings } from "../../settings"
 
 suite("Test Settings - getter", () => {
     const settings: Settings = new Settings();

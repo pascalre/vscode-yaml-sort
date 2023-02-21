@@ -1,7 +1,9 @@
 import { equal, throws } from "assert"
+
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import jsyaml = require("js-yaml")
+
 import { JsYamlAdapter } from "../../../adapter/js-yaml-adapter"
 import { Settings } from "../../../settings"
 

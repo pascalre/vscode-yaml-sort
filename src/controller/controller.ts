@@ -1,11 +1,12 @@
-import { TextEditor, TextEdit, Uri, window } from "vscode"
+import { TextEdit, TextEditor, Uri, window } from "vscode"
+
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "../lib"
 import { Settings } from "../settings"
 import { ErrorUtil } from "../util/error-util"
 import { FileUtil } from "../util/file-util"
-import { splitYaml, validateTextRange, YamlUtil } from "../util/yaml-util"
+import { YamlUtil, splitYaml, validateTextRange } from "../util/yaml-util"
 
 export class Controller {
   editor: TextEditor

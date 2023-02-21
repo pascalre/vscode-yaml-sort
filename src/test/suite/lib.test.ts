@@ -1,4 +1,5 @@
 import { equal, throws} from "assert"
+
 import {
   addNewLineBeforeRootKeywords,
   prependWhitespacesOnEachLine

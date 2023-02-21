@@ -1,8 +1,10 @@
-import { resolve, join} from 'path'
+import { join, resolve} from 'path'
+
+import { sync } from 'glob'
 import Mocha = require('mocha')
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const NYC = require('nyc')
-import { sync } from 'glob'
 
 // Recommended modules, loading them here to speed up NYC init
 // and minimize risk of race condition
