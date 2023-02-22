@@ -12,6 +12,29 @@ suite("Test SpacingProcessor - getMatcher()", () => {
 })
 
 suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
+  test("GitHub issue #122: emptyLinesUntilLevel stopped working ", () => {
+    const text =
+      "key:\n" +
+      "  key2: value\n" +
+      "  key3: value\n" +
+      "key4: value"
+
+    const spacingprocessor = new SpacingProcessor(text)
+    spacingprocessor.settings.emptyLinesUntilLevel = 2
+    spacingprocessor.postprocess()
+
+    const expected =
+      "key:\n" +
+      "\n" +
+      "  key2: value\n" +
+      "\n" +
+      "  key3: value\n" +
+      "\n" +
+      "key4: value"
+
+    equal(spacingprocessor.text, expected)
+  })
+
   test("should add an empty line before `spec`", () => {
     const text =
       "spec: value\n" +
@@ -28,7 +51,7 @@ suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
       "  - a\n" +
       "  - b"
 
-    equal(spacingprocessor.addNewLineBeforeKeywords(), expected)
+    equal(spacingprocessor.postprocess(), expected)
   })
   test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
     const text = 
@@ -46,7 +69,7 @@ suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
       "\n" +
       "spec: value"
 
-    equal(spacingprocessor.addNewLineBeforeKeywords(), expected)
+    equal(spacingprocessor.postprocess(), expected)
 
     spacingprocessor.settings.emptyLinesUntilLevel = 2
 
@@ -58,7 +81,7 @@ suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
       "\n" +
       "spec: value"
 
-    equal(spacingprocessor.addNewLineBeforeKeywords(), expected)
+    equal(spacingprocessor.postprocess(), expected)
   })
 
   test("should recognize keywords containing the char -", () => {
@@ -78,7 +101,7 @@ suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
       "\n" +
       "  sp-ec: value"
 
-    equal(spacingprocessor.addNewLineBeforeKeywords(), expected)
+    equal(spacingprocessor.postprocess(), expected)
   })
 
   test("should recognize keywords containing spaces", () => {
@@ -99,6 +122,6 @@ suite("Test SpacingProcessor - addNewLineBeforeKeywords()", () => {
       "\n" +
       "foo bar: value"
 
-    equal(spacingprocessor.addNewLineBeforeKeywords(), expected)
+    equal(spacingprocessor.postprocess(), expected)
   })
 })

@@ -8,11 +8,7 @@ export class SpacingProcessor {
     this.text = text
   }
 
-  postprocess() {
-    return this.addNewLineBeforeKeywords()
-  }
-
-  addNewLineBeforeKeywords(): string {
+  postprocess(): string {
     let level = 0;
     let result = this.text;
 
