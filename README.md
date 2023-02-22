@@ -66,29 +66,66 @@ There are different types of processors. If you experience any issues with them,
 ### CommentProcessor
 An activated CommentProcessor will keep comments while sorting.
 
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useCommentProcessor: true</code></th>
+        <th>Sorted with<br><code>useCommentProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code># comment<br>foo: bar</code></td>
+        <td><code># comment<br>foo: bar</code></td>
+        <td><code>foo: bar</code></td>
+    </tr>
+</table>
+
 ### HelmProcessor
 The HelmProcessor makes the extension compatible with Helm charts.
 
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useHelmProcessor: true</code></th>
+        <th>Sorted with<br><code>useHelmProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code>foo: {{ .value }}</code></td>
+        <td><code>foo: {{ .value }}</code></td>
+        <td><code>foo:<br>  '[object Object]': null</code></td>
+    </tr>
+</table>
+
 ### OctalProcessor
-The OctalProcessor makes the extension keeping octal value like 0744. If `useOctalProcessor` is set to `false` this number will become 744.
+The OctalProcessor makes the extension keeping octal value like 0744.
+
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useOctalProcessor: true</code></th>
+        <th>Sorted with<br><code>useOctalProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code>foo: 0744</code></td>
+        <td><code>foo: 0744</code></td>
+        <td><code>foo: 484</code></td>
+    </tr>
+</table>
 
 ### ArrayProcessor
-The ArrayProcessor will not add linebreaks to single-line array structures. Example:
-```
-test: [ "CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]
-```
+The ArrayProcessor will not add linebreaks to single-line array structures.
 
-If `useArrayProcessor` is set to `false` will output:
-```
-test:
-- "CMD"
-- "pg_isready"
-- "-q"
-- "-d"
-- "${DB_NAME}"
-- "-U"
-- "${DB_USER}"
-```
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useArrayProcessor: true</code></th>
+        <th>Sorted with<br><code>useArrayProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code>test: [ "CMD", "pg_isready"]</code></td>
+        <td><code>test: [ "CMD", "pg_isready"]</code></td>
+        <td><code>test:<br>- "CMD"<br>- "pg_isready"</code></td>
+    </tr>
+</table>
 
 # 🎉 Support
 
