@@ -63,53 +63,6 @@ Register this extension as VS Code formatter. Also configure VS Code to format f
 
 ## What are the processors doing and how do I use them?
 There are different types of processors. If you experience any issues with them, or just don't want to use them, you can turn them off.
-### CommentProcessor
-An activated CommentProcessor will keep comments while sorting.
-
-<table width="100%">
-    <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useCommentProcessor: true</code></th>
-        <th>Sorted with<br><code>useCommentProcessor: false</code></th>
-    </tr>
-    <tr>
-        <td><code># comment<br>foo: bar</code></td>
-        <td><code># comment<br>foo: bar</code></td>
-        <td><code>foo: bar</code></td>
-    </tr>
-</table>
-
-### HelmProcessor
-The HelmProcessor makes the extension compatible with Helm charts.
-
-<table width="100%">
-    <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useHelmProcessor: true</code></th>
-        <th>Sorted with<br><code>useHelmProcessor: false</code></th>
-    </tr>
-    <tr>
-        <td><code>foo: {{ .value }}</code></td>
-        <td><code>foo: {{ .value }}</code></td>
-        <td><code>foo:<br>  '[object Object]': null</code></td>
-    </tr>
-</table>
-
-### OctalProcessor
-The OctalProcessor makes the extension keeping octal value like 0744.
-
-<table width="100%">
-    <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useOctalProcessor: true</code></th>
-        <th>Sorted with<br><code>useOctalProcessor: false</code></th>
-    </tr>
-    <tr>
-        <td><code>foo: 0744</code></td>
-        <td><code>foo: 0744</code></td>
-        <td><code>foo: 484</code></td>
-    </tr>
-</table>
 
 ### ArrayProcessor
 The ArrayProcessor will not add linebreaks to single-line array structures.
@@ -124,6 +77,70 @@ The ArrayProcessor will not add linebreaks to single-line array structures.
         <td><code>test: [ "CMD", "pg_isready"]</code></td>
         <td><code>test: [ "CMD", "pg_isready"]</code></td>
         <td><code>test:<br>- "CMD"<br>- "pg_isready"</code></td>
+    </tr>
+</table>
+
+### Comment Processor
+An activated Comment Processor will keep comments while sorting.
+
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useCommentProcessor: true</code></th>
+        <th>Sorted with<br><code>useCommentProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code># comment<br>foo: bar</code></td>
+        <td><code># comment<br>foo: bar</code></td>
+        <td><code>foo: bar</code></td>
+    </tr>
+</table>
+
+### Helm Processor
+The Helm Processor makes the extension compatible with Helm charts.
+
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useHelmProcessor: true</code></th>
+        <th>Sorted with<br><code>useHelmProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code>foo: {{ .value }}</code></td>
+        <td><code>foo: {{ .value }}</code></td>
+        <td><code>foo:<br>  '[object Object]': null</code></td>
+    </tr>
+</table>
+
+### Spacing Processor
+The Spacing Processor will add spacing between keywords.
+
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>emptyLinesUntilLevel: 0</code></th>
+        <th>Sorted with<br><code>emptyLinesUntilLevel: 1</code></th>
+    </tr>
+    <tr>
+        <td><code>foo: bar<br>baz: bar</code></td>
+        <td><code>foo: bar<br>baz: bar</code></td>
+        <td><code>foo: bar<br><br>baz: bar</code></td>
+    </tr>
+</table>
+
+### Octal Processor
+The Octal Processor makes the extension keeping octal value like 0744.
+
+<table width="100%">
+    <tr>
+        <th>Original Document</th>
+        <th>Sorted with<br><code>useOctalProcessor: true</code></th>
+        <th>Sorted with<br><code>useOctalProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code>foo: 0744</code></td>
+        <td><code>foo: 0744</code></td>
+        <td><code>foo: 484</code></td>
     </tr>
 </table>
 
