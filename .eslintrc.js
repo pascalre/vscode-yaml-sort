@@ -16,6 +16,7 @@ module.exports = {
     "plugin:import/typescript",
   ],
   rules: {
+    "semi": ["error", "never"],
     "sort-imports": [
       "error",
       {

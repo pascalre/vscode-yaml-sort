@@ -129,7 +129,7 @@ suite("Test sortYamlWrapper", () => {
       activeEditor.selection = new Selection(0, 0, 3, 0)
       await commands.executeCommand("vscode-yaml-sort.sortYaml")
       // do not assert too fast
-      await new Promise(r => setTimeout(r, 2000));
+      await new Promise(r => setTimeout(r, 2000))
       equal(activeEditor.document.getText(), expected)
     } else {
       equal(true, false)

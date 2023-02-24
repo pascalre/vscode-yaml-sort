@@ -9,8 +9,8 @@ export class SpacingProcessor {
   }
 
   postprocess() {
-    let level = 0;
-    let result = this.text;
+    let level = 0
+    let result = this.text
 
     while (level < this.settings.emptyLinesUntilLevel) {
       if (level === 0) {

@@ -1,4 +1,4 @@
-import { GenericProcessor } from "./generic-processor";
+import { GenericProcessor } from "./generic-processor"
 
 export class OctalProcessor extends GenericProcessor {
   constructor(text: string) {

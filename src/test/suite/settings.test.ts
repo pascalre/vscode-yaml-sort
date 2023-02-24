@@ -7,7 +7,7 @@ import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema} from
 import { Settings } from "../../settings"
 
 suite("Test Settings - getter", () => {
-    const settings: Settings = new Settings();
+    const settings: Settings = new Settings()
 
     test("default value of customSortKeywords_1 is set to `['apiVersion', 'kind', 'metadata', 'spec', 'data']`", () => {
         deepEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])

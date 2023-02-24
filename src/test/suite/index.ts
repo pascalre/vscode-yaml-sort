@@ -23,12 +23,12 @@ export async function run(): Promise<void> {
     hookRequire: true,
     hookRunInContext: true,
     hookRunInThisContext: true,
-  });
-  await nyc.wrap();
+  })
+  await nyc.wrap()
 
   // Debug which files will be included/excluded
   // console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
-  await nyc.createTempDirectory();
+  await nyc.createTempDirectory()
 	// Create the mocha test
 	const mocha = new Mocha({
 		ui: "tdd",
@@ -37,13 +37,13 @@ export async function run(): Promise<void> {
 	})
   
   // Add all files to the test suite
-  const files = sync("**/*.test.js", { cwd: testsRoot });
-  files.forEach(f => mocha.addFile(resolve(testsRoot, f)));
+  const files = sync("**/*.test.js", { cwd: testsRoot })
+  files.forEach(f => mocha.addFile(resolve(testsRoot, f)))
 
-  const failures: number = await new Promise(executor => mocha.run(executor));
-  await nyc.writeCoverageFile();
+  const failures: number = await new Promise(executor => mocha.run(executor))
+  await nyc.writeCoverageFile()
 
   if (failures > 0) {
-    throw new Error(`${failures} tests failed.`);
+    throw new Error(`${failures} tests failed.`)
   }
 }
