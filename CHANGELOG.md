@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.1 - February 25, 2023
+* (refs [#122](https://github.com/pascalre/vscode-yaml-sort/issues/122)) emptyLinesUntilLevel stopped working
+* Update dependencies to latest versions
+
 ## 6.4.0 - February 11, 2023
 * (refs [#51](https://github.com/pascalre/vscode-yaml-sort/issues/51)) Add support for sorting arrays
 * Add setting `sortArrays`
