@@ -8,7 +8,7 @@ export class SpacingProcessor {
     this.text = text
   }
 
-  postprocess(): string {
+  postprocess() {
     let level = 0;
     let result = this.text;
 
@@ -19,10 +19,10 @@ export class SpacingProcessor {
         const matcher = this.getMatcher(level)
         result = result.replace(matcher, "\n$&")
       }
-      level++;
+      level++
     }
 
-    return result;
+    this.text = result
   }
 
   getMatcher(level: number) {
