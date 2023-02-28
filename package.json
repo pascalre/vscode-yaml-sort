@@ -177,6 +177,11 @@
           "default": true,
           "description": "When `true`, will activate ArrayProcessor"
         },
+        "vscode-yaml-sort.useBlockProcessor": {
+          "type": "boolean",
+          "default": true,
+          "description": "When `true`, will activate BlockProcessor"
+        },
         "vscode-yaml-sort.useCommentProcessor": {
           "type": "boolean",
           "default": true,

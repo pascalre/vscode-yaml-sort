@@ -1,4 +1,5 @@
 import { ArrayProcessor } from "../processor/array-processor"
+import { BlockProcessor } from "../processor/block-processor"
 import { CommentProcessor } from "../processor/comment-processor"
 import { HelmProcessor } from "../processor/helm-processor"
 import { OctalProcessor } from "../processor/octal-processor"
@@ -8,6 +9,7 @@ import { Settings } from "../settings"
 
 export class ProcessorController {
   arrayprocessor!: ArrayProcessor
+  blockprocessor!: BlockProcessor
   commentprocessor!: CommentProcessor
   helmprocessor!: HelmProcessor
   octalprocessor!: OctalProcessor
@@ -25,6 +27,12 @@ export class ProcessorController {
     this.tabstospacespreprocessor = new TabsToSpacesProcessor(this.text)
     this.tabstospacespreprocessor.preprocess()
     this.text = this.tabstospacespreprocessor.text
+
+    if (this.settings.useBlockProcessor) {
+      this.blockprocessor = new BlockProcessor(this.text)
+      this.blockprocessor.preprocess()
+      this.text = this.blockprocessor.text
+    }
 
     if (this.settings.useArrayProcessor) {
       this.arrayprocessor = new ArrayProcessor(this.text)
@@ -74,6 +82,12 @@ export class ProcessorController {
       this.arrayprocessor.text = this.text
       this.arrayprocessor.postprocess()
       this.text = this.arrayprocessor.text
+    }
+
+    if (this.settings.useBlockProcessor) {
+      this.blockprocessor.text = this.text
+      this.blockprocessor.postprocess()
+      this.text = this.blockprocessor.text
     }
 
     this.spacingprocessor = new SpacingProcessor(this.text)

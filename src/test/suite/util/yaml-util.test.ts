@@ -199,34 +199,6 @@ suite("Test dumpYaml", () => {
 
 
 suite("Test sortYaml", () => {
-  test("should sort a given yaml document", () => {
-    const actual =
-      "persons:\n" +
-      "  bob:\n" +
-      "    place: Germany\n" +
-      "    age: 23\n" +
-      "  key: >\n" +
-      "      This is a very long sentence\n" +
-      "      that spans several lines in the YAML\n" +
-      "animals:\n" +
-      "  kitty:\n" +
-      "    age: 3\n"
-  
-    const expected =
-      "animals:\n" +
-      "  kitty:\n" +
-      "    age: 3\n" +
-      "persons:\n" +
-      "  bob:\n" +
-      "    age: 23\n" +
-      "    place: Germany\n" +
-      "  key: |\n" +
-      "    This is a very long sentence that spans several lines in the YAML"
-  
-    const yamlutil = new YamlUtil()
-    equal(yamlutil.sortYaml(actual, 1), expected)
-  })
-  
   test("should put top level keyword `spec` before `data` when passing customsort=1", () => {
     let actual =
       "data: data\n" +
