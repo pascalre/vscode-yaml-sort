@@ -53,6 +53,7 @@ export class Settings {
     useCustomSortRecursively = this.getBoolean("useCustomSortRecursively")
     useLeadingDashes = this.getBoolean("useLeadingDashes")
     useArrayProcessor = this.getBoolean("useArrayProcessor")
+    useBlockProcessor = this.getBoolean("useBlockProcessor")
     useCommentProcessor = this.getBoolean("useCommentProcessor")
     useHelmProcessor = this.getBoolean("useHelmProcessor")
     useOctalProcessor = this.getBoolean("useOctalProcessor")

@@ -69,9 +69,9 @@ The ArrayProcessor will not add linebreaks to single-line array structures.
 
 <table width="100%">
     <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useArrayProcessor: true</code></th>
-        <th>Sorted with<br><code>useArrayProcessor: false</code></th>
+        <th width="33.3%">Original Document</th>
+        <th width="33.3%">Sorted with<br><code>useArrayProcessor: true</code></th>
+        <th width="33.3%">Sorted with<br><code>useArrayProcessor: false</code></th>
     </tr>
     <tr>
         <td><code>test: [ "CMD", "pg_isready"]</code></td>
@@ -80,14 +80,30 @@ The ArrayProcessor will not add linebreaks to single-line array structures.
     </tr>
 </table>
 
+### BlockProcessor
+The BlockProcessor will keep block sequences.
+
+<table width="100%">
+    <tr>
+        <th width="33.3%">Original Document</th>
+        <th width="33.3%">Sorted with<br><code>useBlockProcessor: true</code></th>
+        <th width="33.3%">Sorted with<br><code>useBlockProcessor: false</code></th>
+    </tr>
+    <tr>
+        <td><code>hello: |-<br>&nbsp;&nbsp;World</code></td>
+        <td><code>hello: |-<br>&nbsp;&nbsp;World</code></td>
+        <td><code>hello: World</code></td>
+    </tr>
+</table>
+
 ### Comment Processor
 An activated Comment Processor will keep comments while sorting.
 
 <table width="100%">
     <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useCommentProcessor: true</code></th>
-        <th>Sorted with<br><code>useCommentProcessor: false</code></th>
+        <th width="33.3%">Original Document</th>
+        <th width="33.3%">Sorted with<br><code>useCommentProcessor: true</code></th>
+        <th width="33.3%">Sorted with<br><code>useCommentProcessor: false</code></th>
     </tr>
     <tr>
         <td><code># comment<br>foo: bar</code></td>
@@ -101,9 +117,9 @@ The Helm Processor makes the extension compatible with Helm charts.
 
 <table width="100%">
     <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useHelmProcessor: true</code></th>
-        <th>Sorted with<br><code>useHelmProcessor: false</code></th>
+        <th width="33.3%">Original Document</th>
+        <th width="33.3%">Sorted with<br><code>useHelmProcessor: true</code></th>
+        <th width="33.3%">Sorted with<br><code>useHelmProcessor: false</code></th>
     </tr>
     <tr>
         <td><code>foo: {{ .value }}</code></td>
@@ -117,9 +133,9 @@ The Spacing Processor will add spacing between keywords.
 
 <table width="100%">
     <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>emptyLinesUntilLevel: 0</code></th>
-        <th>Sorted with<br><code>emptyLinesUntilLevel: 1</code></th>
+        <th width="33.3%">Original Document</th>
+        <th width="33.3%">Sorted with<br><code>emptyLinesUntilLevel: 0</code></th>
+        <th width="33.3%">Sorted with<br><code>emptyLinesUntilLevel: 1</code></th>
     </tr>
     <tr>
         <td><code>foo: bar<br>baz: bar</code></td>
@@ -133,9 +149,9 @@ The Octal Processor makes the extension keeping octal value like 0744.
 
 <table width="100%">
     <tr>
-        <th>Original Document</th>
-        <th>Sorted with<br><code>useOctalProcessor: true</code></th>
-        <th>Sorted with<br><code>useOctalProcessor: false</code></th>
+        <th width="33.3%">Original Document</th>
+        <th width="33.3%">Sorted with<br><code>useOctalProcessor: true</code></th>
+        <th width="33.3%">Sorted with<br><code>useOctalProcessor: false</code></th>
     </tr>
     <tr>
         <td><code>foo: 0744</code></td>
