@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.5.0 - February 28, 2023
+* (refs [#62](https://github.com/pascalre/vscode-yaml-sort/issues/62)) Add support for block sequences
+* Update dependencies to latest versions
+
 ## 6.4.1 - February 25, 2023
 * (refs [#122](https://github.com/pascalre/vscode-yaml-sort/issues/122)) emptyLinesUntilLevel stopped working
 * Update dependencies to latest versions
