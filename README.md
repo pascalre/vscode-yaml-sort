@@ -45,6 +45,7 @@ This extension contributes the following settings:
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                                                    | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                                                        | `true`           |
 | `useArrayProcessor`        | When `true`, will activate ArrayProcessor.                                                                                                                       | `true`           |
+| `useBlockProcessor`        | When `true`, will activate BlockProcessor.                                                                                                                       | `true`           |
 | `useCommentProcessor`      | When `true`, will activate CommentProcessor.                                                                                                                     | `true`           |
 | `useHelmProcessor`         | When `true`, will activate HelmProcessor.                                                                                                                        | `true`           |
 | `useOctalProcessor`        | When `true`, will activate OctalProcessor.                                                                                                                       | `true`           |
