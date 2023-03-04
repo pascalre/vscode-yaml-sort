@@ -10,7 +10,7 @@
       ],
       "outFiles": [
         "${workspaceFolder}/out/**/*.js"
-      ],
+      ]
     },
     {
       "name": "Extension Tests",
