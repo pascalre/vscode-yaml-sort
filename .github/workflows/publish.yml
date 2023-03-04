@@ -20,6 +20,6 @@ jobs:
 
       - name: Publish to VS Marketplace
         run: vsce publish -p ${{ secrets.VSCE_PAT }}
-      
+
       - name: Publish to Open VSX Registry
         run: npx ovsx publish -p ${{ secrets.OVSX_PAT }}
