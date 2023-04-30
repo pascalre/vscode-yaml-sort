@@ -57,5 +57,5 @@ suite("Test BlockProcessor - preprocess()", () => {
     blockprocessor.preprocess()
 
     equal(blockprocessor.store.size, 0)
-    })
+  })
 })
