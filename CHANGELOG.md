@@ -1,4 +1,10 @@
 # Changelog
+## 6.5.1 - April 21, 2023
+🐛 Bugfixes
+* (refs [#126](https://github.com/pascalre/vscode-yaml-sort/issues/126)) YAML with HTML tags breaks in v6.5.0
+
+🔒 Security
+* Update dependencies to latest versions
 
 ## 6.5.0 - February 28, 2023
 * (refs [#62](https://github.com/pascalre/vscode-yaml-sort/issues/62)) Add support for block sequences
