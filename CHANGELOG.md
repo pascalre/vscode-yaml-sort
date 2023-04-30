@@ -1,4 +1,11 @@
 # Changelog
+## 6.5.2 - May 1, 2023
+🐛 Bugfixes
+* (refs [#129](https://github.com/pascalre/vscode-yaml-sort/issues/129)) False remove trailing quotes by Array Processor
+
+🔒 Security
+* Update dependencies to latest versions
+
 ## 6.5.1 - April 21, 2023
 🐛 Bugfixes
 * (refs [#126](https://github.com/pascalre/vscode-yaml-sort/issues/126)) YAML with HTML tags breaks in v6.5.0
