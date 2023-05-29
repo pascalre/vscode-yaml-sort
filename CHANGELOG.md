@@ -1,4 +1,8 @@
 # Changelog
+## 6.5.3 - May 29, 2023
+🔒 Security
+* Update dependencies to latest versions
+
 ## 6.5.2 - May 1, 2023
 🐛 Bugfixes
 * (refs [#129](https://github.com/pascalre/vscode-yaml-sort/issues/129)) False remove trailing quotes by Array Processor
