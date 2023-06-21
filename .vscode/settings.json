@@ -1,0 +1,6 @@
+{
+  "sonarlint.connectedMode.project": {
+    "connectionId": "pascalre",
+    "projectKey": "pascalre_vscode-yaml-sort"
+  }
+}

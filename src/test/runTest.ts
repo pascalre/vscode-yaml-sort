@@ -22,4 +22,4 @@ async function main() {
   }
 }
 
-main()
+main().then().catch()

@@ -9,17 +9,27 @@ const sortArrays = (obj: unknown) => {
   if (!obj || typeof obj !== "object") {
       return
   } else if (Array.isArray(obj)) {
-      obj.sort()
+      obj.sort((a, b) => compareObjects(a, b))
   }
   Object.keys(obj).forEach(key => {
     const object = obj[key as keyof unknown]
     if (typeof object === "object") {
         if (Array.isArray(object)) {
-          Object.entries(object).sort()
+          Object.entries(object).sort((a, b) => compareObjects(a, b))
         }
         sortArrays(object)
     }
   })
+}
+
+export function compareObjects(a: object, b: object) {
+  if (a > b) {
+    return 1
+  }
+  if (a < b) {
+    return -1
+  }
+  return 0
 }
 
 export class YamlUtil {
