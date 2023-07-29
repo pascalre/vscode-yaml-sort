@@ -279,7 +279,7 @@
   "dependencies": {
     "@types/glob": "^8.0.0",
     "@types/js-yaml": "^4.0.5",
-    "@types/vscode": "^1.71.0",
+    "@types/vscode": "^1.80.0",
     "@vscode/test-electron": "^2.1.5",
     "cloudformation-js-yaml-schema": "^0.4.2",
     "glob": "^8.0.3",
