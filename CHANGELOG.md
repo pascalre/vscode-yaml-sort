@@ -1,4 +1,8 @@
 # Changelog
+## 6.5.4 - Aug 13, 2023
+🔒 Security
+* Update dependencies to latest versions
+
 ## 6.5.3 - May 29, 2023
 🔒 Security
 * Update dependencies to latest versions
