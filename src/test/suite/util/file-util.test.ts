@@ -12,22 +12,22 @@ suite("Test FileUtil - getFiles()", () => {
 
   test("should return all files", () => {
     const expected = [
-      "./src/test/suite/util/resources/foo.yaml",
-      "./src/test/suite/util/resources/subfolder/foo2.yaml",
-      "./src/test/suite/util/resources/bar.yml",
-      "./src/test/suite/util/resources/subfolder/.customyaml",
+      "src/test/suite/util/resources/foo.yaml",
+      "src/test/suite/util/resources/subfolder/foo2.yaml",
+      "src/test/suite/util/resources/bar.yml",
+      "src/test/suite/util/resources/subfolder/.customyaml"
     ]
     deepEqual(fileutil.getFiles("./src/test/suite/util/resources"), expected)
   })
 
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
     const expected = [
-      "./src/test/files/getYamlFilesInDirectory/file.yaml",
-      "./src/test/files/getYamlFilesInDirectory/file2.yaml",
-      "./src/test/files/getYamlFilesInDirectory/folder1/file.yaml",
-      "./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml",
-      "./src/test/files/getYamlFilesInDirectory/folder2/file.yaml",
-      "./src/test/files/getYamlFilesInDirectory/file.yml"
+      "src/test/files/getYamlFilesInDirectory/file2.yaml",
+      "src/test/files/getYamlFilesInDirectory/file.yaml",
+      "src/test/files/getYamlFilesInDirectory/folder2/file.yaml",
+      "src/test/files/getYamlFilesInDirectory/folder1/file2.yaml",
+      "src/test/files/getYamlFilesInDirectory/folder1/file.yaml",
+      "src/test/files/getYamlFilesInDirectory/file.yml"
     ]
     deepEqual(fileutil.getFiles("./src/test/files/getYamlFilesInDirectory"), expected)
   })

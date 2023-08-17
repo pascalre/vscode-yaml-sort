@@ -136,16 +136,14 @@ suite("Test sortYamlWrapper", () => {
     }
   })
   test("should remove yaml metadata tags (directives)", async () => {
-    // Todo: This test needs a refactoring
-    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
-    // const uri = Uri.parse(resolve("./src/test/files/testSortYaml.yaml"))
+    const uri = Uri.parse(resolve("./src/test/files/testMetadataTags.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
 
     const activeEditor = window.activeTextEditor
     if (activeEditor) {
       const actual =
-        "%YAML 1.1" +
+        "%YAML 1.1\n" +
         "---\n" +
         "key:\n" +
         "  key2: value"
@@ -160,8 +158,6 @@ suite("Test sortYamlWrapper", () => {
         actual))
 
       await commands.executeCommand("vscode-yaml-sort.sortYaml")
-      // do not assert too fast
-      // await new Promise(r => setTimeout(r, 2000));
       equal(activeEditor.document.getText(), expected)
     } else {
       equal(true, false)
