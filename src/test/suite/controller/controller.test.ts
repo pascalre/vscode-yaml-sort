@@ -24,7 +24,7 @@ suite("Test sortYamlFiles", () => {
 
 suite("Test validateYamlWrapper", () => {
   test("should return true on open document", async () => {
-    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const uri = Uri.parse(resolve("./src/test/files/testValidateYamlWrapper.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
     equal(new Controller().validateYamlWrapper(), true)
@@ -33,7 +33,7 @@ suite("Test validateYamlWrapper", () => {
 
 suite("Test formatYamlWrapper", () => {
   test("should return true on a valid yaml", async () => {
-    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const uri = Uri.parse(resolve("./src/test/files/testFormatYamlWrapper2.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
 

@@ -30,7 +30,7 @@ suite("Test VsCodeAdapter - applyEdits()", () => {
 
 suite("Test VsCodeAdapter - getActiveDocument()", () => {
   test("when text editor is active should open document", async () => {
-    const uri = Uri.parse(path.resolve("./src/test/files/getYamlFilesInDirectory/file.yaml"))
+    const uri = Uri.parse(path.resolve("./src/test/files/testGetActiveDocument.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
 
