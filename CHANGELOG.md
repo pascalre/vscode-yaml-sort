@@ -1,4 +1,11 @@
 # Changelog
+## 6.5.5 - Aug 20, 2023
+🐛 Bugfixes
+* (refs [#134](https://github.com/pascalre/vscode-yaml-sort/issues/134)) Breaks with multiline strings
+
+🔒 Security
+* Update dependencies to latest versions
+
 ## 6.5.4 - Aug 13, 2023
 🔒 Security
 * Update dependencies to latest versions
