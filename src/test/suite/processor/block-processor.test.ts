@@ -58,4 +58,21 @@ suite("Test BlockProcessor - preprocess()", () => {
 
     equal(blockprocessor.store.size, 0)
   })
+
+  test("GitHub issue #134: Do not match trailing keyword", () => {
+    const text =
+      "body: |\n" +
+      "  lorem ipsum 1\n" +
+      "subject: lorem ipsum 2"
+    const match =
+      "|\n" +
+      "  lorem ipsum 1"
+
+    const blockprocessor = new BlockProcessor(text)
+
+    blockprocessor.preprocess()
+
+    equal(blockprocessor.store.size, 1)
+    equal(blockprocessor.store.get("vscode-yaml-sort.block.0"), match)
+  })
 })
