@@ -9,7 +9,8 @@ on:
       - '*'
 
 env:
-  NODE_VERSION: 16
+  # renovate: depName=nodejs/node
+  NODE_VERSION: 20
 
 jobs:
   build:
