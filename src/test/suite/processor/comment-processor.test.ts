@@ -259,6 +259,30 @@ suite("Test CommentProcessor - isCommentFound()", () => {
   })
 })
 
+suite("Test CommentProcessor - insertIfNotContained()", () => {
+  test("when comment is already contained it should not be inserted", () => {
+    const text =
+      "block:\n" +
+      "  - |\n" +
+      "    # comment 1\n" +
+      "    some command"
+    const commentprocessor = new CommentProcessor(text)
+
+    commentprocessor.findComments()
+    equal(commentprocessor.store.length, 1)
+
+    commentprocessor.insertIfNotContained(commentprocessor.store[0])
+    equal(commentprocessor.text, text)
+
+    commentprocessor.text =
+      "block:\n" +
+      "  - |\n" +
+      "    some command"
+    commentprocessor.insertIfNotContained(commentprocessor.store[0])
+    equal(commentprocessor.text, text)
+    })
+})
+
 suite("Test CommentProcessor - Issue 45", () => {
   // https://github.com/pascalre/vscode-yaml-sort/issues/45#issuecomment-1329161613
   test("should fuzzy find comments", () => {

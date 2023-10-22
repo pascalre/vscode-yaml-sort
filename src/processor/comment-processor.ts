@@ -59,8 +59,16 @@ export class CommentProcessor {
   insert(comment: string[]) {
     const indexOfComment = this.getIndexOfString(comment[1])
     if (CommentProcessor.isCommentFound(indexOfComment)) {
-      const textAfter = this.text.slice(indexOfComment)
-      const textBefore = this.text.slice(0, indexOfComment)
+      this.insertIfNotContained(comment)
+    }
+  }
+
+  insertIfNotContained(comment: string[]) {
+    const indexOfComment = this.getIndexOfString(comment[1])
+    const textAfter = this.text.slice(indexOfComment)
+    const textBefore = this.text.slice(0, indexOfComment)
+
+    if (!textBefore.endsWith(`${comment[0]}\n`)) {
       this.text = `${textBefore}${comment[0]}\n${textAfter.trimEnd()}`
     }
   }

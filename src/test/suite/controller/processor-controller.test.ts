@@ -129,4 +129,21 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
 
     equal(processor.text, text)
   })
+
+  test("GitHub issue #164: Comment processor duplicates comments inside block scalars", () => {
+    const text =
+      "block:\n" +
+      "  - |\n" +
+      "    # comment 1\n" +
+      "    some command\n" +
+      "    # comment 2\n" +
+      "    some other command"
+      const processor = new ProcessorController(text)
+
+      processor.preprocess()
+      processor.postprocess()
+
+      equal(processor.text, text)
+
+    })
 })
