@@ -1,4 +1,12 @@
 # Changelog
+## 6.5.8 - Okt 22, 2023
+🐛 Bugfixes
+* (refs [#149](https://github.com/pascalre/vscode-yaml-sort/issues/149)) Recursive sort not adding leading dashes to file
+* (refs [#164](https://github.com/pascalre/vscode-yaml-sort/issues/164)) Comment processor duplicates comments inside block scalars
+
+🔒 Security
+* Update dependencies to latest versions
+
 ## 6.5.7 - Okt 21, 2023
 🔒 Security
 * Update dependencies to latest versions
