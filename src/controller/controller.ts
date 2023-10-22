@@ -79,9 +79,7 @@ export class Controller {
         return []
       }
     }
-    if (this.settings.useLeadingDashes) {
-      newText = `---\n${newText}`
-    }
+    newText = this.yamlutil.setLeadingDashes(newText)
     return this.applyEdits(newText)
   }
 
@@ -129,8 +127,8 @@ export class Controller {
         return [] as TextEdit[]
       }
     })
-    if (this.editor.selection.isEmpty && this.settings.useLeadingDashes) {
-      newText = `---\n${newText}`
+    if (this.editor.selection.isEmpty) {
+      newText = this.yamlutil.setLeadingDashes(newText)
     }
     this.vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
     return this.applyEdits(newText)

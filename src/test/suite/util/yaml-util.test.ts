@@ -52,9 +52,21 @@ suite("Test sortArrays", () => {
   })
 })
 
-suite("Test dumpYaml", () => {
+suite("Test YamlUtil - setLeadingDashes()", () => {
+  test("when setting useLeadingDashes is `true` should prepend `---\n` to text", () => {
+    const yamlutil = new YamlUtil()
+    const text = "lorem ipsum"
+    yamlutil.settings.useLeadingDashes = false
+    equal(yamlutil.setLeadingDashes(text), text)
 
-  test("when useCustomSortRecursively is set to `true` should recursively use customSort", () => {
+    yamlutil.settings.useLeadingDashes = true
+    const expected = "---\nlorem ipsum"
+    equal(yamlutil.setLeadingDashes(text), expected)
+  })
+})
+
+suite("Test dumpYaml", () => {
+  test("when useCustomSortRecursively is set to`true` should recursively use customSort", () => {
     const actual =
       "keyword1: value\n" +
       "keyword: value\n" +

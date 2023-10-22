@@ -27,10 +27,12 @@ export class FileUtil {
   }
 
   sortFile(file: string) {
+    const yamlutil = new YamlUtil()
     const text = readFileSync(file, this.encoding).toString()
-    const sortedYaml = new YamlUtil().sortYaml(text, 0)
+    let sortedYaml = yamlutil.sortYaml(text, 0)
 
     if (sortedYaml) {
+      sortedYaml = yamlutil.setLeadingDashes(sortedYaml)
       writeFileSync(file, sortedYaml)
     } else {
       throw new Error(`File ${file} could not be sorted`)
