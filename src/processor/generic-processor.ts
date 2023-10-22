@@ -14,7 +14,7 @@ export abstract class GenericProcessor {
     const matches = this.findMatches()
     if (matches) {
       for (const match of matches) {
-        this.replaceValueWithSubstitue(match)
+        this.replaceValueWithSubstitute(match)
       }
     }
   }
@@ -23,7 +23,7 @@ export abstract class GenericProcessor {
     return this.text.match(this.matcher)
   }
 
-  replaceValueWithSubstitue(value: string) {
+  replaceValueWithSubstitute(value: string) {
     const substitue = `vscode-yaml-sort.${this.filter}.${this.store.size}`
     this.store.set(substitue, value)
     this.text = this.text.replace(value, substitue)

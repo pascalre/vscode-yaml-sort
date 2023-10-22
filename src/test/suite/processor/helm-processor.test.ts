@@ -41,7 +41,7 @@ suite("Test HelmProcessor - findMatches()", () => {
   })
 })
 
-suite("Test HelmProcessor - replaceValueWithSubstitue()", () => {
+suite("Test HelmProcessor - replaceValueWithSubstitute()", () => {
   test("should replace first match", () => {
     const text =
       "foo: bar\n" +
@@ -51,13 +51,13 @@ suite("Test HelmProcessor - replaceValueWithSubstitue()", () => {
 
     equal(helmprocessor.store.size, 0)
 
-    helmprocessor.replaceValueWithSubstitue("bar")
+    helmprocessor.replaceValueWithSubstitute("bar")
 
     equal(helmprocessor.store.size, 1)
     match(helmprocessor.text, /foo: vscode-yaml-sort.helm.0/)
 
-    helmprocessor.replaceValueWithSubstitue("baz")
-    helmprocessor.replaceValueWithSubstitue("foo2")
+    helmprocessor.replaceValueWithSubstitute("baz")
+    helmprocessor.replaceValueWithSubstitute("foo2")
 
     equal(helmprocessor.store.size, 3)
 
@@ -72,7 +72,7 @@ suite("Test HelmProcessor - replaceValueWithSubstitue()", () => {
     const text = "foo: bar\n"
     const helmprocessor = new HelmProcessor(text)
 
-    helmprocessor.replaceValueWithSubstitue("bar")
+    helmprocessor.replaceValueWithSubstitute("bar")
 
     const expected = "foo: vscode-yaml-sort.helm.0\n"
 
