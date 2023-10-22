@@ -6,19 +6,22 @@ import { Uri, commands, window, workspace } from "vscode"
 
 import { Controller } from "../../../controller/controller"
 
+
 suite("Test sortYamlFiles", () => {
+  const fileContent = "---\nakey: value\nkey: value"
+
   test("should sort all yaml files in directory", async () => {
     const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/folder1"))
 
     await commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
 
     let sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "utf-8").toString()
-    equal(sortedFile, "akey: value\nkey: value")
+    equal(sortedFile, fileContent)
     sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "utf-8").toString()
-    equal(sortedFile, "akey: value\nkey: value")
+    equal(sortedFile, fileContent)
 
-    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "key: value\nakey: value")
-    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "key: value\nakey: value")
+    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", fileContent)
+    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", fileContent)
   })
 })
 

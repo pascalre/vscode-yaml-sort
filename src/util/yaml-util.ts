@@ -54,6 +54,13 @@ export class YamlUtil {
     return (!text.startsWith("|") && text.includes(":")) || text.startsWith("-")
   }
 
+  setLeadingDashes(text: string) {
+    if (this.settings.useLeadingDashes) {
+      return `---\n${text}`
+    }
+    return text
+  }
+
   transformMultilineValue(text: string) {
     let result = prependWhitespacesOnEachLine(text, this.settings.indent)
     if (text.endsWith("\n")) {
