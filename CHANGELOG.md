@@ -1,47 +1,54 @@
 # Changelog
-## 6.5.8 - Okt 22, 2023
+## 6.5.9 - Oct 25, 2023
+🐛 Bugfixes
+* (refs [#159](https://github.com/pascalre/vscode-yaml-sort/issues/159)) Sort YAML Converts `00000000-0000-0000-0000-000000000001` to octal
+
+📦 Dependencies
+* Update dependencies to latest versions
+
+## 6.5.8 - Oct 22, 2023
 🐛 Bugfixes
 * (refs [#149](https://github.com/pascalre/vscode-yaml-sort/issues/149)) Recursive sort not adding leading dashes to file
 * (refs [#164](https://github.com/pascalre/vscode-yaml-sort/issues/164)) Comment processor duplicates comments inside block scalars
 
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
-## 6.5.7 - Okt 21, 2023
-🔒 Security
+## 6.5.7 - Oct 21, 2023
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.6 - Sep 13, 2023
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.5 - Aug 20, 2023
 🐛 Bugfixes
 * (refs [#134](https://github.com/pascalre/vscode-yaml-sort/issues/134)) Breaks with multiline strings
 
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.4 - Aug 13, 2023
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.3 - May 29, 2023
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.2 - May 1, 2023
 🐛 Bugfixes
 * (refs [#129](https://github.com/pascalre/vscode-yaml-sort/issues/129)) False remove trailing quotes by Array Processor
 
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.1 - April 21, 2023
 🐛 Bugfixes
 * (refs [#126](https://github.com/pascalre/vscode-yaml-sort/issues/126)) YAML with HTML tags breaks in v6.5.0
 
-🔒 Security
+📦 Dependencies
 * Update dependencies to latest versions
 
 ## 6.5.0 - February 28, 2023
