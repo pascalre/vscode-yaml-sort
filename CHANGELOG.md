@@ -1,4 +1,8 @@
 # Changelog
+## 6.5.10 - Nov 19, 2023
+📦 Dependencies
+* Update dependencies to latest versions
+
 ## 6.5.9 - Oct 25, 2023
 🐛 Bugfixes
 * (refs [#159](https://github.com/pascalre/vscode-yaml-sort/issues/159)) Sort YAML Converts `00000000-0000-0000-0000-000000000001` to octal
