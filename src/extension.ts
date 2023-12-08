@@ -31,6 +31,9 @@ export function activate(context: ExtensionContext) {
     }),
     commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri: Uri) => {
       new Controller().sortYamlFiles(uri)
+    }),
+    commands.registerCommand("vscode-yaml-sort.customSortYamlByFileName", () => {
+      new Controller().sortYamlWrapper(99)
     })
   )
   for (const index of [1, 2, 3]) {

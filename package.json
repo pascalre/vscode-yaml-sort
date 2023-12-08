@@ -49,6 +49,14 @@
     ],
     "configuration": {
       "properties": {
+        "vscode-yaml-sort.customSortByFileNameKeywords": {
+          "type": "map",
+          "default": [
+            ["gitlab-ci.yaml", ["stages", "variables", "build"]],
+            ["action.yaml", ["name", "on", "jobs"]]
+          ],
+          "description": "Map of filenames and according sort order."
+        },
         "vscode-yaml-sort.emptyLinesUntilLevel": {
           "type": "number",
           "default": 0,
@@ -213,6 +221,11 @@
       {
         "command": "vscode-yaml-sort.customSortYaml_3",
         "title": "YAML Sort: Custom sort 3",
+        "when": "editorLangId == yaml"
+      },
+      {
+        "command": "vscode-yaml-sort.customSortYamlByFileName",
+        "title": "YAML Sort: Custom sort by filename",
         "when": "editorLangId == yaml"
       },
       {

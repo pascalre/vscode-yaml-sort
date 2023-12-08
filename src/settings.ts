@@ -1,7 +1,9 @@
+import path = require("path")
+
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema } from "js-yaml"
-import { workspace } from "vscode"
+import { window, workspace } from "vscode"
 
 export class Settings {
     filter = "vscode-yaml-sort"
@@ -22,14 +24,30 @@ export class Settings {
     getCustomSortKeywords(index: number): string[] {
         if ([1, 2, 3].includes(index))
             return this.workspace.getConfiguration().get(`${this.filter}.customSortKeywords_${index}`) as string[]
+        if (index == 99)
+            return this.getCustomSortKeywordsByFileName()
         return []
     }
+
+    getCustomSortKeywordsByFileName(): string[] {
+        const file = window.activeTextEditor?.document.fileName as string
+        const filename = path.parse(file).base
+        const map = this.workspace.getConfiguration().get(`${this.filter}.customSortByFileNameKeywords`) as Map<string, string[]>
+        const sortorder = map.get(filename)
+        if (sortorder)
+            return sortorder
+
+        return []
+    }
+
     getExtensions(): string[] {
         return this.workspace.getConfiguration().get(`${this.filter}.extensions`) as string[]
     }
+
     getQuotingType(): "'" | "\"" {
         return this.workspace.getConfiguration().get(`${this.filter}.quotingType`) as "'" | "\""
     }
+
     getSchema(): Schema {
         const schema = this.workspace.getConfiguration().get(`${this.filter}.schema`) as string
         return Settings.getJsYamlSchemaFromString(schema)
