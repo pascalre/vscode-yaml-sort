@@ -272,7 +272,7 @@
     "nyc": "15.1.0",
     "sinon": "^17.0.0",
     "sonarqube-scanner": "^3.0.1",
-    "ts-node": "10.9.1",
+    "ts-node": "10.9.2",
     "typescript": "^5.0.4",
     "typescript-require": "0.3.0"
   },
