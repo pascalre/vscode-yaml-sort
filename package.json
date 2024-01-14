@@ -2,7 +2,7 @@
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
   "description": "This VS Code extension exposes the possibility to sort, format and validate yaml files.",
-  "version": "6.5.10",
+  "version": "6.5.11",
   "engines": {
     "vscode": "^1.49.0"
   },
@@ -259,12 +259,12 @@
   "devDependencies": {
     "@types/mocha": "^10.0.4",
     "@types/node": "^20.6.0",
-    "@types/sinon": "^17.0.1",
+    "@types/sinon": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "coveralls": "3.1.1",
-    "dependency-cruiser": "^15.0.0",
-    "eslint": "^8.34.0",
+    "dependency-cruiser": "^16.0.0",
+    "eslint": "^8.56.0",
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-import": "^2.27.5",
     "jsdoc": "^4.0.2",
@@ -273,7 +273,7 @@
     "sinon": "^17.0.0",
     "sonarqube-scanner": "^3.0.1",
     "ts-node": "10.9.2",
-    "typescript": "^5.0.4",
+    "typescript": "^5.3.3",
     "typescript-require": "0.3.0"
   },
   "dependencies": {
