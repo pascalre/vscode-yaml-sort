@@ -36,7 +36,7 @@ export abstract class GenericProcessor {
   }
 
   replaceSubstituteWithValue(substitute: string, value: string) {
-    const match = new RegExp(`('|")?${substitute}('|")?`)
+    const match = new RegExp(`'${substitute}'|"${substitute}"|${substitute}`)
     this.text = this.text.replace(match, value)
   }
 }
