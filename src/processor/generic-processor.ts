@@ -24,9 +24,9 @@ export abstract class GenericProcessor {
   }
 
   replaceValueWithSubstitute(value: string) {
-    const substitue = `vscode-yaml-sort.${this.filter}.${this.store.size}`
-    this.store.set(substitue, value)
-    this.text = this.text.replace(value, substitue)
+    const substitute = `vscode-yaml-sort.${this.filter}.${this.store.size}`
+    this.store.set(substitute, value)
+    this.text = this.text.replace(value, substitute)
   }
 
   postprocess() {
@@ -35,8 +35,8 @@ export abstract class GenericProcessor {
     })
   }
 
-  replaceSubstituteWithValue(substitue: string, value: string) {
-    const match = new RegExp(`('|")?${substitue}('|")?`)
+  replaceSubstituteWithValue(substitute: string, value: string) {
+    const match = new RegExp(`('|")?${substitute}('|")?`)
     this.text = this.text.replace(match, value)
   }
 }
