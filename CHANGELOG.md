@@ -1,4 +1,8 @@
 # Changelog
+# 6.5.14 - Jan 21, 2024
+📦 Dependencies
+* Update dependencies to latest versions
+
 # 6.5.13 - Jan 21, 2024
 📦 Dependencies
 * Update dependencies to latest versions
