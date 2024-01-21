@@ -1,4 +1,11 @@
 # Changelog
+## 6.5.12 - Jan 21, 2024
+🐛 Bugfixes
+* (refs [#154](https://github.com/pascalre/vscode-yaml-sort/issues/154)) ‘{{ TEXT }} TEXT’ turns into {{ TEXT }} TEXT after sorted
+
+📦 Dependencies
+* Update dependencies to latest versions
+
 ## 6.5.11 - Jan 14, 2024
 📦 Dependencies
 * Update dependencies to latest versions
