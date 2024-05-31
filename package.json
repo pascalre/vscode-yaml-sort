@@ -281,7 +281,7 @@
     "@types/vscode": "^1.88.0",
     "@vscode/test-electron": "^2.1.5",
     "cloudformation-js-yaml-schema": "^0.4.2",
-    "glob": "^10.3.5",
+    "glob": "^10.3.14",
     "homeassistant-js-yaml-schema": "^1.1.0",
     "js-yaml": "^4.1.0"
   }
