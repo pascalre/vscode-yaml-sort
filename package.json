@@ -279,7 +279,7 @@
   "dependencies": {
     "@types/js-yaml": "^4.0.6",
     "@types/vscode": "^1.88.0",
-    "@vscode/test-electron": "^2.1.5",
+    "@vscode/test-electron": "^2.4.0",
     "cloudformation-js-yaml-schema": "^0.4.2",
     "glob": "^10.3.5",
     "homeassistant-js-yaml-schema": "^1.1.0",
