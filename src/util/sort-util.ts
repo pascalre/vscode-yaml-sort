@@ -10,12 +10,13 @@ export class SortUtil {
   }
 
   customSort(a: string, b: string): number {
+    const sortOrderReverse = this.settings.sortOrderReverse
     const sortOrder = this.settings.getCustomSortKeywords(this.custom)
     const indexA = sortOrder.indexOf(a)
     const indexB = sortOrder.indexOf(b)
 
     if (indexA > -1 && indexB > -1) {
-      return SortUtil.compare(indexA, indexB)
+      return SortUtil.compare(sortOrderReverse, indexA, indexB)
     }
     if (indexA !== -1 && indexB === -1) {
       return -1
@@ -26,13 +27,15 @@ export class SortUtil {
     return this.localeSort(a, b)
   }
 
-  static compare(a: number, b: number) {
+  static compare(reverse: boolean, a: number, b: number) {
     if (a > b) {
-      return 1
+      return reverse ? -1 : +1
     }
+
     if (a < b) {
-      return -1
+      return reverse ? +1 : -1
     }
+
     return 0
   }
 
