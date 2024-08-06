@@ -49,6 +49,7 @@ export class Settings {
     quotingType = this.getQuotingType()
     schema = this.getSchema()
     sortArrays = this.getBoolean("sortArrays")
+    sortOrderReverse = this.getBoolean("sortOrderReverse")
     sortOnSave = this.getNumber("sortOnSave")
     useCustomSortRecursively = this.getBoolean("useCustomSortRecursively")
     useLeadingDashes = this.getBoolean("useLeadingDashes")
