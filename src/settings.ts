@@ -50,6 +50,7 @@ export class Settings {
     schema = this.getSchema()
     sortArrays = this.getBoolean("sortArrays")
     sortOnSave = this.getNumber("sortOnSave")
+    sortOrderReverse = this.getBoolean("sortOrderReverse")
     useCustomSortRecursively = this.getBoolean("useCustomSortRecursively")
     useLeadingDashes = this.getBoolean("useLeadingDashes")
     useArrayProcessor = this.getBoolean("useArrayProcessor")

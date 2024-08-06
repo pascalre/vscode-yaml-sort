@@ -157,6 +157,11 @@
           "default": false,
           "description": "When `true`, will sort arrays"
         },
+        "vscode-yaml-sort.sortOrderReverse": {
+          "type": "boolean",
+          "default": false,
+          "description": "When `true`, will sort in reverse order"
+        },
         "vscode-yaml-sort.sortOnSave": {
           "type": "number",
           "default": 0,
