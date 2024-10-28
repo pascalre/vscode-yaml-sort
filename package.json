@@ -258,7 +258,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.4",
-    "@types/node": "^20.11.5",
+    "@types/node": "^22.8.1",
     "@types/sinon": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
@@ -269,9 +269,9 @@
     "eslint-plugin-import": "^2.27.5",
     "jsdoc": "^4.0.2",
     "mocha": "^10.2.0",
-    "nyc": "15.1.0",
-    "sinon": "^17.0.0",
-    "sonarqube-scanner": "^3.0.1",
+    "nyc": "^17.1.0",
+    "sinon": "^19.0.2",
+    "sonarqube-scanner": "^4.2.5",
     "ts-node": "10.9.2",
     "typescript": "^5.3.3",
     "typescript-require": "0.3.0"
@@ -281,7 +281,7 @@
     "@types/vscode": "^1.88.0",
     "@vscode/test-electron": "^2.1.5",
     "cloudformation-js-yaml-schema": "^0.4.2",
-    "glob": "^10.3.5",
+    "glob": "^11.0.0",
     "homeassistant-js-yaml-schema": "^1.1.0",
     "js-yaml": "^4.1.0"
   }
