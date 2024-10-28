@@ -1,4 +1,8 @@
 # Changelog
+# 6.6.0 - Oct 28, 2024
+✨ Feature
+* (refs [#225](https://github.com/pascalre/vscode-yaml-sort/issues/225)) Support sorting in reverse order
+
 # 6.5.18 - Oct 28, 2024
 📦 Dependencies
 * Update dependencies to latest versions

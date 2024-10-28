@@ -10,6 +10,7 @@ export class SortUtil {
   }
 
   customSort(a: string, b: string): number {
+    const sortOrderReverse = this.settings.sortOrderReverse
     const sortOrder = this.settings.getCustomSortKeywords(this.custom)
     const indexA = sortOrder.indexOf(a)
     const indexB = sortOrder.indexOf(b)
@@ -23,6 +24,9 @@ export class SortUtil {
     if (indexA === -1 && indexB !== -1) {
       return 1
     }
+    if (sortOrderReverse) {
+      return this.localeSort(b, a)
+    }
     return this.localeSort(a, b)
   }
 
@@ -30,9 +34,11 @@ export class SortUtil {
     if (a > b) {
       return 1
     }
+
     if (a < b) {
       return -1
     }
+
     return 0
   }
 
