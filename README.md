@@ -41,6 +41,7 @@ This extension contributes the following settings:
 | `schema`                   | Schema to use. Possible values are `HOMEASSISTANT_SCHEMA`, `CLOUDFORMATION_SCHEMA`, `CORE_SCHEMA`, `DEFAULT_SCHEMA`, `FAILSAFE_SCHEMA`, `JSON_SCHEMA`.           | `DEFAULT_SCHEMA` |
 | `sortArrays`               | When `true`, will sort arrays                                                                                                                                   | `false`          |
 | `sortOnSave`               | When `0`, will sort files when saving document. When `1`, `2` or `3`, will use customSortKeywords. Set to negative value to disable sortOnSave. Only works in combination with `editor.formatOnSave` set to `true`. | `0`           |
+| `sortOrderReverse`         | When `true`, will sort in reverse order | `false`           |
 | `useAsFormatter`           | When `true`, will enable default YAML formatter (requires restart).                                                                                              | `false`          |
 | `useCustomSortRecursively` | When `true`, will use the custom sort keywords recursively on a file, when using custom sort.                                                                    | `false`          |
 | `useLeadingDashes`         | When `true`, sorted YAML files begin with leading dashes.                                                                                                        | `true`           |

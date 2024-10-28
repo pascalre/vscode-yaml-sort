@@ -16,7 +16,7 @@ export class SortUtil {
     const indexB = sortOrder.indexOf(b)
 
     if (indexA > -1 && indexB > -1) {
-      return SortUtil.compare(sortOrderReverse, indexA, indexB)
+      return SortUtil.compare(indexA, indexB)
     }
     if (indexA !== -1 && indexB === -1) {
       return -1
@@ -24,16 +24,19 @@ export class SortUtil {
     if (indexA === -1 && indexB !== -1) {
       return 1
     }
+    if (sortOrderReverse) {
+      return this.localeSort(b, a)
+    }
     return this.localeSort(a, b)
   }
 
-  static compare(reverse: boolean, a: number, b: number) {
+  static compare(a: number, b: number) {
     if (a > b) {
-      return reverse ? -1 : +1
+      return 1
     }
 
     if (a < b) {
-      return reverse ? +1 : -1
+      return -1
     }
 
     return 0
