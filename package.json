@@ -2,7 +2,7 @@
   "name": "vscode-yaml-sort",
   "displayName": "YAML Sort",
   "description": "This VS Code extension exposes the possibility to sort, format and validate yaml files.",
-  "version": "6.6.1",
+  "version": "6.6.2",
   "engines": {
     "vscode": "^1.49.0"
   },
@@ -253,7 +253,7 @@
     "code-analysis": "npx depcruise --validate .dependency-cruiser.js src",
     "compile": "tsc -p ./",
     "coverage": "rm -rf .nyc_output && rm -rf coverage && nyc npm run test",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "pretest": "npm run compile",
     "sonar": "node sonar-project.js",
@@ -270,7 +270,7 @@
     "coveralls": "3.1.1",
     "dependency-cruiser": "^16.10.0",
     "eslint": "^8.57.0",
-    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-import-resolver-typescript": "^4.2.2",
     "eslint-plugin-import": "^2.27.5",
     "jsdoc": "^4.0.2",
     "mocha": "^11.1.0",
@@ -283,7 +283,7 @@
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.6",
-    "@types/vscode": "^1.88.0",
+    "@types/vscode": "^1.98.0",
     "@vscode/test-electron": "^2.1.5",
     "cloudformation-js-yaml-schema": "^0.4.2",
     "glob": "^11.0.1",
