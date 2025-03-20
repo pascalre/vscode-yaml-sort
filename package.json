@@ -273,7 +273,7 @@
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-import": "^2.27.5",
     "jsdoc": "^4.0.2",
-    "mocha": "^10.2.0",
+    "mocha": "^11.0.0",
     "nyc": "^17.1.0",
     "sinon": "^19.0.2",
     "sonarqube-scanner": "^4.2.5",
