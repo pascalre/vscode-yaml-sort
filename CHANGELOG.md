@@ -1,4 +1,8 @@
 # Changelog
+# 6.6.3 - Sep 9, 2025
+📦 Dependencies
+* Update dependencies to latest versions
+
 # 6.6.2 - Mar 20, 2025
 📦 Dependencies
 * Update dependencies to latest versions
