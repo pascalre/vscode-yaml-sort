@@ -288,6 +288,6 @@
     "cloudformation-js-yaml-schema": "^0.4.2",
     "glob": "^11.0.3",
     "homeassistant-js-yaml-schema": "^1.1.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.1"
   }
 }
