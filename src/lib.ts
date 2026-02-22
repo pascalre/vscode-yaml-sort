@@ -28,11 +28,3 @@ export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArra
   return delimiters
 }
 
-/**
- * Add a new line before each occurence of a top level keyword after a new line
- * @param   {string} text Text to be processed
- * @returns {string} processed text
- */
-export function addNewLineBeforeRootKeywords(text: string): string {
-  return text.replace(/\n[^\s]*:/g, "\n$&")
-}
