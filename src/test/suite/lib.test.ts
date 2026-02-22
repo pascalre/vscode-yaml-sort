@@ -1,7 +1,6 @@
 import { equal, throws} from "assert"
 
 import {
-  addNewLineBeforeRootKeywords,
   prependWhitespacesOnEachLine
 } from "../../lib"
 import { removeTrailingCharacters } from "../../util/yaml-util"
@@ -52,17 +51,3 @@ suite("Test prependWhitespacesOnEachLine", () => {
   })
 })
 
-suite("Test addNewLineBeforeRootKeywords", () => {
-  test("should add an empty line before each top level keyword, but only if they appear after a new line", () => {
-    const actual = `data:
-  key: value
-spec: value
-`
-    const expected = `data:
-  key: value
-
-spec: value
-`
-    equal(addNewLineBeforeRootKeywords(actual), expected)
-  })
-})
