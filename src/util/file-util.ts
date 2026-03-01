@@ -22,10 +22,6 @@ export class FileUtil {
     return files
   }
 
-  readFile(file: string) {
-    return readFileSync(file, this.encoding).toString()
-  }
-
   sortFile(file: string) {
     const yamlutil = new YamlUtil()
     const text = readFileSync(file, this.encoding).toString()

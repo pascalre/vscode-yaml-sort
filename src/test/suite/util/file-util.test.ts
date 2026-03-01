@@ -33,18 +33,6 @@ suite("Test FileUtil - getFiles()", () => {
   })
 })
 
-suite("Test FileUtil - readFile()", () => {
-  const fileutil = new FileUtil()
-
-  test("when `file` is a path to an existing file should return the files content", () => {
-    equal(fileutil.readFile("./src/test/suite/util/resources/readFile.txt"), "lorem impsum")
-  })
-
-  test("when `file` is a path to a non existing file should throw", () => {
-    throws(() => fileutil.readFile("nonexistent-path"), Error)
-  })
-})
-
 suite("Test FileUtil - sortFile()", () => {
   const fileutil = new FileUtil()
 
