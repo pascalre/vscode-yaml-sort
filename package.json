@@ -276,7 +276,7 @@
     "mocha": "^11.1.0",
     "nyc": "^17.1.0",
     "sinon": "^21.0.0",
-    "sonarqube-scanner": "^4.2.5",
+    "sonarqube-scanner": "^4.3.8",
     "ts-node": "10.9.2",
     "typescript": "^5.3.3",
     "typescript-require": "0.3.0"
