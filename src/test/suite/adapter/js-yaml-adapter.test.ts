@@ -2,7 +2,7 @@ import { equal, throws } from "assert"
 
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
-import jsyaml = require("js-yaml")
+import * as jsyaml from "js-yaml"
 
 import { JsYamlAdapter } from "../../../adapter/js-yaml-adapter"
 import { Settings } from "../../../settings"
@@ -106,7 +106,7 @@ suite("Test JsYamlAdapter - dumpYaml() with setting nullStyle", () => {
   ]
 
   cases.forEach(([style, expected]) => {
-    test("when nullStyle is '" + style + "' should print '" + expected.replace("ValidFrom: ", "") + "'", () => {
+    test(`when nullStyle is '${style}' should print '${expected.replace("ValidFrom: ", "")}'`, () => {
       const settings = new Settings()
       settings.nullStyle = style
       equal(new JsYamlAdapter(settings).dumpYaml(doc, true, 0), expected)
