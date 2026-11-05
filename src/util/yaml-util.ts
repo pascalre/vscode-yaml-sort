@@ -123,7 +123,7 @@ export class YamlUtil {
     try {
       const processor = new ProcessorController(yaml)
       processor.preprocess()
-      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text) as string, false, 0)
+      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text) as object, false, 0)
       processor.text = doc
       processor.postprocess()
       doc = processor.text
