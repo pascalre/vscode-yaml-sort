@@ -16,7 +16,7 @@ This extension contributes the following commands:
 | `Custom Sort 2`                                | Same as `Custom Sort 1`                                                                                               |
 | `Custom Sort 3`                                | Same as `Custom Sort 1`                                                                                               |
 | `Format Document`                              | Formats a yaml document without sorting it. Also possible using the shortcut (⇧⌥F on Mac). |
-| `Recursively sort YAML files`                  | Sorts all `.yaml` and `.yml` files in a directory and all its subdirectories.                                         |
+| `Recursively sort YAML files`                  | Sorts all `.yaml` and `.yml` files in a directory and all its subdirectories. A newline at the end of a file will be retained. |
 | `Sort YAML`                                    | Sorts a given YAML. You can either sort the whole YAML document or sort only a selection of the text.                 |
 | `Validate YAML`                                | Validates a given YAML.                                                                                               |
 
