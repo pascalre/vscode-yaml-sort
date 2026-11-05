@@ -52,6 +52,7 @@ export class JsYamlAdapter {
       noCompatMode: this.settings.noCompatMode,
       quotingType: this.settings.getQuotingType(),
       schema: this.settings.getSchema(),
+      styles: { "!!null": this.settings.getNullStyle() },
       sortKeys: (!(custom > 0 && this.settings.useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
         return sort.customSort(a, b)
       })
