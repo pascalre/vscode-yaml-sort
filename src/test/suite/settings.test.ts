@@ -41,6 +41,10 @@ suite("Test Settings - getter", () => {
         deepEqual(settings.locale, "en")
     })
 
+    test("default value of nullStyle is set to `lowercase`", () => {
+        deepEqual(settings.nullStyle, "lowercase")
+    })
+
     test("default value of noArrayIndent is set to `false`", () => {
         deepEqual(settings.noArrayIndent, false)
     })

@@ -35,6 +35,12 @@ export class Settings {
         return Settings.getJsYamlSchemaFromString(schema)
     }
 
+    getNullStyle(): string {
+        // js-yaml only supports these styles for the !!null tag
+        const validStyles = ["lowercase", "uppercase", "camelcase", "canonical", "empty"]
+        return validStyles.includes(this.nullStyle) ? this.nullStyle : "lowercase"
+    }
+
     customSortKeywords1 = this.getCustomSortKeywords(1)
     customSortKeywords2 = this.getCustomSortKeywords(2)
     customSortKeywords3 = this.getCustomSortKeywords(3)
@@ -43,6 +49,7 @@ export class Settings {
     indent = this.getNumber("indent")
     lineWidth = this.getNumber("lineWidth")
     locale = this.getString("locale")
+    nullStyle = this.getString("nullStyle")
     noArrayIndent = this.getBoolean("noArrayIndent")
     noCompatMode = this.getBoolean("noCompatMode")
     notifySuccess = this.getBoolean("notifySuccess")

@@ -94,3 +94,36 @@ suite("Test JsYamlAdapter - validateYaml()", () => {
   })
 })
 
+
+suite("Test JsYamlAdapter - dumpYaml() with setting nullStyle", () => {
+  const doc = { ValidFrom: null }
+
+  test("when nullStyle is 'lowercase' (default) should print 'null'", () => {
+    equal(new JsYamlAdapter(new Settings()).dumpYaml(doc, true, 0), "ValidFrom: null")
+  })
+
+  test("when nullStyle is 'canonical' should print '~'", () => {
+    const settings = new Settings()
+    settings.nullStyle = "canonical"
+    equal(new JsYamlAdapter(settings).dumpYaml(doc, true, 0), "ValidFrom: ~")
+  })
+
+  test("when nullStyle is 'uppercase' should print 'NULL'", () => {
+    const settings = new Settings()
+    settings.nullStyle = "uppercase"
+    equal(new JsYamlAdapter(settings).dumpYaml(doc, true, 0), "ValidFrom: NULL")
+  })
+
+  test("when nullStyle is 'camelcase' should print 'Null'", () => {
+    const settings = new Settings()
+    settings.nullStyle = "camelcase"
+    equal(new JsYamlAdapter(settings).dumpYaml(doc, true, 0), "ValidFrom: Null")
+  })
+
+  test("when nullStyle is 'empty' should print no value", () => {
+    const settings = new Settings()
+    settings.nullStyle = "empty"
+    // js-yaml writes an empty null value as 'key: ' (with a trailing space)
+    equal(new JsYamlAdapter(settings).dumpYaml(doc, true, 0), "ValidFrom: ")
+  })
+})

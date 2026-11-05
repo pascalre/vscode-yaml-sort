@@ -115,6 +115,25 @@
           "default": "en",
           "description": "Language whose sort order should be used."
         },
+        "vscode-yaml-sort.nullStyle": {
+          "type": "string",
+          "default": "lowercase",
+          "enum": [
+            "lowercase",
+            "uppercase",
+            "camelcase",
+            "canonical",
+            "empty"
+          ],
+          "enumDescriptions": [
+            "Print null values as 'null'",
+            "Print null values as 'NULL'",
+            "Print null values as 'Null'",
+            "Print null values as '~' (canonical)",
+            "Print null values without a value ('key: ')"
+          ],
+          "description": "Defines how null values are printed. Possible values: 'lowercase' (null), 'uppercase' (NULL), 'camelcase' (Null), 'canonical' (~) or 'empty' (no value)."
+        },
         "vscode-yaml-sort.noArrayIndent": {
           "type": "boolean",
           "default": false,
