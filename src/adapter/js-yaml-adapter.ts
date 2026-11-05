@@ -33,11 +33,11 @@ export class JsYamlAdapter {
 
   /**
    * Dumps a yaml with the user specific settings.
-   * @param   {string}  text     Yaml document which should be dumped.
+   * @param   {object}  text     Loaded yaml document which should be dumped.
    * @param   {boolean} sortKeys If set to true, the function will sort the keys in the document. Defaults to true.
    * @returns {string}           Clean yaml document.
    */
-  dumpYaml(text: string, sortKeys: boolean, custom: number): string {
+  dumpYaml(text: object, sortKeys: boolean, custom: number): string {
     if (Object.keys(text).length === 0) {
       return ""
     }
@@ -52,6 +52,7 @@ export class JsYamlAdapter {
       noCompatMode: this.settings.noCompatMode,
       quotingType: this.settings.getQuotingType(),
       schema: this.settings.getSchema(),
+      styles: { "!!null": this.settings.getNullStyle() },
       sortKeys: (!(custom > 0 && this.settings.useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
         return sort.customSort(a, b)
       })
