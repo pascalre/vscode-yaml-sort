@@ -29,6 +29,11 @@ export class FileUtil {
 
     if (sortedYaml) {
       sortedYaml = yamlutil.setLeadingDashes(sortedYaml)
+      // retain a trailing newline if the original file had one
+      // see https://github.com/pascalre/vscode-yaml-sort/issues/186
+      if (text.endsWith("\n") && !sortedYaml.endsWith("\n")) {
+        sortedYaml += "\n"
+      }
       writeFileSync(file, sortedYaml)
     } else {
       throw new Error(`File ${file} could not be sorted`)
