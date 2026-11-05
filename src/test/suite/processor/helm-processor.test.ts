@@ -145,3 +145,14 @@ suite("Test HelmProcessor - GitHub issue #130", () => {
     equal(helmprocessor.text, text)
   })
 })
+suite("Test HelmProcessor - GitHub issue #283", () => {
+  test("should keep double quotes around a helm value", () => {
+    const text = "foo: \"{{ .Fighters}}\""
+    const helmprocessor = new HelmProcessor(text)
+
+    helmprocessor.preprocess()
+    helmprocessor.postprocess()
+
+    equal(helmprocessor.text, text)
+  })
+})
