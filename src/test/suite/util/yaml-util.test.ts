@@ -527,3 +527,11 @@ suite("Test YamlUtil - sortYaml() with quoted helm values", () => {
     equal(yamlutil.sortYaml(text), text)
   })
 })
+suite("Test YamlUtil - sortYaml() with double-quoted helm values", () => {
+  test("GitHub issue #283: should keep double quotes around a helm value", () => {
+    const yamlutil = new YamlUtil()
+    const text = "foo: \"{{ .Fighters}}\""
+
+    equal(yamlutil.sortYaml(text), text)
+  })
+})
