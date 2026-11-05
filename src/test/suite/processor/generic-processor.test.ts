@@ -13,4 +13,15 @@ suite("Test GenericProcessor - replaceSubstituteWithValue()", () => {
 
     equal(helmprocessor.text, expected)
   })
+
+  test("GitHub issue #130: dollar signs in a value must not be interpreted as replacement patterns", () => {
+    const text = "label: vscode-yaml-sort.helm.0"
+    const helmprocessor = new HelmProcessor(text)
+
+    helmprocessor.replaceSubstituteWithValue("vscode-yaml-sort.helm.0", "{{''$''}}")
+
+    const expected = "label: {{''$''}}"
+
+    equal(helmprocessor.text, expected)
+  })
 })

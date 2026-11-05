@@ -122,3 +122,26 @@ suite("Test HelmProcessor - replaceSubstituteWithValue()", () => {
     equal(helmprocessor.text, expected)
   })
 })
+
+suite("Test HelmProcessor - GitHub issue #130", () => {
+  test("preprocess should keep the quotation marks of a quoted helm value in the store", () => {
+    const text = "section:\n  label: '{{''$''}}'"
+    const helmprocessor = new HelmProcessor(text)
+
+    helmprocessor.preprocess()
+
+    equal(helmprocessor.store.size, 1)
+    equal(helmprocessor.store.get("vscode-yaml-sort.helm.0"), "'{{''$''}}'")
+    equal(helmprocessor.text, "section:\n  label: vscode-yaml-sort.helm.0")
+  })
+
+  test("postprocess should restore a quoted helm value containing a dollar sign", () => {
+    const text = "section:\n  label: '{{''$''}}'"
+    const helmprocessor = new HelmProcessor(text)
+
+    helmprocessor.preprocess()
+    helmprocessor.postprocess()
+
+    equal(helmprocessor.text, text)
+  })
+})

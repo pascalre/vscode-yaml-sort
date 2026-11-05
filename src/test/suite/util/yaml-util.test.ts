@@ -1,7 +1,7 @@
 import { equal } from "assert"
 
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
-import jsyaml = require("js-yaml")
+import { CORE_SCHEMA } from "js-yaml"
 
 import { Settings } from "../../../settings"
 import { YamlUtil } from "../../../util/yaml-util"
@@ -302,7 +302,7 @@ suite("Test sortYaml", () => {
   
     const settings = new Settings()
     settings.getSchema = function () {
-      return jsyaml.CORE_SCHEMA
+      return CORE_SCHEMA
     }
     yamlutil = new YamlUtil(settings)
 
@@ -519,3 +519,11 @@ suite("Test YamlUtil - getDelimiters()", () => {
   })
 })
 */
+suite("Test YamlUtil - sortYaml() with quoted helm values", () => {
+  test("GitHub issue #130: should not mangle a quoted helm value containing a dollar sign", () => {
+    const yamlutil = new YamlUtil()
+    const text = "section:\n  label: '{{''$''}}'"
+
+    equal(yamlutil.sortYaml(text), text)
+  })
+})

@@ -3,6 +3,7 @@
 ## Unreleased
 🐛 Bugfixes
 * (refs [#186](https://github.com/pascalre/vscode-yaml-sort/issues/186)) Retain newline at end of file when using command `Recursively sort YAML files`
+* (closes [#130](https://github.com/pascalre/vscode-yaml-sort/issues/130)) Keep quoted helm values intact when sorting. Dollar signs in values are no longer interpreted as replacement patterns
 
 ✨ Feature
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
