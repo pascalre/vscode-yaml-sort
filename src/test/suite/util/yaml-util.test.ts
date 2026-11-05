@@ -519,3 +519,11 @@ suite("Test YamlUtil - getDelimiters()", () => {
   })
 })
 */
+suite("Test YallUtil - sortYaml() with quoted helm values", () => {
+  test("GitHub issue #130: should not mangle a quoted helm value containing a dollar sign", () => {
+    const yamlutil = new YamlUtil()
+    const text = "section:\n  label: '{{''$''}}'"
+
+    equal(yamlutil.sortYaml(text), text)
+  })
+})

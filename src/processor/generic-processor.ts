@@ -37,6 +37,8 @@ export abstract class GenericProcessor {
 
   replaceSubstituteWithValue(substitute: string, value: string) {
     const match = new RegExp(`'${substitute}'|"${substitute}"|${substitute}`)
-    this.text = this.text.replace(match, value)
+    // use a replacer function so that dollar signs in the value are inserted
+    // literally and are not interpreted as replacement patterns (see #130)
+    this.text = this.text.replace(match, () => value)
   }
 }
