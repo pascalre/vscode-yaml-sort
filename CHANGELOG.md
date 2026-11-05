@@ -3,6 +3,9 @@
 ## Unreleased
 🐛 Bugfixes
 * (refs [#186](https://github.com/pascalre/vscode-yaml-sort/issues/186)) Retain newline at end of file when using command `Recursively sort YAML files`
+
+✨ Feature
+* (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies
 * Update dependencies to latest versions

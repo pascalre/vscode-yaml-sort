@@ -34,6 +34,7 @@ This extension contributes the following settings:
 | `indent`                   | Indentation width in spaces                                                                                                                                      | `2`              |
 | `lineWidth`                | Maximum line width for YAML files                                                                                                                                | `500`            |
 | `locale`                   | Language whose sort order should be used                                                                                                                         | `en`             |
+| `nullStyle`                | Defines how null values are printed. Possible values: `lowercase` (`null`), `uppercase` (`NULL`), `camelcase` (`Null`), `canonical` (`~`), `empty` (no value). | `lowercase`      |
 | `noArrayIndent`            | When `true`, will not add an indentation level to array elements.                                                                                                | `false`          |
 | `noCompatMode`             | When `true`, don't try to be compatible with older yaml versions. Currently: don't quote "yes", "no" and so on, as required for YAML 1.1                         | `false`          |
 | `notifySuccess`            | When `true`, will notify on successfully performed tasks.                                                                                                        | `true`           |
