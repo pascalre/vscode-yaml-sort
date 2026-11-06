@@ -535,3 +535,14 @@ suite("Test YamlUtil - sortYaml() with double-quoted helm values", () => {
     equal(yamlutil.sortYaml(text), text)
   })
 })
+
+suite("Test YamlUtil - sortYaml() with kustomize patches", () => {
+  test("GitHub issue #188: should keep a block scalar containing colons intact while sorting", () => {
+    const util = new YamlUtil()
+    const kustomize = "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: monitor\nresources:\n  - bundle.yaml\n\npatches:\n  - target:\n      kind: ClusterRoleBinding\n      name: prometheus-operator\n    patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"
+
+    const sorted = util.sortYaml(kustomize)
+
+    equal(sorted !== null && sorted.includes("patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"), true)
+  })
+})

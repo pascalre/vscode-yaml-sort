@@ -76,3 +76,33 @@ suite("Test BlockProcessor - preprocess()", () => {
     equal(blockprocessor.store.get("vscode-yaml-sort.block.0"), match)
   })
 })
+
+suite("Test BlockProcessor - block scalars with special characters", () => {
+  const blockScalarCases: { content: string, hiddenMarker: string }[] = [
+    {
+      // GitHub issue #188: colons in a block scalar
+      content: "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: monitor\nresources:\n  - bundle.yaml\n\npatches:\n  - target:\n      kind: ClusterRoleBinding\n      name: prometheus-operator\n    patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor",
+      hiddenMarker: "- op: replace"
+    },
+    {
+      // GitHub issue #227: comment-like lines in a block scalar
+      content: "'!': |\n    #####################################\n    ##\n    ## Zeta:\n    ##     - C\n    ##     - A\n    ##     - B\n    ## Beta:\n    ##     - B\n    ##     - C\n    ##     - A\n    ## Alpha:\n    ##     - A\n    ##     - B\n    ##     - C\n    ##\n    #####################################\n\nZeta:\n    - C\n    - A\n    - B\nBeta:\n    - B\n    - C\n    - A\nAlpha:\n    - A\n    - B\n    - C",
+      hiddenMarker: "## Zeta:"
+    }
+  ]
+
+  blockScalarCases.forEach(({ content, hiddenMarker }) => {
+    test("pre and postprocessing should restore the original text", () => {
+      const processor = new BlockProcessor(content)
+
+      processor.preprocess()
+
+      equal(processor.store.size, 1)
+      equal(processor.text.includes(hiddenMarker), false)
+
+      processor.postprocess()
+
+      equal(processor.text, content)
+    })
+  })
+})
