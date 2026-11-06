@@ -64,13 +64,17 @@ export class CommentProcessor {
   }
 
   insertIfNotContained(comment: string[]) {
-    const indexOfComment = this.getIndexOfString(comment[1])
+    const indexOfComment = this.getBeginningOfLine(this.getIndexOfString(comment[1]))
     const textAfter = this.text.slice(indexOfComment)
     const textBefore = this.text.slice(0, indexOfComment)
 
     if (!textBefore.endsWith(`${comment[0]}\n`)) {
       this.text = `${textBefore}${comment[0]}\n${textAfter.trimEnd()}`
     }
+  }
+
+  getBeginningOfLine(index: number): number {
+    return this.text.lastIndexOf("\n", index) + 1
   }
 
   getIndexOfString(text: string): number {

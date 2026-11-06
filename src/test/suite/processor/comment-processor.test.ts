@@ -347,3 +347,78 @@ suite("Test CommentProcessor - Issue 45", () => {
     equal(commentprocessor.text, expected)
   })
 })
+
+suite("Test CommentProcessor - GitHub issue #139", () => {
+  const indentationCases: { originalText: string, sortedText: string, expectedText: string }[] = [
+    {
+      // a comment must not steal the indentation of a key whose line has trailing spaces
+      originalText:
+        "eq:\n" +
+        "#  deployments:\n" +
+        "  auth:  \n" +
+        "    org-sso-ids:\n" +
+        "      1: 'pwet'",
+      sortedText:
+        "eq:\n" +
+        "  auth:\n" +
+        "    org-sso-ids:\n" +
+        "      '1': pwet",
+      expectedText:
+        "eq:\n" +
+        "#  deployments:\n" +
+        "  auth:\n" +
+        "    org-sso-ids:\n" +
+        "      '1': pwet"
+    },
+    {
+      // a comment must not steal the indentation of a key which gets re-indented while sorting
+      originalText:
+        "server:\n" +
+        "#   Context path of the application\n" +
+        "    context-path: /mws",
+      sortedText:
+        "server:\n" +
+        "  context-path: /mws",
+      expectedText:
+        "server:\n" +
+        "#   Context path of the application\n" +
+        "  context-path: /mws"
+    },
+    {
+      // multiple comments above sorted keys keep their original indentation
+      originalText:
+        "# Spring boot configuration\n" +
+        "server:\n" +
+        "# Port to be used by the server\n" +
+        "  port: 8080\n" +
+        "  servlet:\n" +
+        "#   Context path of the application\n" +
+        "    context-path: /mws",
+      sortedText:
+        "server:\n" +
+        "  port: 8080\n" +
+        "  servlet:\n" +
+        "    context-path: /mws",
+      expectedText:
+        "# Spring boot configuration\n" +
+        "server:\n" +
+        "# Port to be used by the server\n" +
+        "  port: 8080\n" +
+        "  servlet:\n" +
+        "#   Context path of the application\n" +
+        "    context-path: /mws"
+    }
+  ]
+
+  indentationCases.forEach(({ originalText, sortedText, expectedText }) => {
+    test("should keep the indentation of the line a comment is inserted before", () => {
+      const processor = new CommentProcessor(originalText)
+
+      processor.findComments()
+      processor.text = sortedText
+      processor.postprocess()
+
+      equal(processor.text, expectedText)
+    })
+  })
+})
