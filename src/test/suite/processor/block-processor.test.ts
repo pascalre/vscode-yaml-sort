@@ -76,6 +76,7 @@ suite("Test BlockProcessor - preprocess()", () => {
     equal(blockprocessor.store.get("vscode-yaml-sort.block.0"), match)
   })
 })
+
 suite("Test BlockProcessor - GitHub issue #188", () => {
   test("should keep a block scalar containing colons intact", () => {
     const text = "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: monitor\nresources:\n  - bundle.yaml\n\npatches:\n  - target:\n      kind: ClusterRoleBinding\n      name: prometheus-operator\n    patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"
@@ -91,6 +92,50 @@ suite("Test BlockProcessor - GitHub issue #188", () => {
 
     equal(blockprocessor.text, text)
   })
+})
 
-  test("should keep a block scalar containing comment-like lines intact (GitHub issue #227)", () => {
-    const text = "'!': |\n    #####################################\n    ##\n    ## Zeta:\n    ##     - C\n    ###########"222222222222222222222222225ÆåÆå¦WF¥ÆâÒ2 ¢6öç7B&Æö6·&ö6W76÷"ÒæWr&Æö6µ&ö6W76÷"FWB ¢&Æö6·&ö6W76÷"ç&W&ö6W72 ¢WVÂ&Æö6·&ö6W76÷"ç7F÷&Rç6¦RÂ ¢&Æö6·&ö6W76÷"ç÷7G&ö6W72 ¢WVÂ&Æö6·&ö6W76÷"çFWBÂFWB¢Ò§Ò 
+suite("Test BlockProcessor - GitHub issue #227", () => {
+  test("should keep a block scalar containing comment-like lines intact", () => {
+    const text =
+      "'!': |\n" +
+      "    #####################################\n" +
+      "    ##\n" +
+      "    ## Zeta:\n" +
+      "    ##     - C\n" +
+      "    ##     - A\n" +
+      "    ##     - B\n" +
+      "    ## Beta:\n" +
+      "    ##     - B\n" +
+      "    ##     - C\n" +
+      "    ##     - A\n" +
+      "    ## Alpha:\n" +
+      "    ##     - A\n" +
+      "    ##     - B\n" +
+      "    ##     - C\n" +
+      "    ##\n" +
+      "    #####################################\n" +
+      "\n" +
+      "Zeta:\n" +
+      "    - C\n" +
+      "    - A\n" +
+      "    - B\n" +
+      "Beta:\n" +
+      "    - B\n" +
+      "    - C\n" +
+      "    - A\n" +
+      "Alpha:\n" +
+      "    - A\n" +
+      "    - B\n" +
+      "    - C"
+
+    const blockprocessor = new BlockProcessor(text)
+
+    blockprocessor.preprocess()
+
+    equal(blockprocessor.store.size, 1)
+
+    blockprocessor.postprocess()
+
+    equal(blockprocessor.text, text)
+  })
+})
