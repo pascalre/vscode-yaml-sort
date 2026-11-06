@@ -77,65 +77,32 @@ suite("Test BlockProcessor - preprocess()", () => {
   })
 })
 
-suite("Test BlockProcessor - GitHub issue #188", () => {
-  test("should keep a block scalar containing colons intact", () => {
-    const text = "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: monitor\nresources:\n  - bundle.yaml\n\npatches:\n  - target:\n      kind: ClusterRoleBinding\n      name: prometheus-operator\n    patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"
-    const blockprocessor = new BlockProcessor(text)
+suite("Test BlockProcessor - block scalars with special characters", () => {
+  const blockScalarCases: { content: string, hiddenMarker: string }[] = [
+    {
+      // GitHub issue #188: colons in a block scalar
+      content: "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: monitor\nresources:\n  - bundle.yaml\n\npatches:\n  - target:\n      kind: ClusterRoleBinding\n      name: prometheus-operator\n    patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor",
+      hiddenMarker: "- op: replace"
+    },
+    {
+      // GitHub issue #227: comment-like lines in a block scalar
+      content: "'!': |\n    #####################################\n    ##\n    ## Zeta:\n    ##     - C\n    ##     - A\n    ##     - B\n    ## Beta:\n    ##     - B\n    ##     - C\n    ##     - A\n    ## Alpha:\n    ##     - A\n    ##     - B\n    ##     - C\n    ##\n    #####################################\n\nZeta:\n    - C\n    - A\n    - B\nBeta:\n    - B\n    - C\n    - A\nAlpha:\n    - A\n    - B\n    - C",
+      hiddenMarker: "## Zeta:"
+    }
+  ]
 
-    blockprocessor.preprocess()
+  blockScalarCases.forEach(({ content, hiddenMarker }) => {
+    test("pre and postprocessing should restore the original text", () => {
+      const processor = new BlockProcessor(content)
 
-    equal(blockprocessor.store.size, 1)
-    equal(blockprocessor.text.includes("patch: vscode-yaml-sort.block.0"), true)
-    equal(blockprocessor.text.includes("- op: replace"), false)
+      processor.preprocess()
 
-    blockprocessor.postprocess()
+      equal(processor.store.size, 1)
+      equal(processor.text.includes(hiddenMarker), false)
 
-    equal(blockprocessor.text, text)
-  })
-})
+      processor.postprocess()
 
-suite("Test BlockProcessor - GitHub issue #227", () => {
-  test("should keep a block scalar containing comment-like lines intact", () => {
-    const text =
-      "'!': |\n" +
-      "    #####################################\n" +
-      "    ##\n" +
-      "    ## Zeta:\n" +
-      "    ##     - C\n" +
-      "    ##     - A\n" +
-      "    ##     - B\n" +
-      "    ## Beta:\n" +
-      "    ##     - B\n" +
-      "    ##     - C\n" +
-      "    ##     - A\n" +
-      "    ## Alpha:\n" +
-      "    ##     - A\n" +
-      "    ##     - B\n" +
-      "    ##     - C\n" +
-      "    ##\n" +
-      "    #####################################\n" +
-      "\n" +
-      "Zeta:\n" +
-      "    - C\n" +
-      "    - A\n" +
-      "    - B\n" +
-      "Beta:\n" +
-      "    - B\n" +
-      "    - C\n" +
-      "    - A\n" +
-      "Alpha:\n" +
-      "    - A\n" +
-      "    - B\n" +
-      "    - C"
-
-    const blockprocessor = new BlockProcessor(text)
-
-    blockprocessor.preprocess()
-
-    equal(blockprocessor.store.size, 1)
-
-    blockprocessor.postprocess()
-
-    equal(blockprocessor.text, text)
+      equal(processor.text, content)
+    })
   })
 })
