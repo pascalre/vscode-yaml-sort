@@ -537,7 +537,7 @@ suite("Test CommentProcessor - GitHub issue #221", () => {
         "    depends_on:\n" +
         "      mysql5:\n" +
         "        condition: \"service_healthy\"\n" +
-        "    image: \"mysql:5.7\"
+        "    image: \"mysql:5.7\""
     },
     {
       // the same scenario with unquoted values
