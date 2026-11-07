@@ -1,5 +1,6 @@
 export class CommentProcessor {
   store: string[][] = []
+  inlineStore: string[][] = []
   text: string
   lines: string[]
 
@@ -9,13 +10,16 @@ export class CommentProcessor {
   }
 
   /**
-   * Finds all full line comments in a given yaml (ignoring comments in the same line with code).
+   * Finds all comments in a given yaml. Stores full line comments with their following line
+   * and inline comments with the code they belong to.
    * @param text Yaml document
    */
   findComments() {
     this.lines.forEach((line, index) => {
       if (CommentProcessor.isLineComment(line)) {
         this.addLineToComments(index)
+      } else {
+        this.addInlineCommentToStore(line)
       }
     })
   }
@@ -32,16 +36,73 @@ export class CommentProcessor {
     }
   }
 
+  addInlineCommentToStore(line: string) {
+    const comment = CommentProcessor.getInlineComment(line)
+
+    if (comment !== undefined) {
+      this.inlineStore.push([` ${comment}`, line.slice(0, line.length - comment.length).trimEnd()])
+    }
+  }
+
+  static getInlineComment(line: string): string | undefined {
+    let inDoubleQuotes = false
+    let inSingleQuotes = false
+
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === "\"" && !inSingleQuotes) {
+        inDoubleQuotes = !inDoubleQuotes
+      } else if (line[i] === "'" && !inDoubleQuotes) {
+        inSingleQuotes = !inSingleQuotes
+      } else if (line[i] === "#" && i > 0 && (line[i - 1] === " " || line[i - 1] === "\t") && !inDoubleQuotes && !inSingleQuotes) {
+        return line.slice(i)
+      }
+    }
+
+    return undefined
+  }
+
   postprocess(): string {
     this.reverseComments()
     this.store.forEach(comment => {
       this.applyComment(comment)
     })
+    this.applyInlineComments()
     return this.text
   }
 
   reverseComments() {
     this.store.reverse()
+  }
+
+  applyInlineComments() {
+    this.inlineStore.reverse()
+    this.inlineStore.forEach(comment => {
+      this.applyInlineComment(comment)
+    })
+  }
+
+  applyInlineComment(comment: string[]) {
+    const indexOfComment = this.getIndexOfString(comment[1])
+
+    if (CommentProcessor.isCommentFound(indexOfComment)) {
+      this.insertInlineIfNotContained(comment)
+    }
+  }
+
+  insertInlineIfNotContained(comment: string[]) {
+    const endOfLine = this.getEndOfLine(this.getIndexOfString(comment[1]))
+    const textBefore = this.text.slice(0, endOfLine)
+    const textAfter = this.text.slice(endOfLine)
+
+    if (!textBefore.endsWith(comment[0])) {
+      this.text = `${textBefore}${comment[0]}${textAfter}`
+    }
+  }
+
+  getEndOfLine(index: number): number {
+    const endOfLine = this.text.indexOf("\n", index)
+
+    return endOfLine === -1 ? this.text.length : endOfLine
   }
 
   applyComment(comment: string[]) {

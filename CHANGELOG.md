@@ -6,6 +6,7 @@
 * (closes [#130](https://github.com/pascalre/vscode-yaml-sort/issues/130)) Keep quoted helm values intact when sorting. Dollar signs in values are no longer interpreted as replacement patterns
 * (closes [#188](https://github.com/pascalre/vscode-yaml-sort/issues/188), refs [#227](https://github.com/pascalre/vscode-yaml-sort/issues/227)) Keep block scalars intact when their content contains colons or comment-like lines
 * (closes [#139](https://github.com/pascalre/vscode-yaml-sort/issues/139)) Comments no longer break the indentation of the keys they precede
+* (closes [#222](https://github.com/pascalre/vscode-yaml-sort/issues/222)) Keep inline comments while sorting
 
 ✨ Feature
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
