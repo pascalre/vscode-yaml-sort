@@ -422,3 +422,90 @@ suite("Test CommentProcessor - GitHub issue #139", () => {
     })
   })
 })
+
+suite("Test CommentProcessor - GitHub issue #222", () => {
+  const inlineCommentCases: { sourceText: string, sortedOutput: string, expectedOutput: string }[] = [
+    {
+      // an inline comment is kept when sorting
+      sourceText:
+        "game:\n" +
+        "  core:\n" +
+        "    serviceRpcTimeoutMillis: 6900000 # Extra-long for debugging locally",
+      sortedOutput:
+        "game:\n" +
+        "  core:\n" +
+        "    serviceRpcTimeoutMillis: 6900000",
+      expectedOutput:
+        "game:\n" +
+        "  core:\n" +
+        "    serviceRpcTimeoutMillis: 6900000 # Extra-long for debugging locally"
+    },
+    {
+      // an inline comment is reattached when the value gets quoted while sorting
+      sourceText:
+        "webhook:\n" +
+        "  image: mysql:5.7 # https://hub.docker.com/_/mysql",
+      sortedOutput:
+        "webhook:\n" +
+        "  image: \"mysql:5.7\"",
+      expectedOutput:
+        "webhook:\n" +
+        "  image: \"mysql:5.7\" # https://hub.docker.com/_/mysql"
+    },
+    {
+      // a hash inside a quoted value is not treated as an inline comment
+      sourceText:
+        "label: \"app # prod\"\n" +
+        "stage: prod # deploy stage",
+      sortedOutput:
+        "label: \"app # prod\"\n" +
+        "stage: prod",
+      expectedOutput:
+        "label: \"app # prod\"\n" +
+        "stage: prod # deploy stage"
+    },
+    {
+      // a full line comment is kept above its anchor when sorting moves the anchor
+      sourceText:
+        "# group config\n" +
+        "timeout: 30 # seconds\n" +
+        "name: demo",
+      sortedOutput:
+        "name: demo\n" +
+        "timeout: 30",
+      expectedOutput:
+        "name: demo\n" +
+        "# group config\n" +
+        "timeout: 30 # seconds"
+    }
+  ]
+
+  inlineCommentCases.forEach(({ sourceText, sortedOutput, expectedOutput }) => {
+    test("should keep inline comments while sorting", () => {
+      const instance = new CommentProcessor(sourceText)
+
+      instance.findComments()
+      instance.text = sortedOutput
+      instance.postprocess()
+
+      equal(instance.text, expectedOutput)
+    })
+  })
+})
+
+suite("Test CommentProcessor - getInlineComment()", () => {
+  const detectionCases: { line: string, expectedComment: string | undefined }[] = [
+    { line: "key: value # comment", expectedComment: "# comment" },
+    { line: "key: \"value # quoted\"", expectedComment: undefined },
+    { line: "key: 'value # quoted'", expectedComment: undefined },
+    { line: "key: value#noComment", expectedComment: undefined },
+    { line: "key: \"a\" # comment", expectedComment: "# comment" },
+    { line: "# full line comment", expectedComment: undefined }
+  ]
+
+  detectionCases.forEach(({ line, expectedComment }) => {
+    test("should only detect comments outside of quotes", () => {
+      equal(CommentProcessor.getInlineComment(line), expectedComment)
+    })
+  })
+})

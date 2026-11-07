@@ -546,3 +546,12 @@ suite("Test YamlUtil - sortYaml() with kustomize patches", () => {
     equal(sorted !== null && sorted.includes("patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"), true)
   })
 })
+
+suite("Test YamlUtil - sortYaml() with inline comments", () => {
+  test("GitHub issue #222: should keep an inline comment while sorting", () => {
+    const instance = new YamlUtil()
+    const game = "game:\n  core:\n    serviceRpcTimeoutMillis: 6900000 # Extra-long for debugging locally"
+
+    equal(instance.sortYaml(game), game)
+  })
+})
