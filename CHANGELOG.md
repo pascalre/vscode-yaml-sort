@@ -7,6 +7,7 @@
 * (closes [#188](https://github.com/pascalre/vscode-yaml-sort/issues/188), refs [#227](https://github.com/pascalre/vscode-yaml-sort/issues/227)) Keep block scalars intact when their content contains colons or comment-like lines
 * (closes [#139](https://github.com/pascalre/vscode-yaml-sort/issues/139)) Comments no longer break the indentation of the keys they precede
 * (closes [#222](https://github.com/pascalre/vscode-yaml-sort/issues/222)) Keep inline comments while sorting
+* (closes [#221](https://github.com/pascalre/vscode-yaml-sort/issues/221)) Keep comments above their anchor while sorting, even when a deeper indented line contains the anchor as a substring
 
 ✨ Feature
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)

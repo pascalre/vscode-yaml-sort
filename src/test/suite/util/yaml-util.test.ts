@@ -555,3 +555,24 @@ suite("Test YamlUtil - sortYaml() with inline comments", () => {
     equal(instance.sortYaml(game), game)
   })
 })
+
+suite("Test YamlUtil - sortYaml() with docker-compose files", () => {
+  test("GitHub issue #221: should keep a comment above a service while sorting with forceQuotes", () => {
+    const composeSettings = new Settings()
+    composeSettings.forceQuotes = true
+    composeSettings.getQuotingType = function () {
+      return "\""
+    }
+    const composeUtil = new YamlUtil(composeSettings)
+    const composeYaml =
+      "services:\n" +
+      "  # https://hub.docker.com/_/mysql\n" +
+      "  mysql5:\n" +
+      "    depends_on:\n" +
+      "      mysql5:\n" +
+      "        condition: \"service_healthy\"\n" +
+      "    image: \"mysql:5.7\""
+
+    equal(composeUtil.sortYaml(composeYaml), composeYaml)
+  })
+})

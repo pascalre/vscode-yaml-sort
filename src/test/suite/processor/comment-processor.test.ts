@@ -509,3 +509,73 @@ suite("Test CommentProcessor - getInlineComment()", () => {
     })
   })
 })
+
+suite("Test CommentProcessor - GitHub issue #221", () => {
+  const composeCommentCases: { unsortedYaml: string, sortedYaml: string, expectedYaml: string }[] = [
+    {
+      // a comment above a service key must not be inserted above the same
+      // key inside a deeper indented `depends_on` block
+      unsortedYaml:
+        "services:\n" +
+        "  # https://hub.docker.com/_/mysql\n" +
+        "  mysql5:\n" +
+        "    image: \"mysql:5.7\"\n" +
+        "    depends_on:\n" +
+        "      mysql5:\n" +
+        "        condition: \"service_healthy\"",
+      sortedYaml:
+        "services:\n" +
+        "  mysql5:\n" +
+        "    depends_on:\n" +
+        "      mysql5:\n" +
+        "        condition: \"service_healthy\"\n" +
+        "    image: \"mysql:5.7\"",
+      expectedYaml:
+        "services:\n" +
+        "  # https://hub.docker.com/_/mysql\n" +
+        "  mysql5:\n" +
+        "    depends_on:\n" +
+        "      mysql5:\n" +
+        "        condition: \"service_healthy\"\n" +
+        "    image: \"mysql:5.7\"
+    },
+    {
+      // the same scenario with unquoted values
+      unsortedYaml:
+        "services:\n" +
+        "  # https://hub.docker.com/_/redis\n" +
+        "  redis7:\n" +
+        "    image: redis:7\n" +
+        "    depends_on:\n" +
+        "      redis7:\n" +
+        "        condition: service_healthy",
+      sortedYaml:
+        "services:\n" +
+        "  redis7:\n" +
+        "    depends_on:\n" +
+        "      redis7:\n" +
+        "        condition: service_healthy\n" +
+        "    image: redis:7",
+      expectedYaml:
+        "services:\n" +
+        "  # https://hub.docker.com/_/redis\n" +
+        "  redis7:\n" +
+        "    depends_on:\n" +
+        "      redis7:\n" +
+        "        condition: service_healthy\n" +
+        "    image: redis:7"
+    }
+  ]
+
+  composeCommentCases.forEach(({ unsortedYaml, sortedYaml, expectedYaml }) => {
+    test("should insert a comment above the exact matching line and not above a line containing the anchor", () => {
+      const composeProcessor = new CommentProcessor(unsortedYaml)
+
+      composeProcessor.findComments()
+      composeProcessor.text = sortedYaml
+      composeProcessor.postprocess()
+
+      equal(composeProcessor.text, expectedYaml)
+    })
+  })
+})
