@@ -49,7 +49,7 @@ export class JsYamlAdapter {
     let sortKeysOption: boolean | ((a: string, b: string) => number) = sortKeys
     if (sortKeys) {
       sortKeysOption = (a: string, b: string) => {
-        return sort.sortKeys(a, b)
+        return SortUtil.sortKeys(a, b)
       }
     }
     if (custom > 0 && this.settings.useCustomSortRecursively) {

@@ -56,31 +56,29 @@ suite("Test Sort - customSort()", () => {
 })
 
 suite("Test Sort - sortKeys()", () => {
-  const templateReferenceSettings = new Settings()
-  const templateReferenceSort = new SortUtil(templateReferenceSettings)
 
   test("when a is `template` and b is `parameters` should return -1 (see #205)", () => {
-    equal(templateReferenceSort.sortKeys("template", "parameters"), -1)
+    equal(SortUtil.sortKeys("template", "parameters"), -1)
   })
 
   test("when a is `parameters` and b is `template` should return 1 (see #205)", () => {
-    equal(templateReferenceSort.sortKeys("parameters", "template"), 1)
+    equal(SortUtil.sortKeys("parameters", "template"), 1)
   })
 
   test("when a is `parameters` and b is `stages` should return -1", () => {
-    equal(templateReferenceSort.sortKeys("parameters", "stages"), -1)
+    equal(SortUtil.sortKeys("parameters", "stages"), -1)
   })
 
   test("when a is `template` and b is `stages` should return 1", () => {
-    equal(templateReferenceSort.sortKeys("template", "stages"), 1)
+    equal(SortUtil.sortKeys("template", "stages"), 1)
   })
 
   test("when a is `b` and b is `a` should return 1", () => {
-    equal(templateReferenceSort.sortKeys("b", "a"), 1)
+    equal(SortUtil.sortKeys("b", "a"), 1)
   })
 
   test("when a is `a` and b is `a` should return 0", () => {
-    equal(templateReferenceSort.sortKeys("a", "a"), 0)
+    equal(SortUtil.sortKeys("a", "a"), 0)
   })
 })
 

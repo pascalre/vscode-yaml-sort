@@ -46,7 +46,7 @@ export class SortUtil {
    * Sorts keys like the default sort of an array of strings, but keeps the
    * keys of an azure devops template reference in a readable order (see #205)
    */
-  sortKeys(a: string, b: string): number {
+  static sortKeys(a: string, b: string): number {
     const templateReferenceA = templateReference.indexOf(a)
     const templateReferenceB = templateReference.indexOf(b)
     if (templateReferenceA !== -1 && templateReferenceB !== -1) {
