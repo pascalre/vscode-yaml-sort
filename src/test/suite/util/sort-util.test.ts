@@ -54,3 +54,49 @@ suite("Test Sort - customSort()", () => {
   sort.settings.sortOrderReverse = false
 
 })
+
+suite("Test Sort - sortKeys()", () => {
+  const templateReferenceSettings = new Settings()
+  const templateReferenceSort = new SortUtil(templateReferenceSettings)
+
+  test("when a is `template` and b is `parameters` should return -1 (see #205)", () => {
+    equal(templateReferenceSort.sortKeys("template", "parameters"), -1)
+  })
+
+  test("when a is `parameters` and b is `template` should return 1 (see #205)", () => {
+    equal(templateReferenceSort.sortKeys("parameters", "template"), 1)
+  })
+
+  test("when a is `parameters` and b is `stages` should return -1", () => {
+    equal(templateReferenceSort.sortKeys("parameters", "stages"), -1)
+  })
+
+  test("when a is `template` and b is `stages` should return 1", () => {
+    equal(templateReferenceSort.sortKeys("template", "stages"), 1)
+  })
+
+  test("when a is `b` and b is `a` should return 1", () => {
+    equal(templateReferenceSort.sortKeys("b", "a"), 1)
+  })
+
+  test("when a is `a` and b is `a` should return 0", () => {
+    equal(templateReferenceSort.sortKeys("a", "a"), 0)
+  })
+})
+
+suite("Test Sort - customSort() with azure devops template references (see #205)", () => {
+  const devOpsSettings = new Settings()
+  devOpsSettings.getCustomSortKeywords = function () {
+    return []
+  }
+  const devOpsSort = new SortUtil(devOpsSettings)
+  devOpsSort.custom = 2
+
+  test("when a is `template` and b is `parameters` should return -1", () => {
+    equal(devOpsSort.customSort("template", "parameters"), -1)
+  })
+
+  test("when a is `parameters` and b is `template` should return 1", () => {
+    equal(devOpsSort.customSort("parameters", "template"), 1)
+  })
+})
