@@ -161,15 +161,43 @@ export class CommentProcessor {
   }
 
   searchExactMatch(text: string): number {
-    return this.text.lastIndexOf(text)
+    // an empty anchor keeps its previous behavior
+    if (text === "") {
+      return this.text.lastIndexOf(text)
+    }
+    // comments must be inserted above the exact matching line (see #221).
+    // a substring search would also find `mysql5:` inside a deeper indented
+    // line like `      mysql5:` of a `depends_on` block
+    let result = -1
+    let offset = 0
+    for (const line of this.text.split("\n")) {
+      if (line === text) {
+        result = offset
+      }
+      offset += line.length + 1
+    }
+    return result
   }
 
   searchFuzzyForTrimmedText(text: string): number {
-    return this.searchExactMatch(text.trim())
+    // like searchExactMatch(), but the line may have more or less
+    // surrounding whitespaces than the anchor (see #139)
+    const trimmedText = text.trim()
+    let result = -1
+    let offset = 0
+    for (const line of this.text.split("\n")) {
+      if (line.trim() === trimmedText) {
+        result = offset
+      }
+      offset += line.length + 1
+    }
+    return result
   }
 
   searchFuzzyForKeyword(text: string): number {
-    return this.searchExactMatch(text.split(":")[0])
+    // the value of a line may change while sorting,
+    // so only search for the keyword in front of the first colon
+    return this.text.lastIndexOf(text.split(":")[0])
   }
 
   static isCommentFound(index: number): boolean {
