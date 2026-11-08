@@ -585,10 +585,10 @@ suite("Test YamlUtil - sortYaml() with azure devops templates", () => {
       "  - parameters:\n" +
       "      firstparamter: XXX\n" +
       "      secondparameter: YYY\n" +
-      "    template: templates\CI.yml"
+      "    template: templates\\CI.yml"
     const expectedDevOpsPipeline =
       "stages:\n" +
-      "  - template: templates\CI.yml\n" +
+      "  - template: templates\\CI.yml\n" +
       "    parameters:\n" +
       "      firstparamter: XXX\n" +
       "      secondparameter: YYY"
