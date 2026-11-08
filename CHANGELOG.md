@@ -17,6 +17,7 @@
 ♻️ Refactoring
 * Extract shared yaml metadata handling in the Controller
 * Simplify the processor pipeline in the ProcessorController
+* Read settings through a single configuration snapshot
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies
 * Update dependencies to latest versions
