@@ -576,3 +576,24 @@ suite("Test YamlUtil - sortYaml() with docker-compose files", () => {
     equal(composeUtil.sortYaml(composeYaml), composeYaml)
   })
 })
+
+suite("Test YamlUtil - sortYaml() with azure devops templates", () => {
+  test("GitHub issue #205: should keep the template in front of its parameters while sorting", () => {
+    const devOpsUtil = new YamlUtil()
+    const devOpsPipeline =
+      "stages:\n" +
+      "  - parameters:\n" +
+      "      firstparamter: XXX\n" +
+      "      secondparameter: YYY\n" +
+      "    template: templates\\CI.yml"
+    const expectedDevOpsPipeline =
+      "stages:\n" +
+      "  - template: templates\\CI.yml\n" +
+      "    parameters:\n" +
+      "      firstparamter: XXX\n" +
+      "      secondparameter: YYY"
+
+    equal(devOpsUtil.sortYaml(devOpsPipeline), expectedDevOpsPipeline)
+  })
+})
+
