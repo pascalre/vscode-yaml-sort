@@ -14,9 +14,6 @@ const sortArrays = (obj: unknown) => {
   Object.keys(obj).forEach(key => {
     const object = obj[key as keyof unknown]
     if (typeof object === "object") {
-        if (Array.isArray(object)) {
-          Object.entries(object).sort((a, b) => compareObjects(a, b))
-        }
         sortArrays(object)
     }
   })
@@ -75,8 +72,8 @@ export class YamlUtil {
       processor.preprocess()
       const unsortedYamlWithoutTabs = processor.text
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
+      // a loaded yaml mapping is assumed to be a Record of objects
+      const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as Record<string, object>
 
       if (this.settings.sortArrays) {
         sortArrays(doc)
