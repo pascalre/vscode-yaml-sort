@@ -31,7 +31,16 @@ jobs:
              npm install -g vsce
 
       - name: lint
-        run: npm run lint
+        run: |
+          set +e
+          npx eslint . 2>&1 | tee /tmp/eslint-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            msg=$( (head -c 500 /tmp/eslint-output.log; tail -c 500 /tmp/eslint-output.log) | awk '{printf "%s%%0A", $0}' | head -c 900 )
+            echo "::error title=eslint exit $status::${msg}"
+            exit "$status"
+          fi
 
       - name: static code analysis
         run: npm run code-analysis
