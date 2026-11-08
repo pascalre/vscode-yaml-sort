@@ -59,19 +59,30 @@ export class Controller {
     }
   }
 
+  /**
+   * Removes yaml metadata directives (like `%YAML` or `%TAG`) from the text.
+   * Their delimiter is dropped along with them.
+   */
+  private stripMetadataTags(text: string, delimiters: RegExpMatchArray): { text: string, delimiters: RegExpMatchArray } {
+    // the global regex is created per call, because global regexes are stateful (see lastIndex)
+    const matchMetadata = /^%.*\n/gm
+    if (matchMetadata.test(text)) {
+      delimiters.shift()
+      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
+    }
+    return {
+      text: text.replace(matchMetadata, "").replace(/^\n/, ""),
+      delimiters
+    }
+  }
+
   formatYamlWrapper(): TextEdit[] {
     const editor = this.getActiveEditor()
     let doc = VsCodeAdapter.getActiveDocument(editor)
     let delimiters = this.yamlutil.getDelimiters(doc, true)
-    // remove yaml metadata tags
-    const matchMetadata = /^%.*\n/gm
-    // set metadata tags, if there is no metadata tag it should be an emtpy array
-    if (matchMetadata.test(doc)) {
-      delimiters.shift()
-      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
-    }
-    doc = doc.replace(matchMetadata, "")
-    doc = doc.replace(/^\n/, "")
+    const stripped = this.stripMetadataTags(doc, delimiters)
+    doc = stripped.text
+    delimiters = stripped.delimiters
 
     const yamls = splitYaml(doc)
     let newText = ""
@@ -108,15 +119,9 @@ export class Controller {
     }
 
     let delimiters = this.yamlutil.getDelimiters(text, editor.selection.isEmpty)
-    // remove yaml metadata tags
-    const matchMetadata = /^%.*\n/gm
-    // set metadata tags, if there is no metadata tag it should be an emtpy array
-    if (matchMetadata.test(text)) {
-      delimiters.shift()
-      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
-    }
-    text = text.replace(matchMetadata, "")
-    text = text.replace(/^\n/, "")
+    const stripped = this.stripMetadataTags(text, delimiters)
+    text = stripped.text
+    delimiters = stripped.delimiters
 
     // sort yaml
     let newText = ""
