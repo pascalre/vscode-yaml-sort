@@ -120,19 +120,19 @@ export class Controller {
 
     // sort yaml
     let newText = ""
-    splitYaml(text).forEach((unsortedYaml) => {
+    for (const unsortedYaml of splitYaml(text)) {
       let sortedYaml = this.yamlutil.sortYaml(unsortedYaml, customSort)
-      if (sortedYaml) {
-        if (!editor.selection.isEmpty) {
-          // get number of leading whitespaces, these whitespaces will be used for indentation
-          const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
-          sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
-        }
-        newText += delimiters.shift() + sortedYaml
-      } else {
+      if (!sortedYaml) {
+        // return no edits at all instead of applying partially sorted text
         return [] as TextEdit[]
       }
-    })
+      if (!editor.selection.isEmpty) {
+        // get number of leading whitespaces, these whitespaces will be used for indentation
+        const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
+        sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
+      }
+      newText += delimiters.shift() + sortedYaml
+    }
     if (editor.selection.isEmpty) {
       newText = this.yamlutil.setLeadingDashes(newText)
     }

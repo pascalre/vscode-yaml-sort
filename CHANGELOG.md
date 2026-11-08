@@ -9,6 +9,7 @@
 * (closes [#222](https://github.com/pascalre/vscode-yaml-sort/issues/222)) Keep inline comments while sorting
 * (closes [#221](https://github.com/pascalre/vscode-yaml-sort/issues/221)) Keep comments above their anchor while sorting, even when a deeper indented line contains the anchor as a substring
 * The command `Recursively sort YAML files` now works when no editor is open
+* Abort sorting instead of applying partially sorted text when a yaml document cannot be sorted
 
 ✨ Feature
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
