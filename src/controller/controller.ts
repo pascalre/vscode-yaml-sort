@@ -41,7 +41,7 @@ export class Controller {
   }
 
   /**
-   * Sorts all yamm files in a directory
+   * Sorts all yaml files in a directory
    * @param {Uri} uri Base URI
    */
   sortYamlFiles(uri: Uri) {
