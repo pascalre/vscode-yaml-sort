@@ -6,7 +6,7 @@ import tseslint from "typescript-eslint"
 
 export default defineConfig(
   {
-    ignores: ["coverage/**", "dist/**", "out/**", ".vscode-test/**"],
+    ignores: ["coverage/**", "dist/**", "out/**", ".vscode-test/**", "**/.*.js"],
   },
   {
     files: ["**/*.{js,ts}"],
@@ -33,6 +33,9 @@ export default defineConfig(
     },
   },
   {
+    plugins: {
+      "import-x": importX,
+    },
     rules: {
       "semi": ["error", "never"],
       "quotes": ["warn", "double"],
