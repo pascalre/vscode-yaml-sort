@@ -9,7 +9,6 @@ import { FileUtil } from "../util/file-util"
 import { YamlUtil, splitYaml, validateTextRange } from "../util/yaml-util"
 
 export class Controller {
-  editor: TextEditor
   fileutil = new FileUtil()
   yamlutil = new YamlUtil()
   jsyamladapter = new JsYamlAdapter()
@@ -17,16 +16,20 @@ export class Controller {
   errorutil = new ErrorUtil()
   settings = new Settings()
 
-  constructor() {
-    if (window.activeTextEditor) {
-      this.editor = window.activeTextEditor
-    } else {
+  /**
+   * Returns the active text editor. It is required by all commands operating on
+   * the open document, unlike `sortYamlFiles()` which works on files on disk.
+   */
+  private getActiveEditor(): TextEditor {
+    const editor = window.activeTextEditor
+    if (!editor) {
       throw new Error("No texteditor is active")
     }
+    return editor
   }
 
   validateYamlWrapper(): boolean {
-    const text = VsCodeAdapter.getActiveDocument(this.editor)
+    const text = VsCodeAdapter.getActiveDocument(this.getActiveEditor())
     try {
       this.jsyamladapter.validateYaml(text)
       this.vscodeadapter.showMessage(Severity.INFO, "YAML is valid.")
@@ -38,7 +41,7 @@ export class Controller {
   }
 
   /**
-   * Sorts all yaml files in a directory
+   * Sorts all yamm files in a directory
    * @param {Uri} uri Base URI
    */
   sortYamlFiles(uri: Uri) {
@@ -57,7 +60,8 @@ export class Controller {
   }
 
   formatYamlWrapper(): TextEdit[] {
-    let doc = VsCodeAdapter.getActiveDocument(this.editor)
+    const editor = this.getActiveEditor()
+    let doc = VsCodeAdapter.getActiveDocument(editor)
     let delimiters = this.yamlutil.getDelimiters(doc, true)
     // remove yaml metadata tags
     const matchMetadata = /^%.*\n/gm
@@ -84,14 +88,16 @@ export class Controller {
   }
 
   applyEdits(text: string) {
-    const edits = VsCodeAdapter.getEdits(this.editor, text)
+    const editor = this.getActiveEditor()
+    const edits = VsCodeAdapter.getEdits(editor, text)
     VsCodeAdapter.applyEdits([edits])
     return [edits]
   }
 
   sortYamlWrapper(customSort = 0): TextEdit[] {
-    const textRange = VsCodeAdapter.getRange(this.editor)
-    let text = VsCodeAdapter.getText(this.editor, textRange)
+    const editor = this.getActiveEditor()
+    const textRange = VsCodeAdapter.getRange(editor)
+    let text = VsCodeAdapter.getText(editor, textRange)
 
     try {
       validateTextRange(text)
@@ -101,7 +107,7 @@ export class Controller {
       return [] as TextEdit[]
     }
 
-    let delimiters = this.yamlutil.getDelimiters(text, this.editor.selection.isEmpty)
+    let delimiters = this.yamlutil.getDelimiters(text, editor.selection.isEmpty)
     // remove yaml metadata tags
     const matchMetadata = /^%.*\n/gm
     // set metadata tags, if there is no metadata tag it should be an emtpy array
@@ -117,7 +123,7 @@ export class Controller {
     splitYaml(text).forEach((unsortedYaml) => {
       let sortedYaml = this.yamlutil.sortYaml(unsortedYaml, customSort)
       if (sortedYaml) {
-        if (!this.editor.selection.isEmpty) {
+        if (!editor.selection.isEmpty) {
           // get number of leading whitespaces, these whitespaces will be used for indentation
           const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
           sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
@@ -127,7 +133,7 @@ export class Controller {
         return [] as TextEdit[]
       }
     })
-    if (this.editor.selection.isEmpty) {
+    if (editor.selection.isEmpty) {
       newText = this.yamlutil.setLeadingDashes(newText)
     }
     this.vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
