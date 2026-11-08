@@ -7,11 +7,6 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
-    # only safe semver updates are merged automatically,
-    # major updates stay manual
-    auto-merge:
-      - update-type: "semver:patch"
-      - update-type: "semver:minor"
 
   # keep github actions fresh
   - package-ecosystem: "github-actions"
@@ -20,6 +15,3 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
-    auto-merge:
-      - update-type: "semver:patch"
-      - update-type: "semver:minor"
