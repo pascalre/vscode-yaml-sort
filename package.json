@@ -281,19 +281,19 @@
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/js-yaml": "^4.0.6",
     "@types/mocha": "^10.0.4",
     "@types/node": "^22.13.10",
     "@types/sinon": "^17.0.3",
     "@types/vscode": "^1.98.0",
-    "@typescript-eslint/eslint-plugin": "^7.2.0",
-    "@typescript-eslint/parser": "^7.2.0",
     "@vscode/test-electron": "^2.1.5",
     "coveralls": "3.1.1",
     "dependency-cruiser": "^17.0.1",
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "eslint-import-resolver-typescript": "^4.2.2",
-    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-import-x": "^4.0.0",
+    "globals": "^16.0.0",
     "jsdoc": "^4.0.2",
     "mocha": "^11.1.0",
     "nyc": "^17.1.0",
@@ -301,6 +301,7 @@
     "sonarqube-scanner": "^4.2.5",
     "ts-node": "10.9.2",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.0.0",
     "typescript-require": "0.3.0"
   },
   "dependencies": {
