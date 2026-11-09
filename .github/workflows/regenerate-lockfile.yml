@@ -1,0 +1,41 @@
+name: regenerate lockfile
+
+# one-off helper for the toolchain migration on this branch:
+# package.json moved to ESLint 9 and the stale package-lock.json still
+# describes the old ESLint 8 tree, which breaks eslint-plugin-import-x
+# module resolution in CI. This workflow regenerates the lockfile from
+# package.json and commits it back to the branch. It will be removed
+# again once the lockfile is up to date.
+on:
+  push:
+    branches: [feat/refactor-codebase-and-toolchain]
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Regenerate package-lock.json from package.json
+        run: npm install --no-audit --no-fund
+
+      - name: Commit lockfile if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "package-lock.json is already in sync"
+          else
+            git commit -m "build(deps): regenerate package-lock.json"
+            git push
+          fi
