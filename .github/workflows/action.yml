@@ -43,7 +43,16 @@ jobs:
           fi
 
       - name: static code analysis
-        run: npm run code-analysis
+        run: |
+          set +e
+          npx depcruise --validate .dependency-cruiser.js src 2>&1 | tee /tmp/depcruise-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            msg=$(cat /tmp/depcruise-output.log | awk '{printf "%s%%0A", $0}' | head -c 900 )
+            echo "::error title=depcruise exit $status::${msg}"
+            exit "$status"
+          fi
 
       - name: test
         uses: GabrielBB/xvfb-action@v1
