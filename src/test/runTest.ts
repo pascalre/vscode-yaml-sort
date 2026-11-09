@@ -16,7 +16,7 @@ async function main() {
     await runTests({ extensionDevelopmentPath, extensionTestsPath })
   } catch (err) {
     /* istanbul ignore next */
-    console.error("Failed to run tests")
+    console.error("Failed to run tests", err)
     /* istanbul ignore next */
     process.exit(1)
   }

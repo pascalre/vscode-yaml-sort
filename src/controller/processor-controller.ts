@@ -23,36 +23,45 @@ export class ProcessorController {
     this.settings = settings
   }
 
+  /**
+   * Runs a processors `preprocess()` and adopts the processed text.
+   */
+  private runPreprocessor<T extends { text: string, preprocess(): void }>(processor: T): T {
+    processor.preprocess()
+    this.text = processor.text
+    return processor
+  }
+
+  /**
+   * Runs a processors `postprocess()` on the current text and adopts the result.
+   */
+  private runPostprocessor<T extends { text: string, postprocess(): void }>(processor: T): void {
+    processor.text = this.text
+    processor.postprocess()
+    this.text = processor.text
+  }
+
   preprocess() {
-    this.tabstospacespreprocessor = new TabsToSpacesProcessor(this.text)
-    this.tabstospacespreprocessor.preprocess()
-    this.text = this.tabstospacespreprocessor.text
+    this.tabstospacespreprocessor = this.runPreprocessor(new TabsToSpacesProcessor(this.text))
 
     if (this.settings.useBlockProcessor) {
-      this.blockprocessor = new BlockProcessor(this.text)
-      this.blockprocessor.preprocess()
-      this.text = this.blockprocessor.text
+      this.blockprocessor = this.runPreprocessor(new BlockProcessor(this.text))
     }
 
     if (this.settings.useArrayProcessor) {
-      this.arrayprocessor = new ArrayProcessor(this.text)
-      this.arrayprocessor.preprocess()
-      this.text = this.arrayprocessor.text
+      this.arrayprocessor = this.runPreprocessor(new ArrayProcessor(this.text))
     }
 
     if (this.settings.useHelmProcessor) {
-      this.helmprocessor = new HelmProcessor(this.text)
-      this.helmprocessor.preprocess()
-      this.text = this.helmprocessor.text
+      this.helmprocessor = this.runPreprocessor(new HelmProcessor(this.text))
     }
 
     if (this.settings.useOctalProcessor) {
-      this.octalprocessor = new OctalProcessor(this.text)
-      this.octalprocessor.preprocess()
-      this.text = this.octalprocessor.text
+      this.octalprocessor = this.runPreprocessor(new OctalProcessor(this.text))
     }
 
     if (this.settings.useCommentProcessor) {
+      // the CommentProcessor does not extend the GenericProcessor and uses findComments() instead of preprocess()
       this.commentprocessor = new CommentProcessor(this.text)
       this.commentprocessor.findComments()
       this.text = this.commentprocessor.text
@@ -61,37 +70,26 @@ export class ProcessorController {
 
   postprocess() {
     if (this.settings.useCommentProcessor) {
-      this.commentprocessor.text = this.text
-      this.commentprocessor.postprocess()
-      this.text = this.commentprocessor.text
+      this.runPostprocessor(this.commentprocessor)
     }
 
     if (this.settings.useOctalProcessor) {
-      this.octalprocessor.text = this.text
-      this.octalprocessor.postprocess()
-      this.text = this.octalprocessor.text
+      this.runPostprocessor(this.octalprocessor)
     }
 
     if (this.settings.useHelmProcessor) {
-      this.helmprocessor.text = this.text
-      this.helmprocessor.postprocess()
-      this.text = this.helmprocessor.text
+      this.runPostprocessor(this.helmprocessor)
     }
 
     if (this.settings.useArrayProcessor) {
-      this.arrayprocessor.text = this.text
-      this.arrayprocessor.postprocess()
-      this.text = this.arrayprocessor.text
+      this.runPostprocessor(this.arrayprocessor)
     }
 
     if (this.settings.useBlockProcessor) {
-      this.blockprocessor.text = this.text
-      this.blockprocessor.postprocess()
-      this.text = this.blockprocessor.text
+      this.runPostprocessor(this.blockprocessor)
     }
 
     this.spacingprocessor = new SpacingProcessor(this.text)
-    this.spacingprocessor.postprocess()
-    this.text = this.spacingprocessor.text
+    this.runPostprocessor(this.spacingprocessor)
   }
 }

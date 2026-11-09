@@ -52,7 +52,8 @@ module.exports = {
           '^(v8/tools/profile_view)$',
           '^(v8/tools/profile)$',
           '^(v8/tools/SourceMap)$',
-          '^(v8/tools/splaytree)$',
+    
+      '^(v8/tools/splaytree)$',
           '^(v8/tools/tickprocessor-driver)$',
           '^(v8/tools/tickprocessor)$',
           '^(node-inspect/lib/_inspect)$',
@@ -164,7 +165,8 @@ module.exports = {
       from: {},
       to: {
         dependencyTypes: [
-          'npm-optional'
+      
+    'npm-optional'
         ]
       }
     },
@@ -174,7 +176,7 @@ module.exports = {
         "This module depends on an npm package that is declared as a peer dependency " +
         "in your package.json. This makes sense if your package is e.g. a plugin, but in " +
         "other cases - maybe not so much. If the use of a peer dependency is intentional " +
-        "add an exception to your dependency-cruiser configuration.",
+        "add an exception to it in your dependency-cruiser configuration.",
       severity: 'warn',
       from: {},
       to: {
@@ -207,11 +209,14 @@ module.exports = {
        - path: a regular expression to match
        - dynamic: a boolean indicating whether to ignore dynamic (true) or static (false) dependencies.
           leave out if you want to exclude neither (recommended!)
+
+       The ambient `vscode` module is provided by the extension host at
+       runtime; imports only pull in typings from the `@types/vscode`
+       devDependency, so they must not count as production dependencies.
     */
-    // exclude : {
-    //   path: '',
-    //   dynamic: true
-    // },
+    exclude: {
+      path: '^(vscode|node_modules/(vscode|@types/vscode))'
+    },
 
     /* pattern specifying which files to include (regular expression)
        dependency-cruiser will skip everything not matching this pattern
@@ -256,7 +261,7 @@ module.exports = {
        (2) resolution (e.g. with the paths property)
 
        The (optional) fileName attribute specifies which file to take (relative to
-       dependency-cruiser's current working directory). When not provided
+       dependency-cruiser's current working directory). When not provided it
        defaults to './tsconfig.json'.
      */
     tsConfig: {
@@ -266,7 +271,7 @@ module.exports = {
     /* Webpack configuration to use to get resolve options from.
 
        The (optional) fileName attribute specifies which file to take (relative
-       to dependency-cruiser's current working directory. When not provided defaults
+       to dependency-cruiser's current working directory). When not provided defaults
        to './webpack.conf.js'.
 
        The (optional) `env` and `args` attributes contain the parameters to be passed if
@@ -291,8 +296,8 @@ module.exports = {
 
     /* List of strings you have in use in addition to cjs/ es6 requires
        & imports to declare module dependencies. Use this e.g. if you've
-       redeclared require, use a require-wrapper or use window.require as
-       a hack.
+       redeclared require, use a require-wrapper or use window.require as a
+       hack.
     */
     // exoticRequireStrings: [],
     /* options to pass on to enhanced-resolve, the package dependency-cruiser
@@ -326,12 +331,12 @@ module.exports = {
       dot: {
         /* pattern of modules that can be consolidated in the detailed
            graphical dependency graph. The default pattern in this configuration
-           collapses everything in node_modules to one folder deep so you see
-           the external modules, but not the innards your app depends upon.
+           collapses everything in node_modules to one folder deep so you see the
+           external modules, but not the innards your app depends upon.
          */
         collapsePattern: 'node_modules/[^/]+',
 
-        /* Options to tweak the appearance of your graph.See
+        /* Options to tweak the appearance of your graph.See the
            https://github.com/sverweij/dependency-cruiser/blob/master/doc/options-reference.md#reporteroptions
            for details and some examples. If you don't specify a theme
            don't worry - dependency-cruiser will fall back to the default one.
@@ -386,11 +391,11 @@ module.exports = {
         */
         collapsePattern: '^(packages|src|lib|app|bin|test(s?)|spec(s?))/[^/]+|node_modules/[^/]+',
 
-        /* Options to tweak the appearance of your graph.See
+        /* Options to tweak the appearance of your graph.See the
            https://github.com/sverweij/dependency-cruiser/blob/master/doc/options-reference.md#reporteroptions
-           for details and some examples. If you don't specify a theme
-           for 'archi' dependency-cruiser will use the one specified in the
-           dot section (see above), if any, and otherwise use the default one.
+           for details and some examples. If you don't specify a theme for 'archi'
+           dependency-cruiser will use the one in the dot section (see above), if
+           any, and otherwise the default one.
          */
         // theme: {
         // },

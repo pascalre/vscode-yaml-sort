@@ -1,37 +1,37 @@
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema } from "js-yaml"
-import { workspace } from "vscode"
+import { WorkspaceConfiguration, workspace } from "vscode"
 
 export class Settings {
     filter = "vscode-yaml-sort"
-    workspace = workspace
+    private config: WorkspaceConfiguration = workspace.getConfiguration()
 
     getBoolean(name: string) {
-        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as boolean
+        return this.config.get(`${this.filter}.${name}`) as boolean
     }
 
     getNumber(name: string) {
-        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as number
+        return this.config.get(`${this.filter}.${name}`) as number
     }
 
     getString(name: string) {
-        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as string
+        return this.config.get(`${this.filter}.${name}`) as string
     }
 
     getCustomSortKeywords(index: number): string[] {
         if ([1, 2, 3].includes(index))
-            return this.workspace.getConfiguration().get(`${this.filter}.customSortKeywords_${index}`) as string[]
+            return this.config.get(`${this.filter}.customSortKeywords_${index}`) as string[]
         return []
     }
     getExtensions(): string[] {
-        return this.workspace.getConfiguration().get(`${this.filter}.extensions`) as string[]
+        return this.config.get(`${this.filter}.extensions`) as string[]
     }
     getQuotingType(): "'" | "\"" {
-        return this.workspace.getConfiguration().get(`${this.filter}.quotingType`) as "'" | "\""
+        return this.config.get(`${this.filter}.quotingType`) as "'" | "\""
     }
     getSchema(): Schema {
-        const schema = this.workspace.getConfiguration().get(`${this.filter}.schema`) as string
+        const schema = this.config.get(`${this.filter}.schema`) as string
         return Settings.getJsYamlSchemaFromString(schema)
     }
 

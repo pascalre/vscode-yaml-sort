@@ -9,8 +9,28 @@ import { Controller } from "../../../controller/controller"
 
 suite("Test sortYamlFiles", () => {
   const fileContent = "---\nakey: value\nkey: value"
+  const unsortedFileContent = "---\nkey: value\nakey: value"
 
   test("should sort all yaml files in directory", async () => {
+    const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/folder1"))
+
+    await commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
+
+    let sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", "utf-8").toString()
+    equal(sortedFile, fileContent)
+    sortedFile = readFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", "utf-8").toString()
+    equal(sortedFile, fileContent)
+
+    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", fileContent)
+    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", fileContent)
+  })
+
+  test("should sort all yaml files in directory when no editor is open", async () => {
+    // regression test: the command used to fail with "No texteditor is active"
+    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file.yaml", unsortedFileContent)
+    writeFileSync("./src/test/files/getYamlFilesInDirectory/folder1/file2.yaml", unsortedFileContent)
+    await commands.executeCommand("workbench.action.closeAllEditors")
+
     const uri = Uri.parse(resolve("./src/test/files/getYamlFilesInDirectory/folder1"))
 
     await commands.executeCommand("vscode-yaml-sort.sortYamlFilesInDirectory", uri)
