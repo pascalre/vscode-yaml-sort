@@ -1,9 +1,9 @@
-import { ErrorUtil } from "./error-util"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { ProcessorController } from "../controller/processor-controller"
 import { prependWhitespacesOnEachLine } from "../lib"
 import { Settings } from "../settings"
+import { ErrorUtil } from "./error-util"
 
 const sortArrays = (obj: unknown) => {
   if (!obj || typeof obj !== "object") {
