@@ -33,7 +33,7 @@ jobs:
       - name: lint
         run: |
           set +e
-          npx eslint . 2>&1 | tee /tmp/eslint-output.log
+          ./node_modules/.bin/eslint . 2>&1 | tee /tmp/eslint-output.log
           status=${PIPESTATUS[0]}
           set -e
           if [ "$status" -ne 0 ]; then
@@ -45,7 +45,7 @@ jobs:
       - name: static code analysis
         run: |
           set +e
-          npx depcruise --validate .dependency-cruiser.js src 2>&1 | tee /tmp/depcruise-output.log
+          ./node_modules/.bin/depcruise --validate .dependency-cruiser.js src 2>&1 | tee /tmp/depcruise-output.log
           status=${PIPESTATUS[0]}
           set -e
           if [ "$status" -ne 0 ]; then
@@ -63,3 +63,4 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
