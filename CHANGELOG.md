@@ -24,6 +24,8 @@
 * Move `@types/vscode`, `@types/js-yaml` and `@vscode/test-electron` to devDependencies to slim the extension package
 * Migrate ESLint 8 to ESLint 9 with flat config, typescript-eslint 8 and eslint-plugin-import-x
 * Add `@typescript-eslint/parser` as an explicit devDependency so eslint-plugin-import-x can resolve it at the root of `node_modules`
+* Exclude the ambient `vscode` module from the dependency-cruiser check: it is injected by the extension host at runtime and only its typings (`@types/vscode`) are needed at compile time
+* Run `eslint` and `dependency-cruiser` in CI via the lockfile-pinned binaries in `node_modules/.bin` instead of `npx`
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies
 * Update dependencies to latest versions
