@@ -1,9 +1,12 @@
 import { join, resolve} from "path"
 
 import { sync } from "glob"
+// mocha exports its class via `export =` and nyc ships without type
+// definitions, so the test runner has to stick to CommonJS requires here
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import Mocha = require("mocha")
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const NYC = require("nyc")
 
 // Recommended modules, loading them here to speed up NYC init
