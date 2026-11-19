@@ -1,5 +1,8 @@
 import { equal, throws } from "assert"
 
+import { spy } from "sinon"
+import { window } from "vscode"
+
 import { YamlOperations, formatDocuments, sortDocuments } from "../../../controller/document-transformer"
 import { YamlUtil } from "../../../util/yaml-util"
 
@@ -73,8 +76,63 @@ suite("Test DocumentTransformer - sortDocuments() with an indented selection (#5
   })
 })
 
+suite("Test DocumentTransformer - delimiters and directives", () => {
+  const sort = (text: string, yaml?: YamlOperations) => sortDocuments(text, { customSort: 0, isSelection: false }, yaml)
+
+  test("should add exactly one leading delimiter to several documents without one", () => {
+    equal(sort("b: 1\n---\nd: 1\nc: 2"), "---\nb: 1\n---\nc: 2\nd: 1")
+  })
+
+  test("should keep every delimiter with its comment in front of its own document", () => {
+    const text = "--- # first\nb: 1\n--- # second\nd: 1\nc: 2"
+
+    equal(sort(text), "--- # first\nb: 1\n--- # second\nc: 2\nd: 1")
+  })
+
+  test("should drop only the leading delimiter when useLeadingDashes is false", () => {
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+
+    equal(sort("--- # first\nb: 1\n--- # second\nd: 1\nc: 2", yamlutil), "b: 1\n--- # second\nc: 2\nd: 1")
+  })
+
+  test("should keep an empty document", () => {
+    equal(sort("---\n---\nb: 1\na: 2"), "---\n---\na: 2\nb: 1")
+  })
+
+  test("should keep yaml directives in front of the first document", () => {
+    equal(sort("%YAML 1.2\n---\nb: 1\na: 2"), "%YAML 1.2\n---\na: 2\nb: 1")
+  })
+
+  test("should keep yaml directives when useLeadingDashes is false, because they require a delimiter", () => {
+    const yamlutil = new YamlUtil()
+    yamlutil.settings.useLeadingDashes = false
+
+    equal(sort("%YAML 1.2\n---\nb: 1\n---\nd: 1\nc: 2", yamlutil), "%YAML 1.2\n---\nb: 1\n---\nc: 2\nd: 1")
+  })
+
+  test("should keep the delimiters of a selection as they are", () => {
+    equal(sortDocuments("b: 1\n---\nd: 1\nc: 2", { customSort: 0, isSelection: true }), "b: 1\n---\nc: 2\nd: 1")
+  })
+
+  test("should format several documents without a leading delimiter", () => {
+    equal(formatDocuments("b:   1\n---\na:   2"), "---\nb: 1\n---\na: 2")
+  })
+})
+
 suite("Test DocumentTransformer - formatDocuments()", () => {
   test("should format every document and keep the delimiters", () => {
     equal(formatDocuments("---\nkey1:   value\n---\nkey2:   value"), "---\nkey1: value\n---\nkey2: value")
+  })
+
+  test("should not show a message, so formatting on save stays silent (#65)", () => {
+    const info = spy(window, "showInformationMessage")
+    try {
+      formatDocuments("---\nkey1: value\n---\nkey2: value")
+
+      equal(info.callCount, 0)
+    } finally {
+      info.restore()
+    }
   })
 })

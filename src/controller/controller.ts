@@ -1,16 +1,14 @@
-import { TextEdit, TextEditor, Uri, window } from "vscode"
+import { TextEdit, TextEditor, window } from "vscode"
 
 import { formatDocuments, sortDocuments } from "./document-transformer"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { Settings } from "../settings"
 import { ErrorUtil } from "../util/error-util"
-import { FileUtil } from "../util/file-util"
 import { YamlUtil } from "../util/yaml-util"
 
 export class Controller {
   editor: TextEditor
-  fileutil = new FileUtil()
   yamlutil = new YamlUtil()
   jsyamladapter = new JsYamlAdapter()
   vscodeadapter = new VsCodeAdapter()
@@ -37,31 +35,15 @@ export class Controller {
     return false
   }
 
-  /**
-   * Sorts all yaml files in a directory
-   * @param {Uri} uri Base URI
-   */
-  sortYamlFiles(uri: Uri) {
-    const files = this.fileutil.getFiles(uri.fsPath)
-    files.forEach((file: string) => {
-      this.sortFile(file)
-    })
-  }
-
-  sortFile(file: string) {
-    try {
-      this.fileutil.sortFile(file)
-    } catch (error) {
-      this.errorutil.handleError(error)
-    }
-  }
-
   formatYamlWrapper(): TextEdit[] {
     const newText = formatDocuments(VsCodeAdapter.getActiveDocument(this.editor), this.yamlutil)
     if (newText === null) {
       return []
     }
-    return this.applyEdits(newText)
+    const edits = this.applyEdits(newText)
+    // only the command reports success, the formatter stays silent (see #65)
+    this.vscodeadapter.showMessage(Severity.INFO, "Yaml formatted successfully")
+    return edits
   }
 
   applyEdits(text: string) {

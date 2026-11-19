@@ -1,12 +1,12 @@
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
-import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement, removeLeadingSpacesOnEachLine } from "../lib"
-import { splitYaml, validateTextRange } from "../util/yaml-text"
+import { prependWhitespacesOnEachLine, removeLeadingSpacesOnEachLine } from "../lib"
+import { YamlDocument, YamlStream, splitDocuments, validateTextRange } from "../util/yaml-text"
 import { YamlUtil } from "../util/yaml-util"
 
 /**
  * The parts of YamlUtil a transformation depends on. Kept narrow so tests can pass a stub.
  */
-export type YamlOperations = Pick<YamlUtil, "formatYaml" | "getDelimiters" | "setLeadingDashes" | "sortYaml">
+export type YamlOperations = Pick<YamlUtil, "formatYaml" | "settings" | "sortYaml">
 
 export interface SortOptions {
   /** 0 for the default sort, 1 to 3 for the custom sort keywords. */
@@ -15,28 +15,48 @@ export interface SortOptions {
   isSelection: boolean
 }
 
-interface PreparedText {
-  text: string
-  delimiters: string[]
-}
-
-const DIRECTIVE = /^%.*\n/m
-const DIRECTIVES = /^%.*\n/gm
+/**
+ * Transforms the content of a single, non-empty document. Returns null if that fails.
+ */
+type ContentTransformation = (content: string) => string | null
 
 /**
- * Removes yaml directives (e.g. `%YAML 1.1`) and collects the document delimiters.
- * @param text       Text containing one or more yaml documents.
- * @param delimiters Delimiters as returned by YamlUtil.getDelimiters().
- * @returns The text without directives and the delimiters to put in front of each document.
+ * Puts the transformed documents back together.
+ * @param stream        The directives and the documents, with their transformed content.
+ * @param leadingDashes Whether the first document should start with a delimiter. Directives always keep theirs.
+ * @returns The joined text.
  */
-const removeDirectives = (text: string, delimiters: RegExpMatchArray): PreparedText => {
-  let adjustedDelimiters = delimiters
-  if (DIRECTIVE.test(text)) {
-    adjustedDelimiters.shift()
-    adjustedDelimiters = removeLeadingLineBreakOfFirstElement(adjustedDelimiters)
+const joinDocuments = (stream: YamlStream, leadingDashes: boolean | undefined): string => {
+  const rendered = stream.documents.map((document, index) => {
+    let delimiter = document.delimiter
+    if (index === 0 && leadingDashes !== undefined && stream.directives === "") {
+      // undefined keeps the first delimiter as it is, e.g. for a selection
+      delimiter = leadingDashes ? (delimiter ?? "---") : undefined
+    }
+    return [delimiter, document.content].filter((line) => line).join("\n")
+  })
+  return stream.directives + rendered.join("\n")
+}
+
+/**
+ * Applies a transformation to every non-empty document. Empty documents are kept as they are.
+ * @returns The transformed stream, or null if one document could not be transformed.
+ */
+const transformDocuments = (stream: YamlStream, transform: ContentTransformation): YamlStream | null => {
+  const documents: YamlDocument[] = []
+  for (const document of stream.documents) {
+    if (document.content.trim() === "") {
+      documents.push({ delimiter: document.delimiter, content: "" })
+      continue
+    }
+    const content = transform(document.content)
+    if (!content) {
+      // never return a partial result: it would drop documents or empty the selection
+      return null
+    }
+    documents.push({ delimiter: document.delimiter, content })
   }
-  const withoutDirectives = text.replace(DIRECTIVES, "").replace(/^\n/, "")
-  return { text: withoutDirectives, delimiters: adjustedDelimiters }
+  return { directives: stream.directives, documents }
 }
 
 /**
@@ -52,19 +72,16 @@ export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOper
   validateTextRange(text)
   new JsYamlAdapter().validateYaml(text)
 
-  const prepared = removeDirectives(text, yaml.getDelimiters(text, !options.isSelection))
-  let newText = ""
-  for (const unsortedYaml of splitYaml(prepared.text)) {
+  const sorted = transformDocuments(splitDocuments(text), (content) => {
     // an indented selection is sorted like a top-level document and indented again afterwards (see #53)
-    const indentation = options.isSelection ? YamlUtil.getNumberOfLeadingSpaces(unsortedYaml) : 0
-    const sortedYaml = yaml.sortYaml(removeLeadingSpacesOnEachLine(unsortedYaml, indentation), options.customSort)
-    if (!sortedYaml) {
-      // never return a partial result: it would drop documents or empty the selection
-      return null
-    }
-    newText += (prepared.delimiters.shift() ?? "") + prependWhitespacesOnEachLine(sortedYaml, indentation)
+    const indentation = options.isSelection ? YamlUtil.getNumberOfLeadingSpaces(content) : 0
+    const sortedContent = yaml.sortYaml(removeLeadingSpacesOnEachLine(content, indentation), options.customSort)
+    return sortedContent ? prependWhitespacesOnEachLine(sortedContent, indentation) : null
+  })
+  if (!sorted) {
+    return null
   }
-  return options.isSelection ? newText : yaml.setLeadingDashes(newText)
+  return joinDocuments(sorted, options.isSelection ? undefined : yaml.settings.useLeadingDashes)
 }
 
 /**
@@ -75,14 +92,9 @@ export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOper
  *          (the error has already been reported to the user).
  */
 export const formatDocuments = (text: string, yaml: YamlOperations = new YamlUtil()): string | null => {
-  const prepared = removeDirectives(text, yaml.getDelimiters(text, true))
-  let newText = ""
-  for (const unformattedYaml of splitYaml(prepared.text)) {
-    const formattedYaml = yaml.formatYaml(unformattedYaml, false)
-    if (!formattedYaml) {
-      return null
-    }
-    newText += (prepared.delimiters.shift() ?? "") + formattedYaml
+  const formatted = transformDocuments(splitDocuments(text), (content) => yaml.formatYaml(content, false))
+  if (!formatted) {
+    return null
   }
-  return yaml.setLeadingDashes(newText)
+  return joinDocuments(formatted, yaml.settings.useLeadingDashes)
 }

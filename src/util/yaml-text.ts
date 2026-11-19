@@ -27,10 +27,41 @@ export function validateTextRange(textRange: string) {
 }
 
 /**
- * Splits a string, which contains multiple yaml documents.
- * @param   {string}   multipleYamls String which contains multiple yaml documents.
- * @returns {[string]} Array of yaml documents.
+ * A yaml document together with the delimiter line (`---`, optionally with a comment) in front of it.
  */
-export function splitYaml(multipleYamls: string): [string] {
-  return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
+export interface YamlDocument {
+  /** The delimiter line without line break, undefined if the document has none. */
+  delimiter?: string
+  /** The content of the document, without leading empty lines. */
+  content: string
+}
+
+export interface YamlStream {
+  /** Directives like `%YAML 1.2` in front of the first delimiter, including their line breaks. */
+  directives: string
+  documents: YamlDocument[]
+}
+
+/**
+ * Splits a text into its yaml documents, keeping every delimiter with its own document.
+ * @param text Text containing one or more yaml documents.
+ * @returns The directives and the documents.
+ */
+export const splitDocuments = (text: string): YamlStream => {
+  // a capturing group makes split() return the delimiters between the contents:
+  // [leading content, delimiter, content, delimiter, content, ...]
+  const parts = text.split(/^(---.*)$/m)
+  const withoutLeadingEmptyLines = (content: string) => content.replace(/^(?:[ \t]*\n)+/, "")
+  const leading = parts[0]
+  const stream: YamlStream = { directives: "", documents: [] }
+
+  if (/^%/m.test(leading)) {
+    stream.directives = leading
+  } else if (leading.trim() !== "") {
+    stream.documents.push({ content: withoutLeadingEmptyLines(leading) })
+  }
+  for (let i = 1; i < parts.length; i += 2) {
+    stream.documents.push({ delimiter: parts[i], content: withoutLeadingEmptyLines(parts[i + 1]) })
+  }
+  return stream
 }

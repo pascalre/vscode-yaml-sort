@@ -15,21 +15,6 @@ export function prependWhitespacesOnEachLine(text: string, count: number): strin
 }
 
 /**
- * Removes the leading line break of the first element of an array.
- * @param   {RegExpMatchArray} delimiters Array for processing.
- * @returns {RegExpMatchArray}
- */
-export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArray): RegExpMatchArray {
-  let firstDelimiter = delimiters.shift()
-  if (firstDelimiter) {
-    firstDelimiter = firstDelimiter.replace(/^\n/, "")
-    delimiters.unshift(firstDelimiter)
-  }
-  return delimiters
-}
-
-
-/**
  * Removes up to a given count of leading spaces from every single line in a text.
  * The counterpart of prependWhitespacesOnEachLine().
  * @param   text  Text whose lines should lose their leading spaces.

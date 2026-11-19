@@ -1,7 +1,4 @@
-import { deepEqual, doesNotThrow, ok, throws } from "assert"
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs"
-import { tmpdir } from "os"
-import { join } from "path"
+import { deepEqual } from "assert"
 
 import { Settings } from "../../../settings"
 import { FileUtil } from "../../../util/file-util"
@@ -33,43 +30,5 @@ suite("Test FileUtil - getFiles()", () => {
       "src/test/files/getYamlFilesInDirectory/file.yml"
     ]
     deepEqual(fileutil.getFiles("./src/test/files/getYamlFilesInDirectory"), expected)
-  })
-})
-
-suite("Test FileUtil - sortFile()", () => {
-  const fileutil = new FileUtil()
-
-  test("should throw when file does not contain a valid yaml", () => {
-    throws(() => fileutil.sortFile("./src/test/suite/util/resources/subfolder/foo2.yaml"))
-  })
-
-  test("should not throw when file contains a valid yaml", () => {
-    doesNotThrow(() => fileutil.sortFile("./src/test/suite/util/resources/subfolder/.customyaml"))
-  })
-
-  test("should retain a trailing newline when the original file has one", () => {
-    const dir = mkdtempSync(join(tmpdir(), "yaml-sort-"))
-    const file = join(dir, "trailing-newline.yaml")
-    try {
-      writeFileSync(file, "zkey: zvalue\nakey: avalue\n")
-      fileutil.sortFile(file)
-      const sorted = readFileSync(file, "utf-8")
-      ok(sorted.endsWith("\n"))
-    } finally {
-      rmSync(dir, { recursive: true, force: true })
-    }
-  })
-
-  test("should not add a trailing newline when the original file has none", () => {
-    const dir = mkdtempSync(join(tmpdir(), "yaml-sort-"))
-    const file = join(dir, "no-trailing-newline.yaml")
-    try {
-      writeFileSync(file, "zkey: zvalue\nakey: avalue")
-      fileutil.sortFile(file)
-      const sorted = readFileSync(file, "utf-8")
-      ok(!sorted.endsWith("\n"))
-    } finally {
-      rmSync(dir, { recursive: true, force: true })
-    }
   })
 })

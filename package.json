@@ -260,10 +260,17 @@
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "vscode-yaml-sort.sortYamlFilesInDirectory",
+          "when": "false"
+        }
+      ],
       "explorer/context": [
         {
           "command": "vscode-yaml-sort.sortYamlFilesInDirectory",
-          "title": "Recursively sort YAML files"
+          "title": "Recursively sort YAML files",
+          "when": "explorerResourceIsFolder"
         }
       ]
     }

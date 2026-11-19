@@ -5,7 +5,6 @@ import { Position, Range, Selection, Uri, commands, window, workspace } from "vs
 
 import { Controller } from "../../controller/controller"
 import { Settings } from "../../settings"
-import { splitYaml } from "../../util/yaml-text"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
@@ -134,81 +133,5 @@ suite("Test sortYamlWrapper", () => {
     } else {
       equal(true, false)
     }
-  })
-  test("should remove yaml metadata tags (directives)", async () => {
-    const uri = Uri.parse(resolve("./src/test/files/testMetadataTags.yaml"))
-    const doc = await workspace.openTextDocument(uri)
-    await window.showTextDocument(doc, { preview: false })
-
-    const activeEditor = window.activeTextEditor
-    if (activeEditor) {
-      const actual =
-        "%YAML 1.1\n" +
-        "---\n" +
-        "key:\n" +
-        "  key2: value"
-      const expected =
-        "key:\n" +
-        "  key2: value"
-
-      activeEditor.edit((builder) => builder.replace(
-        new Range(
-          new Position(0, 0),
-          new Position(activeEditor.document.lineCount + 1, 0)),
-        actual))
-
-      await commands.executeCommand("vscode-yaml-sort.sortYaml")
-      equal(activeEditor.document.getText(), expected)
-    } else {
-      equal(true, false)
-    }
-  })
-})
-
-suite("Test splitYaml", () => {
-  test("should return the input string, when the input does not contain `---`", () => {
-    const actual = `\
-- Orange
-- Apple`
-    deepEqual(splitYaml(actual), ["- Orange\n- Apple"])
-  })
-  test("should return the input document without the delimiters", () => {
-    const actual = `\
----
-- Orange
-- Apple`
-    deepEqual(splitYaml(actual), ["\n- Orange\n- Apple"])
-  })
-  test("should return an array with the yaml documents", () => {
-    const actual = `\
-- Orange
-- Apple
----
-- Orange
-- Apple`
-    deepEqual(splitYaml(actual), ["- Orange\n- Apple\n", "\n- Orange\n- Apple"])
-  })
-  test("Split multiple yaml documents with leading dashes", () => {
-    const actual = `\
----
-- Orange
-- Apple
----
-- Orange
-- Apple`
-
-    deepEqual(splitYaml(actual),
-      ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
-  })
-  test("Split multiple yaml documents with text behind delimiter", () => {
-    const actual = `\
---- # comment 1
-- Orange
-- Apple
---- text
-- Orange
-- Apple`
-    deepEqual(splitYaml(actual),
-      ["\n- Orange\n- Apple\n", "\n- Orange\n- Apple"])
   })
 })
