@@ -5,7 +5,7 @@ import { Position, Range, Selection, Uri, commands, window, workspace } from "vs
 
 import { Controller } from "../../controller/controller"
 import { Settings } from "../../settings"
-import { splitYaml } from "../../util/yaml-util"
+import { splitYaml } from "../../util/yaml-text"
 
 suite("Test getCustomSortKeywords", () => {
   test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {

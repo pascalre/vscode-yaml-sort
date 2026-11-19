@@ -4,7 +4,7 @@ import {
   prependWhitespacesOnEachLine,
   removeLeadingSpacesOnEachLine
 } from "../../lib"
-import { removeTrailingCharacters } from "../../util/yaml-util"
+import { removeTrailingCharacters } from "../../util/yaml-text"
 
 suite("Test removeTrailingCharacters", () => {
   const actual = "text"

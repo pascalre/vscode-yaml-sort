@@ -1,6 +1,7 @@
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement, removeLeadingSpacesOnEachLine } from "../lib"
-import { YamlUtil, splitYaml, validateTextRange } from "../util/yaml-util"
+import { splitYaml, validateTextRange } from "../util/yaml-text"
+import { YamlUtil } from "../util/yaml-util"
 
 /**
  * The parts of YamlUtil a transformation depends on. Kept narrow so tests can pass a stub.

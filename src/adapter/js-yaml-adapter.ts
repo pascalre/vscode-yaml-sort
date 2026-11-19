@@ -2,7 +2,7 @@ import { dump, load } from "js-yaml"
 
 import { Settings } from "../settings"
 import { SortUtil } from "../util/sort-util"
-import { removeTrailingCharacters, splitYaml } from "../util/yaml-util"
+import { removeTrailingCharacters, splitYaml } from "../util/yaml-text"
 
 export class JsYamlAdapter {
   settings: Settings
