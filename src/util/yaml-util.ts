@@ -4,33 +4,8 @@ import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { ProcessorController } from "../controller/processor-controller"
 import { prependWhitespacesOnEachLine } from "../lib"
 import { Settings } from "../settings"
-
-const sortArrays = (obj: unknown) => {
-  if (!obj || typeof obj !== "object") {
-      return
-  } else if (Array.isArray(obj)) {
-      obj.sort((a, b) => compareObjects(a, b))
-  }
-  Object.keys(obj).forEach(key => {
-    const object = obj[key as keyof unknown]
-    if (typeof object === "object") {
-        if (Array.isArray(object)) {
-          Object.entries(object).sort((a, b) => compareObjects(a, b))
-        }
-        sortArrays(object)
-    }
-  })
-}
-
-export function compareObjects(a: object, b: object) {
-  if (a > b) {
-    return 1
-  }
-  if (a < b) {
-    return -1
-  }
-  return 0
-}
+import { sortArraysRecursively } from "./sort-util"
+import { removeTrailingCharacters } from "./yaml-text"
 
 export class YamlUtil {
   settings: Settings
@@ -79,7 +54,7 @@ export class YamlUtil {
       const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
 
       if (this.settings.sortArrays) {
-        sortArrays(doc)
+        sortArraysRecursively(doc)
       }
 
       let sortedYaml = ""
@@ -87,8 +62,9 @@ export class YamlUtil {
         const keywords = this.settings.getCustomSortKeywords(customSort)
 
         keywords.forEach(key => {
-          if (doc[key]) {
-            let sortedSubYaml = this.jsyamladapter.dumpYaml(doc[key], true, customSort)
+          // check for the key itself, values like 0, false or null must be ordered too
+          if (Object.prototype.hasOwnProperty.call(doc, key)) {
+            let sortedSubYaml = this.jsyamladapter.dumpValue(doc[key], true, customSort)
             if (YamlUtil.isValueMultiline(sortedSubYaml)) {
               sortedSubYaml = this.transformMultilineValue(sortedSubYaml)
               sortedYaml += `${key}:\n${sortedSubYaml}\n`
@@ -123,7 +99,7 @@ export class YamlUtil {
     try {
       const processor = new ProcessorController(yaml)
       processor.preprocess()
-      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text) as object, false, 0)
+      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text), false, 0)
       processor.text = doc
       processor.postprocess()
       doc = processor.text
@@ -182,36 +158,4 @@ export class YamlUtil {
     }
     return delimiters
   }
-}
-
-/**
- * Removes a given count of characters from a string.
- * @param   {string} text  String for processing.
- * @param   {number} count The number of characters to remove from the end of the returned string.
- * @returns {string} Input text with removed trailing characters.
- */
-export function removeTrailingCharacters(text: string, count = 1): string {
-  if (count >= 0 && count <= text.length) {
-    return text.substring(0, text.length - count)
-  } else {
-    throw new Error("The count parameter is not in a valid range")
-  }
-}
-
-export function validateTextRange(textRange: string) {
-  // remove trailing whitespaces, to check for things like 'text:  '
-  const text = textRange.trim()
-  const notValidEndingCharacters = [":", "|", ">"]
-  if (notValidEndingCharacters.includes(text.charAt(text.length - 1))) {
-    throw new Error("YAML selection is invalid. Check the ending of your selection.")
-  }
-}
-
-/**
- * Splits a string, which contains multiple yaml documents.
- * @param   {string}   multipleYamls String which contains multiple yaml documents.
- * @returns {[string]} Array of yaml documents.
- */
-export function splitYaml(multipleYamls: string): [string] {
-  return multipleYamls.split(/^---.*/m).filter((obj) => obj) as [string]
 }

@@ -592,3 +592,43 @@ suite("Test YamlUtil - sortYaml() keeps substituted values intact", () => {
     equal(yamlutil.sortYaml(text), text)
   })
 })
+
+suite("Test YamlUtil - sortYaml() with custom sort and scalar values", () => {
+  const yamlutil = new YamlUtil()
+
+  test("should keep number and boolean values of custom sort keywords", () => {
+    equal(yamlutil.sortYaml("spec: x\nkind: true\napiVersion: 3", 1), "apiVersion: 3\nkind: true\nspec: x\n")
+  })
+
+  test("should keep an empty mapping as value of a custom sort keyword", () => {
+    equal(yamlutil.sortYaml("spec: x\nmetadata: {}", 1), "metadata: {}\nspec: x\n")
+  })
+
+  test("should order custom sort keywords even if their values are falsy", () => {
+    const text = "spec: x\nmetadata: null\nkind: false\napiVersion: 0"
+
+    equal(yamlutil.sortYaml(text, 1), "apiVersion: 0\nkind: false\nmetadata: null\nspec: x\n")
+  })
+
+  test("should not add a value to a document containing only a comment", () => {
+    equal(yamlutil.sortYaml("# only a comment"), "\n# only a comment")
+  })
+
+  test("should keep a document containing only a scalar", () => {
+    equal(yamlutil.sortYaml("42"), "42")
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with sortOrderReverse", () => {
+  const settings = new Settings()
+  settings.sortOrderReverse = true
+  const yamlutil = new YamlUtil(settings)
+
+  test("should sort keys in reverse order on every level", () => {
+    equal(yamlutil.sortYaml("a: 1\nc:\n  x: 1\n  z: 2\nb: 2"), "c:\n  z: 2\n  x: 1\nb: 2\na: 1")
+  })
+
+  test("should sort the remaining keys of a custom sort in reverse order", () => {
+    equal(yamlutil.sortYaml("a: 1\nkind: x\nb: 2", 1), "kind: x\nb: 2\na: 1")
+  })
+})

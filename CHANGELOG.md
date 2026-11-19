@@ -2,6 +2,10 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Setting `sortArrays` now sorts arrays with mixed item types deterministically: numbers (numerically), booleans and strings first, mappings and nested lists keep their order at the end. Before, such arrays were left in an arbitrary order
+* Setting `sortOrderReverse` now also applies to the default sort and to the keys following the keywords of a custom sort. Before, it only worked with `useCustomSortRecursively`
+* (closes [#53](https://github.com/pascalre/vscode-yaml-sort/issues/53)) Sort an indented selection, e.g. a part of a list or the children of a nested key, without having to unindent it first. The selection keeps its indentation
+* Custom sort no longer removes number, boolean and empty mapping values of custom sort keywords (`apiVersion: 3` became `apiVersion: `), and also orders keywords whose value is `0`, `false`, `null` or an empty string. Documents containing only comments can be sorted now
 * (closes [#180](https://github.com/pascalre/vscode-yaml-sort/issues/180)) "Format Document" and format on save no longer apply their changes twice. The formatter now only returns its edits to VS Code and always processes the whole document it was asked to format, instead of the active editor or its selection
 * Abort sorting when one of several yaml documents cannot be sorted. Previously the failing document was silently dropped, and a selection that could not be sorted (e.g. an indented section, refs [#53](https://github.com/pascalre/vscode-yaml-sort/issues/53)) was replaced with nothing. The success message is now only shown after the edits were applied
 * Keep octal values such as `0755` when the same digits appear earlier in the document. Previously the first occurrence was substituted instead of the matched value, so `z: 0755` became `z: 755`
@@ -15,6 +19,9 @@
 
 ✨ Feature
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
+📦 Dependencies
+* Move `@types/js-yaml` and `@vscode/test-electron` to `devDependencies`, so they are no longer shipped with the extension
+
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies
 * Update dependencies to latest versions

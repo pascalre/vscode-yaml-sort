@@ -1,6 +1,7 @@
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
-import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "../lib"
-import { YamlUtil, splitYaml, validateTextRange } from "../util/yaml-util"
+import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement, removeLeadingSpacesOnEachLine } from "../lib"
+import { splitYaml, validateTextRange } from "../util/yaml-text"
+import { YamlUtil } from "../util/yaml-util"
 
 /**
  * The parts of YamlUtil a transformation depends on. Kept narrow so tests can pass a stub.
@@ -54,17 +55,14 @@ export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOper
   const prepared = removeDirectives(text, yaml.getDelimiters(text, !options.isSelection))
   let newText = ""
   for (const unsortedYaml of splitYaml(prepared.text)) {
-    let sortedYaml = yaml.sortYaml(unsortedYaml, options.customSort)
+    // an indented selection is sorted like a top-level document and indented again afterwards (see #53)
+    const indentation = options.isSelection ? YamlUtil.getNumberOfLeadingSpaces(unsortedYaml) : 0
+    const sortedYaml = yaml.sortYaml(removeLeadingSpacesOnEachLine(unsortedYaml, indentation), options.customSort)
     if (!sortedYaml) {
       // never return a partial result: it would drop documents or empty the selection
       return null
     }
-    if (options.isSelection) {
-      // the leading whitespaces of the selection are used for indentation
-      const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
-      sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
-    }
-    newText += (prepared.delimiters.shift() ?? "") + sortedYaml
+    newText += (prepared.delimiters.shift() ?? "") + prependWhitespacesOnEachLine(sortedYaml, indentation)
   }
   return options.isSelection ? newText : yaml.setLeadingDashes(newText)
 }

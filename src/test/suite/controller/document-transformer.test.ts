@@ -46,6 +46,33 @@ suite("Test DocumentTransformer - sortDocuments() when a document cannot be sort
   })
 })
 
+suite("Test DocumentTransformer - sortDocuments() with an indented selection (#53)", () => {
+  test("should sort an indented selection and keep its indentation", () => {
+    equal(sortDocuments("  b: 1\n  a: 2", { customSort: 0, isSelection: true }), "  a: 2\n  b: 1")
+  })
+
+  test("should sort an indented selection with nested keys", () => {
+    const text = "  b:\n    y: 1\n    x: 2\n  a: 3"
+
+    equal(sortDocuments(text, { customSort: 0, isSelection: true }), "  a: 3\n  b:\n    x: 2\n    'y': 1")
+  })
+
+  test("should sort the keys of indented list items", () => {
+    const text = "    - type: angular\n      style: powerline\n    - type: aws\n      background: orange"
+
+    equal(
+      sortDocuments(text, { customSort: 0, isSelection: true }),
+      "    - style: powerline\n      type: angular\n    - background: orange\n      type: aws"
+    )
+  })
+
+  test("should keep a comment of an indented selection above its key", () => {
+    const text = "  b: 1\n  # about a\n  a: 2"
+
+    equal(sortDocuments(text, { customSort: 0, isSelection: true }), "  # about a\n  a: 2\n  b: 1")
+  })
+})
+
 suite("Test DocumentTransformer - formatDocuments()", () => {
   test("should format every document and keep the delimiters", () => {
     equal(formatDocuments("---\nkey1:   value\n---\nkey2:   value"), "---\nkey1: value\n---\nkey2: value")
