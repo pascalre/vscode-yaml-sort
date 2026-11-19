@@ -36,7 +36,10 @@ export abstract class GenericProcessor {
   }
 
   replaceSubstituteWithValue(substitute: string, value: string) {
-    const match = new RegExp(`'${substitute}'|"${substitute}"|${substitute}`)
+    const escaped = substitute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    // the lookahead ensures that `...helm.1` does not match the prefix of `...helm.10`
+    const unquoted = `${escaped}(?!\\d)`
+    const match = new RegExp(`'${unquoted}'|"${unquoted}"|${unquoted}`)
     // use a replacer function so that dollar signs in the value are inserted
     // literally and are not interpreted as replacement patterns (see #130)
     this.text = this.text.replace(match, () => value)

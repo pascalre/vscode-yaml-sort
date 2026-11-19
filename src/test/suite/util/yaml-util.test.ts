@@ -140,7 +140,6 @@ suite("Test dumpYaml", () => {
     const yamlutil = new YamlUtil(settings)
     equal(yamlutil.sortYaml(actual, 1), expected)
   })
-
 })
 
 suite("Test dumpYaml", () => {
@@ -574,5 +573,15 @@ suite("Test YamlUtil - sortYaml() with docker-compose files", () => {
       "    image: \"mysql:5.7\""
 
     equal(composeUtil.sortYaml(composeYaml), composeYaml)
+  })
+})
+
+suite("Test YamlUtil - sortYaml() keeps substituted values intact", () => {
+  const yamlutil = new YamlUtil()
+
+  test("should keep more than ten helm values at their keys", () => {
+    const lines = Array.from({ length: 12 }, (_, i) => `key${String(i).padStart(2, "0")}: "{{ .Values.value${i} }}"`)
+
+    equal(yamlutil.sortYaml([...lines].reverse().join("\n")), lines.join("\n"))
   })
 })

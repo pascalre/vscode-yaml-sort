@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Keep every helm, array and block value at its key when a document contains more than ten of them. Previously the substitute `vscode-yaml-sort.helm.1` also matched the prefix of `vscode-yaml-sort.helm.10`, which swapped or lost values
 * (refs [#186](https://github.com/pascalre/vscode-yaml-sort/issues/186)) Retain newline at end of file when using command `Recursively sort YAML files`
 * (closes [#130](https://github.com/pascalre/vscode-yaml-sort/issues/130)) Keep quoted helm values intact when sorting. Dollar signs in values are no longer interpreted as replacement patterns
 * (closes [#188](https://github.com/pascalre/vscode-yaml-sort/issues/188), refs [#227](https://github.com/pascalre/vscode-yaml-sort/issues/227)) Keep block scalars intact when their content contains colons or comment-like lines
