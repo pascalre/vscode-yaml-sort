@@ -1,25 +1,12 @@
-import { DocumentFormattingEditProvider, ExtensionContext, TextEdit, Uri, commands } from "vscode"
+import { ExtensionContext, Uri, commands } from "vscode"
 
 import { VsCodeAdapter } from "./adapter/vs-code-adapter"
 import { Controller } from "./controller/controller"
-import { Settings } from "./settings"
+import { YamlFormattingProvider } from "./controller/formatting-provider"
 
 export function activate(context: ExtensionContext) {
-
-  const formatter: DocumentFormattingEditProvider = {
-    provideDocumentFormattingEdits(): TextEdit[] {
-      const settings = new Settings()
-      if (settings.doSortOnSave()) {
-        return new Controller().sortYamlWrapper(settings.sortOnSave)
-      } else {
-        return new Controller().formatYamlWrapper()
-      }
-    }
-  }
-
-  VsCodeAdapter.registerFormatter(formatter)
-
   context.subscriptions.push(
+    VsCodeAdapter.registerFormatter(new YamlFormattingProvider()),
     commands.registerCommand("vscode-yaml-sort.sortYaml", () => {
       new Controller().sortYamlWrapper()
     }),
