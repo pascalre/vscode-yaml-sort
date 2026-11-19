@@ -1,12 +1,12 @@
 import { TextEdit, TextEditor, Uri, window } from "vscode"
 
+import { formatDocuments, sortDocuments } from "./document-transformer"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
-import { prependWhitespacesOnEachLine, removeLeadingLineBreakOfFirstElement } from "../lib"
 import { Settings } from "../settings"
 import { ErrorUtil } from "../util/error-util"
 import { FileUtil } from "../util/file-util"
-import { YamlUtil, splitYaml, validateTextRange } from "../util/yaml-util"
+import { YamlUtil } from "../util/yaml-util"
 
 export class Controller {
   editor: TextEditor
@@ -57,29 +57,10 @@ export class Controller {
   }
 
   formatYamlWrapper(): TextEdit[] {
-    let doc = VsCodeAdapter.getActiveDocument(this.editor)
-    let delimiters = this.yamlutil.getDelimiters(doc, true)
-    // remove yaml metadata tags
-    const matchMetadata = /^%.*\n/gm
-    // set metadata tags, if there is no metadata tag it should be an emtpy array
-    if (matchMetadata.test(doc)) {
-      delimiters.shift()
-      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
+    const newText = formatDocuments(VsCodeAdapter.getActiveDocument(this.editor), this.yamlutil)
+    if (newText === null) {
+      return []
     }
-    doc = doc.replace(matchMetadata, "")
-    doc = doc.replace(/^\n/, "")
-
-    const yamls = splitYaml(doc)
-    let newText = ""
-    for (const unformattedYaml of yamls) {
-      const formattedYaml = this.yamlutil.formatYaml(unformattedYaml, false)
-      if (formattedYaml) {
-        newText += delimiters.shift() + formattedYaml
-      } else {
-        return []
-      }
-    }
-    newText = this.yamlutil.setLeadingDashes(newText)
     return this.applyEdits(newText)
   }
 
@@ -90,45 +71,13 @@ export class Controller {
   }
 
   sortYamlWrapper(customSort = 0): TextEdit[] {
-    const textRange = VsCodeAdapter.getRange(this.editor)
-    let text = VsCodeAdapter.getText(this.editor, textRange)
-
+    const text = VsCodeAdapter.getText(this.editor, VsCodeAdapter.getRange(this.editor))
+    let newText: string
     try {
-      validateTextRange(text)
-      this.jsyamladapter.validateYaml(text)
+      newText = sortDocuments(text, { customSort, isSelection: !this.editor.selection.isEmpty }, this.yamlutil)
     } catch (error) {
       this.errorutil.handleError(error)
-      return [] as TextEdit[]
-    }
-
-    let delimiters = this.yamlutil.getDelimiters(text, this.editor.selection.isEmpty)
-    // remove yaml metadata tags
-    const matchMetadata = /^%.*\n/gm
-    // set metadata tags, if there is no metadata tag it should be an emtpy array
-    if (matchMetadata.test(text)) {
-      delimiters.shift()
-      delimiters = removeLeadingLineBreakOfFirstElement(delimiters)
-    }
-    text = text.replace(matchMetadata, "")
-    text = text.replace(/^\n/, "")
-
-    // sort yaml
-    let newText = ""
-    splitYaml(text).forEach((unsortedYaml) => {
-      let sortedYaml = this.yamlutil.sortYaml(unsortedYaml, customSort)
-      if (sortedYaml) {
-        if (!this.editor.selection.isEmpty) {
-          // get number of leading whitespaces, these whitespaces will be used for indentation
-          const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
-          sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
-        }
-        newText += delimiters.shift() + sortedYaml
-      } else {
-        return [] as TextEdit[]
-      }
-    })
-    if (this.editor.selection.isEmpty) {
-      newText = this.yamlutil.setLeadingDashes(newText)
+      return []
     }
     this.vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
     return this.applyEdits(newText)
