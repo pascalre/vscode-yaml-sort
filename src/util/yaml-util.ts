@@ -114,48 +114,4 @@ export class YamlUtil {
     }
   }
 
-  /**
-   * Returns all delimiters with comments.
-   * @param   {string}  multipleYamls String which contains multiple yaml documents.
-   * @param   {boolean} isSelectionEmpty Specify if the text is an selection
-   * @param   {boolean} useLeadingDashes Specify if the documents should have a leading delimiter.
-   *                                   If set to false, it will add an empty array element at the beginning of the output.
-   * @returns {[string]} Array of yaml delimiters.
-   */
-  getDelimiters(yamls: string, isSelectionEmpty: boolean): RegExpMatchArray {
-    // remove empty lines
-    let multipleYamls = yamls.trim()
-    multipleYamls = multipleYamls.replace(/^\n/, "")
-    let delimiters = multipleYamls.match(/^---.*/gm)
-    if (!delimiters) {
-      return [""]
-    }
-
-    // append line break to every delimiter
-    delimiters = delimiters.map((delimiter) => `\n${delimiter}\n`) as RegExpMatchArray
-
-    if (delimiters) {
-      if (isSelectionEmpty) {
-        if (!this.settings.useLeadingDashes && multipleYamls.startsWith("---")) {
-          delimiters.shift()
-          delimiters.unshift("")
-        } else if (this.settings.useLeadingDashes && !multipleYamls.startsWith("---")) {
-          delimiters.unshift("---\n")
-        } else {
-          delimiters.unshift("")
-        }
-      } else {
-        if (!multipleYamls.startsWith("---")) {
-          delimiters.unshift("")
-        } else {
-          let firstDelimiter = delimiters.shift()
-          if (firstDelimiter) {
-            firstDelimiter = firstDelimiter.replace(/^\n/, "")
-            delimiters.unshift(firstDelimiter)
-          }
-        }
-      }
-    }
-    return delimiters
-  }
 }

@@ -2,6 +2,9 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Keep every document delimiter (`---`, including a comment behind it) in front of its own document. Before, several documents without a leading `---` got a duplicated `---` (an additional empty document), and with a leading `--- # comment` the comments moved to the next document or got lost
+* Keep yaml directives like `%YAML 1.2` when sorting or formatting, and accept them when validating. Before, files with directives could not be processed
+* Keep empty documents (`---` directly followed by `---`) instead of aborting
 * Setting `sortArrays` now sorts arrays with mixed item types deterministically: numbers (numerically), booleans and strings first, mappings and nested lists keep their order at the end. Before, such arrays were left in an arbitrary order
 * Setting `sortOrderReverse` now also applies to the default sort and to the keys following the keywords of a custom sort. Before, it only worked with `useCustomSortRecursively`
 * (closes [#53](https://github.com/pascalre/vscode-yaml-sort/issues/53)) Sort an indented selection, e.g. a part of a list or the children of a nested key, without having to unindent it first. The selection keeps its indentation

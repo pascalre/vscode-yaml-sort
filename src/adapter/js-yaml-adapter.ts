@@ -2,7 +2,7 @@ import { dump, load } from "js-yaml"
 
 import { Settings } from "../settings"
 import { SortUtil } from "../util/sort-util"
-import { removeTrailingCharacters, splitYaml } from "../util/yaml-text"
+import { removeTrailingCharacters, splitDocuments } from "../util/yaml-text"
 
 /**
  * @param value Any loaded yaml value.
@@ -24,8 +24,9 @@ export class JsYamlAdapter {
    * @returns true if yaml is valid
    */
   validateYaml(text: string): boolean {
-    splitYaml(text).forEach((yaml) => {
-      load(yaml, { schema: this.settings.getSchema() })
+    // directives are not part of a document's content, so they are not loaded (see splitDocuments)
+    splitDocuments(text).documents.forEach((document) => {
+      load(document.content, { schema: this.settings.getSchema() })
     })
     return true
   }
