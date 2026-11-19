@@ -1,6 +1,5 @@
 import { ErrorUtil } from "./error-util"
 import { JsYamlAdapter } from "../adapter/js-yaml-adapter"
-import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
 import { ProcessorController } from "../controller/processor-controller"
 import { prependWhitespacesOnEachLine } from "../lib"
 import { Settings } from "../settings"
@@ -106,7 +105,6 @@ export class YamlUtil {
       if (useLeadingDashes) {
         doc = `---\n${doc}`
       }
-      new VsCodeAdapter().showMessage(Severity.INFO, "Yaml formatted successfully")
       return doc
     } catch (error) {
       this.errorutil.handleError(error)

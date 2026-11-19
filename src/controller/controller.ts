@@ -40,7 +40,10 @@ export class Controller {
     if (newText === null) {
       return []
     }
-    return this.applyEdits(newText)
+    const edits = this.applyEdits(newText)
+    // only the command reports success, the formatter stays silent (see #65)
+    this.vscodeadapter.showMessage(Severity.INFO, "Yaml formatted successfully")
+    return edits
   }
 
   applyEdits(text: string) {

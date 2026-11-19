@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* (refs [#65](https://github.com/pascalre/vscode-yaml-sort/issues/65)) Formatting via "Format Document" or on save no longer shows "Yaml formatted successfully", once per document. The command `Format YAML` shows it once after the changes were applied
 * Command `Recursively sort YAML files` now sorts files with several documents, works without an open editor and is only offered for folders in the explorer. A file that cannot be sorted is reported and left unchanged. Files are now also found on Windows paths
 * Keep every document delimiter (`---`, including a comment behind it) in front of its own document. Before, several documents without a leading `---` got a duplicated `---` (an additional empty document), and with a leading `--- # comment` the comments moved to the next document or got lost
 * Keep yaml directives like `%YAML 1.2` when sorting or formatting, and accept them when validating. Before, files with directives could not be processed

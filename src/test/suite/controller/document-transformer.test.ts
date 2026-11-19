@@ -1,5 +1,8 @@
 import { equal, throws } from "assert"
 
+import { spy } from "sinon"
+import { window } from "vscode"
+
 import { YamlOperations, formatDocuments, sortDocuments } from "../../../controller/document-transformer"
 import { YamlUtil } from "../../../util/yaml-util"
 
@@ -120,5 +123,16 @@ suite("Test DocumentTransformer - delimiters and directives", () => {
 suite("Test DocumentTransformer - formatDocuments()", () => {
   test("should format every document and keep the delimiters", () => {
     equal(formatDocuments("---\nkey1:   value\n---\nkey2:   value"), "---\nkey1: value\n---\nkey2: value")
+  })
+
+  test("should not show a message, so formatting on save stays silent (#65)", () => {
+    const info = spy(window, "showInformationMessage")
+    try {
+      formatDocuments("---\nkey1: value\n---\nkey2: value")
+
+      equal(info.callCount, 0)
+    } finally {
+      info.restore()
+    }
   })
 })
