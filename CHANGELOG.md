@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Command `Recursively sort YAML files` now sorts files with several documents, works without an open editor and is only offered for folders in the explorer. A file that cannot be sorted is reported and left unchanged. Files are now also found on Windows paths
 * Keep every document delimiter (`---`, including a comment behind it) in front of its own document. Before, several documents without a leading `---` got a duplicated `---` (an additional empty document), and with a leading `--- # comment` the comments moved to the next document or got lost
 * Keep yaml directives like `%YAML 1.2` when sorting or formatting, and accept them when validating. Before, files with directives could not be processed
 * Keep empty documents (`---` directly followed by `---`) instead of aborting
