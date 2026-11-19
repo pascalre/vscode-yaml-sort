@@ -28,3 +28,17 @@ export function removeLeadingLineBreakOfFirstElement(delimiters: RegExpMatchArra
   return delimiters
 }
 
+
+/**
+ * Removes up to a given count of leading spaces from every single line in a text.
+ * The counterpart of prependWhitespacesOnEachLine().
+ * @param   text  Text whose lines should lose their leading spaces.
+ * @param   count The maximum number of spaces to remove from each line.
+ * @returns Input text without the leading spaces.
+ */
+export const removeLeadingSpacesOnEachLine = (text: string, count: number): string => {
+  if (count <= 0) {
+    return text
+  }
+  return text.replace(new RegExp(`^ {1,${count}}`, "gm"), "")
+}

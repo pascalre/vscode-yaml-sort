@@ -1,7 +1,8 @@
 import { equal, throws} from "assert"
 
 import {
-  prependWhitespacesOnEachLine
+  prependWhitespacesOnEachLine,
+  removeLeadingSpacesOnEachLine
 } from "../../lib"
 import { removeTrailingCharacters } from "../../util/yaml-util"
 
@@ -51,3 +52,16 @@ suite("Test prependWhitespacesOnEachLine", () => {
   })
 })
 
+suite("Test removeLeadingSpacesOnEachLine", () => {
+  test("should remove the given count of spaces from every line", () => {
+    equal(removeLeadingSpacesOnEachLine("  a:\n    b: 1\n  c: 2", 2), "a:\n  b: 1\nc: 2")
+  })
+
+  test("should not remove more spaces than a line has", () => {
+    equal(removeLeadingSpacesOnEachLine("  a: 1\nb: 2\n\n c: 3", 2), "a: 1\nb: 2\n\nc: 3")
+  })
+
+  test("should return the text unchanged for a count of 0", () => {
+    equal(removeLeadingSpacesOnEachLine("  a: 1", 0), "  a: 1")
+  })
+})
