@@ -30,7 +30,7 @@ export class SortUtil {
     return this.localeSort(a, b)
   }
 
-  static compare(a: number, b: number) {
+  static compare<T extends number | string>(a: T, b: T): number {
     if (a > b) {
       return 1
     }

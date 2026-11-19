@@ -55,8 +55,6 @@ export class JsYamlAdapter {
    * @returns The dumped value without trailing line break.
    */
   dumpValue(value: unknown, sortKeys: boolean, custom: number): string {
-    const sort = new SortUtil(this.settings, custom)
-
     let yaml = dump(value, {
       indent: this.settings.indent,
       forceQuotes: this.settings.forceQuotes,
@@ -66,9 +64,7 @@ export class JsYamlAdapter {
       quotingType: this.settings.getQuotingType(),
       schema: this.settings.getSchema(),
       styles: { "!!null": this.settings.getNullStyle() },
-      sortKeys: (!(custom > 0 && this.settings.useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
-        return sort.customSort(a, b)
-      })
+      sortKeys: this.getKeyComparator(sortKeys, custom)
     })
 
     // this is neccesary to avoid linebreaks in a selection sort
@@ -76,6 +72,23 @@ export class JsYamlAdapter {
 
     return yaml
   }
+  /**
+   * @param sortKeys If set to false, keys keep their order.
+   * @param custom   0 for the default sort, 1 to 3 for the custom sort keywords.
+   * @returns The value for js-yaml's `sortKeys` option.
+   */
+  getKeyComparator(sortKeys: boolean, custom: number): boolean | ((a: string, b: string) => number) {
+    if (custom > 0 && this.settings.useCustomSortRecursively) {
+      const sort = new SortUtil(this.settings, custom)
+      return (a: string, b: string) => sort.customSort(a, b)
+    }
+    if (sortKeys && this.settings.sortOrderReverse) {
+      // mirror js-yaml's default order, which compares by code point
+      return (a: string, b: string) => SortUtil.compare(b, a)
+    }
+    return sortKeys
+  }
+
 }
 
 /**

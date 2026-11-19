@@ -618,3 +618,17 @@ suite("Test YamlUtil - sortYaml() with custom sort and scalar values", () => {
     equal(yamlutil.sortYaml("42"), "42")
   })
 })
+
+suite("Test YamlUtil - sortYaml() with sortOrderReverse", () => {
+  const settings = new Settings()
+  settings.sortOrderReverse = true
+  const yamlutil = new YamlUtil(settings)
+
+  test("should sort keys in reverse order on every level", () => {
+    equal(yamlutil.sortYaml("a: 1\nc:\n  x: 1\n  z: 2\nb: 2"), "c:\n  z: 2\n  x: 1\nb: 2\na: 1")
+  })
+
+  test("should sort the remaining keys of a custom sort in reverse order", () => {
+    equal(yamlutil.sortYaml("a: 1\nkind: x\nb: 2", 1), "kind: x\nb: 2\na: 1")
+  })
+})
