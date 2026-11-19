@@ -4,6 +4,13 @@ import { Settings } from "../settings"
 import { SortUtil } from "../util/sort-util"
 import { removeTrailingCharacters, splitYaml } from "../util/yaml-text"
 
+/**
+ * @param value Any loaded yaml value.
+ * @returns True for a mapping without keys, e.g. an empty document.
+ */
+const isEmptyMapping = (value: unknown): boolean =>
+  typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 0
+
 export class JsYamlAdapter {
   settings: Settings
 
@@ -88,12 +95,4 @@ export class JsYamlAdapter {
     }
     return sortKeys
   }
-
 }
-
-/**
- * @param value Any loaded yaml value.
- * @returns True for a mapping without keys, e.g. an empty document.
- */
-const isEmptyMapping = (value: unknown): boolean =>
-  typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 0

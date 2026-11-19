@@ -16,6 +16,9 @@ module.exports = {
     "plugin:import/typescript",
   ],
   rules: {
+    // the base rule does not understand typescript, so use the typescript-eslint variant
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "error",
     "semi": ["error", "never"],
     "sort-imports": [
       "error",
