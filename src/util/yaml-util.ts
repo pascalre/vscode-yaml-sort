@@ -87,8 +87,9 @@ export class YamlUtil {
         const keywords = this.settings.getCustomSortKeywords(customSort)
 
         keywords.forEach(key => {
-          if (doc[key]) {
-            let sortedSubYaml = this.jsyamladapter.dumpYaml(doc[key], true, customSort)
+          // check for the key itself, values like 0, false or null must be ordered too
+          if (Object.prototype.hasOwnProperty.call(doc, key)) {
+            let sortedSubYaml = this.jsyamladapter.dumpValue(doc[key], true, customSort)
             if (YamlUtil.isValueMultiline(sortedSubYaml)) {
               sortedSubYaml = this.transformMultilineValue(sortedSubYaml)
               sortedYaml += `${key}:\n${sortedSubYaml}\n`
@@ -123,7 +124,7 @@ export class YamlUtil {
     try {
       const processor = new ProcessorController(yaml)
       processor.preprocess()
-      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text) as object, false, 0)
+      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text), false, 0)
       processor.text = doc
       processor.postprocess()
       doc = processor.text

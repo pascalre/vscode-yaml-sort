@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Custom sort no longer removes number, boolean and empty mapping values of custom sort keywords (`apiVersion: 3` became `apiVersion: `), and also orders keywords whose value is `0`, `false`, `null` or an empty string. Documents containing only comments can be sorted now
 * (closes [#180](https://github.com/pascalre/vscode-yaml-sort/issues/180)) "Format Document" and format on save no longer apply their changes twice. The formatter now only returns its edits to VS Code and always processes the whole document it was asked to format, instead of the active editor or its selection
 * Abort sorting when one of several yaml documents cannot be sorted. Previously the failing document was silently dropped, and a selection that could not be sorted (e.g. an indented section, refs [#53](https://github.com/pascalre/vscode-yaml-sort/issues/53)) was replaced with nothing. The success message is now only shown after the edits were applied
 * Keep octal values such as `0755` when the same digits appear earlier in the document. Previously the first occurrence was substituted instead of the matched value, so `z: 0755` became `z: 755`
