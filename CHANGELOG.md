@@ -19,6 +19,9 @@
 
 ✨ Feature
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
+📦 Dependencies
+* Move `@types/js-yaml` and `@vscode/test-electron` to `devDependencies`, so they are no longer shipped with the extension
+
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies
 * Update dependencies to latest versions
