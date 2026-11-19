@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Keep octal values such as `0755` when the same digits appear earlier in the document. Previously the first occurrence was substituted instead of the matched value, so `z: 0755` became `z: 755`
 * Keep every helm, array and block value at its key when a document contains more than ten of them. Previously the substitute `vscode-yaml-sort.helm.1` also matched the prefix of `vscode-yaml-sort.helm.10`, which swapped or lost values
 * (refs [#186](https://github.com/pascalre/vscode-yaml-sort/issues/186)) Retain newline at end of file when using command `Recursively sort YAML files`
 * (closes [#130](https://github.com/pascalre/vscode-yaml-sort/issues/130)) Keep quoted helm values intact when sorting. Dollar signs in values are no longer interpreted as replacement patterns

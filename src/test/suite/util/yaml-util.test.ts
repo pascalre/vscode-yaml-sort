@@ -140,6 +140,7 @@ suite("Test dumpYaml", () => {
     const yamlutil = new YamlUtil(settings)
     equal(yamlutil.sortYaml(actual, 1), expected)
   })
+
 })
 
 suite("Test dumpYaml", () => {
@@ -583,5 +584,11 @@ suite("Test YamlUtil - sortYaml() keeps substituted values intact", () => {
     const lines = Array.from({ length: 12 }, (_, i) => `key${String(i).padStart(2, "0")}: "{{ .Values.value${i} }}"`)
 
     equal(yamlutil.sortYaml([...lines].reverse().join("\n")), lines.join("\n"))
+  })
+
+  test("should keep an octal value when the same digits appear quoted earlier", () => {
+    const text = "a: '0755'\nz: 0755"
+
+    equal(yamlutil.sortYaml(text), text)
   })
 })
