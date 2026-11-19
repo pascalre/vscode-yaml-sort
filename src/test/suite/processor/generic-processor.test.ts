@@ -25,3 +25,18 @@ suite("Test GenericProcessor - replaceSubstituteWithValue()", () => {
     equal(helmprocessor.text, expected)
   })
 })
+
+suite("Test GenericProcessor - substitutes with more than ten matches", () => {
+  test("postprocess restores every value at its own key when more than ten substitutes exist", () => {
+    // vscode-yaml-sort.helm.1 must not match the prefix of vscode-yaml-sort.helm.10 or .11
+    const lines = Array.from({ length: 12 }, (_, i) => `key${i}: "{{ .Values.value${i} }}"`)
+    const helmprocessor = new HelmProcessor(lines.join("\n"))
+
+    helmprocessor.preprocess()
+    // simulate sorting, which moves the higher substitutes in front of the lower ones
+    helmprocessor.text = helmprocessor.text.split("\n").reverse().join("\n")
+    helmprocessor.postprocess()
+
+    equal(helmprocessor.text, [...lines].reverse().join("\n"))
+  })
+})

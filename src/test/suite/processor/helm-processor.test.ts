@@ -22,61 +22,26 @@ suite("Test HelmProcessor - preprocess()", () => {
   })
 })
 
-suite("Test HelmProcessor - findMatches()", () => {
-  test("should return all matches of helm values", () => {
-    const text =
-      "apiVersion: keycloak.org/v1alpha1\n" +
-      "kind: KeycloakClient\n" +
-      "metadata:\n" +
-      "labels:\n" +
-      "app: clientsso\n" +
-      "name: {{ .Values.ui.environment.keycloakClientId }}\n" +
-      "namespace: {{ required 'Keycloak namespace required' .Values.keycloak.namespace }}\n"
-    const helmprocessor = new HelmProcessor(text)
-    const helmValues = helmprocessor.findMatches()
+suite("Test HelmProcessor - createSubstitute()", () => {
+  test("should store each value under a consecutive substitute", () => {
+    const helmprocessor = new HelmProcessor("")
 
-    equal(helmValues?.length, 2)
-    equal(helmValues?.at(0), "{{ .Values.ui.environment.keycloakClientId }}")
-    equal(helmValues?.at(1), "{{ required 'Keycloak namespace required' .Values.keycloak.namespace }}")
+    equal(helmprocessor.createSubstitute("{{ .a }}"), "vscode-yaml-sort.helm.0")
+    equal(helmprocessor.createSubstitute("{{ .b }}"), "vscode-yaml-sort.helm.1")
+
+    equal(helmprocessor.store.size, 2)
+    equal(helmprocessor.store.get("vscode-yaml-sort.helm.0"), "{{ .a }}")
+    equal(helmprocessor.store.get("vscode-yaml-sort.helm.1"), "{{ .b }}")
   })
 })
 
-suite("Test HelmProcessor - replaceValueWithSubstitute()", () => {
-  test("should replace first match", () => {
-    const text =
-      "foo: bar\n" +
-      "bar: baz\n" +
-      "baz: foo2"
-    const helmprocessor = new HelmProcessor(text)
-
-    equal(helmprocessor.store.size, 0)
-
-    helmprocessor.replaceValueWithSubstitute("bar")
-
-    equal(helmprocessor.store.size, 1)
-    match(helmprocessor.text, /foo: vscode-yaml-sort.helm.0/)
-
-    helmprocessor.replaceValueWithSubstitute("baz")
-    helmprocessor.replaceValueWithSubstitute("foo2")
-
-    equal(helmprocessor.store.size, 3)
-
-    const expected =
-      "foo: vscode-yaml-sort.helm.0\n" +
-      "bar: vscode-yaml-sort.helm.1\n" +
-      "baz: vscode-yaml-sort.helm.2"
-
-    equal(helmprocessor.text, expected)
-  })
+suite("Test HelmProcessor - preprocess() keeps surrounding text", () => {
   test("should keep trailing newline character", () => {
-    const text = "foo: bar\n"
-    const helmprocessor = new HelmProcessor(text)
+    const helmprocessor = new HelmProcessor("foo: {{ .bar }}\n")
 
-    helmprocessor.replaceValueWithSubstitute("bar")
+    helmprocessor.preprocess()
 
-    const expected = "foo: vscode-yaml-sort.helm.0\n"
-
-    equal(helmprocessor.text, expected)
+    equal(helmprocessor.text, "foo: vscode-yaml-sort.helm.0\n")
   })
 })
 

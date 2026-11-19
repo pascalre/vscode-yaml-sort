@@ -44,3 +44,23 @@ suite("Test OctalProcessor - preprocess()", () => {
     equal(octalprocessor.store.size, 0)
   })
 })
+suite("Test OctalProcessor - matched occurrence", () => {
+  test("preprocess substitutes the matched octal value, not an earlier identical string", () => {
+    const text = "a: \"0755\"\nz: 0755"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.text, "a: \"0755\"\nz: vscode-yaml-sort.octal.0")
+  })
+
+  test("text should be the same before preprocessing and after postprocessing", () => {
+    const text = "a: \"0755\"\nz: 0755"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+    octalprocessor.postprocess()
+
+    equal(octalprocessor.text, text)
+  })
+})
