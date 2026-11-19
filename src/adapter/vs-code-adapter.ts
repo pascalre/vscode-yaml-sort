@@ -1,4 +1,4 @@
-import { DocumentFormattingEditProvider, Position, Range, Selection, TextEdit, TextEditor, WorkspaceEdit, languages, window, workspace }  from "vscode"
+import { Disposable, DocumentFormattingEditProvider, Position, Range, Selection, TextEdit, TextEditor, WorkspaceEdit, languages, window, workspace }  from "vscode"
 
 import { Settings } from "../settings"
 
@@ -32,8 +32,8 @@ export class VsCodeAdapter {
     }
   }
 
-  static registerFormatter(formatter: DocumentFormattingEditProvider) {
-    languages.registerDocumentFormattingEditProvider("yaml", formatter)
+  static registerFormatter(formatter: DocumentFormattingEditProvider): Disposable {
+    return languages.registerDocumentFormattingEditProvider("yaml", formatter)
   }
 
   static getText(textEditor: TextEditor, range: Range) {
