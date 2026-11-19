@@ -72,14 +72,18 @@ export class Controller {
 
   sortYamlWrapper(customSort = 0): TextEdit[] {
     const text = VsCodeAdapter.getText(this.editor, VsCodeAdapter.getRange(this.editor))
-    let newText: string
+    let newText: string | null
     try {
       newText = sortDocuments(text, { customSort, isSelection: !this.editor.selection.isEmpty }, this.yamlutil)
     } catch (error) {
       this.errorutil.handleError(error)
       return []
     }
+    if (newText === null) {
+      return []
+    }
+    const edits = this.applyEdits(newText)
     this.vscodeadapter.showMessage(Severity.INFO, "Keys resorted successfully")
-    return this.applyEdits(newText)
+    return edits
   }
 }

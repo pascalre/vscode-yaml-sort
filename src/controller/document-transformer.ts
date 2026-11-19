@@ -43,28 +43,29 @@ const removeDirectives = (text: string, delimiters: RegExpMatchArray): PreparedT
  * @param text    Text containing one or more yaml documents.
  * @param options Sort options.
  * @param yaml    Yaml operations, injectable for tests.
- * @returns The sorted text.
+ * @returns The sorted text, or null if a document could not be sorted
+ *          (the error has already been reported to the user).
  * @throws  Error if the text is not valid yaml or the selection ends invalid.
  */
-export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlUtil()): string => {
+export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlUtil()): string | null => {
   validateTextRange(text)
   new JsYamlAdapter().validateYaml(text)
 
   const prepared = removeDirectives(text, yaml.getDelimiters(text, !options.isSelection))
   let newText = ""
-  splitYaml(prepared.text).forEach((unsortedYaml) => {
+  for (const unsortedYaml of splitYaml(prepared.text)) {
     let sortedYaml = yaml.sortYaml(unsortedYaml, options.customSort)
-    if (sortedYaml) {
-      if (options.isSelection) {
-        // the leading whitespaces of the selection are used for indentation
-        const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
-        sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
-      }
-      newText += prepared.delimiters.shift() + sortedYaml
-    } else {
-      return []
+    if (!sortedYaml) {
+      // never return a partial result: it would drop documents or empty the selection
+      return null
     }
-  })
+    if (options.isSelection) {
+      // the leading whitespaces of the selection are used for indentation
+      const indentation = YamlUtil.getNumberOfLeadingSpaces(unsortedYaml)
+      sortedYaml = prependWhitespacesOnEachLine(sortedYaml, indentation)
+    }
+    newText += (prepared.delimiters.shift() ?? "") + sortedYaml
+  }
   return options.isSelection ? newText : yaml.setLeadingDashes(newText)
 }
 
@@ -83,7 +84,7 @@ export const formatDocuments = (text: string, yaml: YamlOperations = new YamlUti
     if (!formattedYaml) {
       return null
     }
-    newText += prepared.delimiters.shift() + formattedYaml
+    newText += (prepared.delimiters.shift() ?? "") + formattedYaml
   }
   return yaml.setLeadingDashes(newText)
 }
