@@ -1,7 +1,7 @@
-import { equal } from "assert"
+import { deepEqual, equal } from "assert"
 
 import { Settings } from "../../../settings"
-import { SortUtil } from "../../../util/sort-util"
+import { SortUtil, sortArraysRecursively } from "../../../util/sort-util"
 
 suite("Test Sort - localeSort()", () => {
   test("when `locale` is `sv` and a is `ä` and b is `z` should return 1", () => {
@@ -53,4 +53,29 @@ suite("Test Sort - customSort()", () => {
   sort.custom = 1
   sort.settings.sortOrderReverse = false
 
+})
+suite("Test sortArraysRecursively()", () => {
+  test("should sort numbers numerically, then booleans, then strings", () => {
+    const value = ["c", 10, true, "b", 2, false]
+
+    sortArraysRecursively(value)
+
+    deepEqual(value, [2, 10, false, true, "b", "c"])
+  })
+
+  test("should keep mappings and nested lists after the scalars in their original order", () => {
+    const value = [{ name: "b" }, "z", { name: "a" }, ["y", "x"]]
+
+    sortArraysRecursively(value)
+
+    deepEqual(value, ["z", { name: "b" }, { name: "a" }, ["x", "y"]])
+  })
+
+  test("should sort arrays nested in mappings", () => {
+    const value = { a: { b: [3, 1, 2] }, c: null }
+
+    sortArraysRecursively(value)
+
+    deepEqual(value, { a: { b: [1, 2, 3] }, c: null })
+  })
 })
