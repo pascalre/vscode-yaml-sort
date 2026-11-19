@@ -44,6 +44,20 @@ export class JsYamlAdapter {
 
     const sort = new SortUtil(this.settings, custom)
 
+    // keys are sorted alphabetically, but the keys of an azure devops template
+    // reference keep a readable order (see #205)
+    let sortKeysOption: boolean | ((a: string, b: string) => number) = sortKeys
+    if (sortKeys) {
+      sortKeysOption = (a: string, b: string) => {
+        return SortUtil.sortKeys(a, b)
+      }
+    }
+    if (custom > 0 && this.settings.useCustomSortRecursively) {
+      sortKeysOption = (a: string, b: string) => {
+        return sort.customSort(a, b)
+      }
+    }
+
     let yaml = dump(text, {
       indent: this.settings.indent,
       forceQuotes: this.settings.forceQuotes,
@@ -53,9 +67,7 @@ export class JsYamlAdapter {
       quotingType: this.settings.getQuotingType(),
       schema: this.settings.getSchema(),
       styles: { "!!null": this.settings.getNullStyle() },
-      sortKeys: (!(custom > 0 && this.settings.useCustomSortRecursively) ? sortKeys : (a: string, b: string) => {
-        return sort.customSort(a, b)
-      })
+      sortKeys: sortKeysOption
     })
 
     // this is neccesary to avoid linebreaks in a selection sort
