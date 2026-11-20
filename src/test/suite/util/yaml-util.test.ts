@@ -583,3 +583,23 @@ suite("Test YamlUtil - injected settings reach every processing step", () => {
     equal(new YamlUtil(settings).formatYaml("a:\n  b: 1", false), "a:\n    b: 1")
   })
 })
+
+suite("Test YamlUtil - sortYaml() with custom sort keeps the document intact", () => {
+  const yamlutil = new YamlUtil()
+
+  test("should put the keywords in their order before the remaining keys", () => {
+    equal(yamlutil.sortYaml("data: 1\nkind: x\nb:\n  c: 1", 1), "kind: x\ndata: 1\nb:\n  c: 1")
+  })
+
+  test("should keep a document that only contains keywords", () => {
+    equal(yamlutil.sortYaml("kind: x", 1), "kind: x\n")
+  })
+
+  test("should leave a list document unchanged", () => {
+    equal(yamlutil.sortYaml("- kind: x\n- a: 1", 1), "- kind: x\n- a: 1")
+  })
+
+  test("should leave a scalar document unchanged", () => {
+    equal(yamlutil.sortYaml("42", 1), "42")
+  })
+})
