@@ -1,12 +1,55 @@
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema } from "js-yaml"
-import { ConfigurationScope, WorkspaceConfiguration, workspace } from "vscode"
 
-type QuotingType = "'" | "\""
+export type QuotingType = "'" | "\""
 
 // js-yaml only supports these styles for the !!null tag
 const NULL_STYLES = ["lowercase", "uppercase", "camelcase", "canonical", "empty"]
+
+/**
+ * The values used when the configuration has none. They must match the defaults declared in
+ * package.json, which a unit test verifies.
+ */
+export const DEFAULT_CONFIGURATION = {
+  customSortKeywords_1: ["apiVersion", "kind", "metadata", "spec", "data"],
+  customSortKeywords_2: [] as string[],
+  customSortKeywords_3: [] as string[],
+  emptyLinesUntilLevel: 0,
+  extensions: ["yaml", "yml"],
+  forceQuotes: false,
+  indent: 2,
+  lineWidth: 500,
+  locale: "en",
+  noArrayIndent: false,
+  noCompatMode: false,
+  notifySuccess: true,
+  nullStyle: "lowercase",
+  quotingType: "'" as QuotingType,
+  schema: "DEFAULT_SCHEMA",
+  sortArrays: false,
+  sortOnSave: 0,
+  sortOrderReverse: false,
+  useArrayProcessor: true,
+  useBlockProcessor: true,
+  useCommentProcessor: true,
+  useCustomSortRecursively: false,
+  useHelmProcessor: true,
+  useLeadingDashes: true,
+  useOctalProcessor: true,
+}
+
+export type ConfigurationKey = keyof typeof DEFAULT_CONFIGURATION
+
+/**
+ * Read access to the extension's configuration section. VS Code's `WorkspaceConfiguration`
+ * satisfies it, so the core does not depend on the VS Code API.
+ */
+export interface ConfigurationReader {
+  get<T>(key: string): T | undefined
+}
+
+const NO_CONFIGURATION: ConfigurationReader = { get: () => undefined }
 
 /**
  * A snapshot of the extension's settings.
@@ -44,49 +87,40 @@ export class Settings {
   useOctalProcessor: boolean
 
   /**
-   * @param configuration The extension's configuration section. Defaults to the global and workspace settings.
+   * @param configuration The extension's configuration section. Missing values fall back to
+   *                      DEFAULT_CONFIGURATION, so `new Settings()` yields the defaults.
    */
-  constructor(configuration: WorkspaceConfiguration = workspace.getConfiguration(Settings.SECTION)) {
-    const read = <T>(name: string) => configuration.get(name) as T
-    this.customSortKeywords1 = read<string[]>("customSortKeywords_1")
-    this.customSortKeywords2 = read<string[]>("customSortKeywords_2")
-    this.customSortKeywords3 = read<string[]>("customSortKeywords_3")
-    this.emptyLinesUntilLevel = read<number>("emptyLinesUntilLevel")
-    this.extensions = read<string[]>("extensions")
-    this.forceQuotes = read<boolean>("forceQuotes")
-    this.indent = read<number>("indent")
-    this.lineWidth = read<number>("lineWidth")
-    this.locale = read<string>("locale")
-    this.nullStyle = read<string>("nullStyle")
-    this.noArrayIndent = read<boolean>("noArrayIndent")
-    this.noCompatMode = read<boolean>("noCompatMode")
-    this.notifySuccess = read<boolean>("notifySuccess")
-    this.quotingType = read<QuotingType>("quotingType")
-    this.schema = Settings.getJsYamlSchemaFromString(read<string>("schema"))
-    this.sortArrays = read<boolean>("sortArrays")
-    this.sortOnSave = read<number>("sortOnSave")
-    this.sortOrderReverse = read<boolean>("sortOrderReverse")
-    this.useCustomSortRecursively = read<boolean>("useCustomSortRecursively")
-    this.useLeadingDashes = read<boolean>("useLeadingDashes")
-    this.useArrayProcessor = read<boolean>("useArrayProcessor")
-    this.useBlockProcessor = read<boolean>("useBlockProcessor")
-    this.useCommentProcessor = read<boolean>("useCommentProcessor")
-    this.useHelmProcessor = read<boolean>("useHelmProcessor")
-    this.useOctalProcessor = read<boolean>("useOctalProcessor")
-  }
-
-  /**
-   * Reads the settings that apply to a document: workspace folder settings in a multi-root
-   * workspace and language specific settings like `"[yaml]": { "vscode-yaml-sort.indent": 4 }`.
-   * @param document         The document, or its uri and language id.
-   * @param getConfiguration Injectable for tests.
-   * @returns The settings for the document.
-   */
-  static forDocument(
-    document: ConfigurationScope,
-    getConfiguration: (section?: string, scope?: ConfigurationScope) => WorkspaceConfiguration = workspace.getConfiguration
-  ): Settings {
-    return new Settings(getConfiguration(Settings.SECTION, document))
+  constructor(configuration: ConfigurationReader = NO_CONFIGURATION) {
+    const read = <K extends ConfigurationKey>(key: K): (typeof DEFAULT_CONFIGURATION)[K] => {
+      const value = configuration.get<(typeof DEFAULT_CONFIGURATION)[K]>(key) ?? DEFAULT_CONFIGURATION[key]
+      // copy lists, so changing a snapshot never changes the defaults or another snapshot
+      return (Array.isArray(value) ? [...value] : value) as (typeof DEFAULT_CONFIGURATION)[K]
+    }
+    this.customSortKeywords1 = read("customSortKeywords_1")
+    this.customSortKeywords2 = read("customSortKeywords_2")
+    this.customSortKeywords3 = read("customSortKeywords_3")
+    this.emptyLinesUntilLevel = read("emptyLinesUntilLevel")
+    this.extensions = read("extensions")
+    this.forceQuotes = read("forceQuotes")
+    this.indent = read("indent")
+    this.lineWidth = read("lineWidth")
+    this.locale = read("locale")
+    this.nullStyle = read("nullStyle")
+    this.noArrayIndent = read("noArrayIndent")
+    this.noCompatMode = read("noCompatMode")
+    this.notifySuccess = read("notifySuccess")
+    this.quotingType = read("quotingType")
+    this.schema = Settings.getJsYamlSchemaFromString(read("schema"))
+    this.sortArrays = read("sortArrays")
+    this.sortOnSave = read("sortOnSave")
+    this.sortOrderReverse = read("sortOrderReverse")
+    this.useCustomSortRecursively = read("useCustomSortRecursively")
+    this.useLeadingDashes = read("useLeadingDashes")
+    this.useArrayProcessor = read("useArrayProcessor")
+    this.useBlockProcessor = read("useBlockProcessor")
+    this.useCommentProcessor = read("useCommentProcessor")
+    this.useHelmProcessor = read("useHelmProcessor")
+    this.useOctalProcessor = read("useOctalProcessor")
   }
 
   /**

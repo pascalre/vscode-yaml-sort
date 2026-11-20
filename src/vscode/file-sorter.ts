@@ -2,11 +2,11 @@ import { readFileSync, writeFileSync } from "fs"
 
 import { Uri } from "vscode"
 
+import { readSettings } from "./configuration"
 import { ErrorUtil } from "./error-util"
 import { Severity, VsCodeAdapter } from "./vs-code-adapter"
 import { YamlOperations, sortDocuments } from "../core/document-transformer"
 import { FileUtil } from "../core/file-util"
-import { Settings } from "../core/settings"
 import { YamlUtil } from "../core/yaml-util"
 
 /**
@@ -39,7 +39,7 @@ export const sortYamlFilesInDirectory = (uri: Uri | undefined): void => {
     new VsCodeAdapter().showMessage(Severity.ERROR, "Please run this command from the context menu of a folder in the explorer.")
     return
   }
-  const settingsFor = (resource: Uri) => Settings.forDocument({ uri: resource, languageId: "yaml" })
+  const settingsFor = (resource: Uri) => readSettings({ uri: resource, languageId: "yaml" })
   for (const file of new FileUtil(settingsFor(uri)).getFiles(uri.fsPath)) {
     try {
       sortFile(file, new YamlUtil(settingsFor(Uri.file(file))))

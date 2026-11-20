@@ -1,5 +1,6 @@
 import { TextEdit, TextEditor, window } from "vscode"
 
+import { readSettings } from "./configuration"
 import { ErrorUtil } from "./error-util"
 import { Severity, VsCodeAdapter } from "./vs-code-adapter"
 import { formatDocuments, sortDocuments } from "../core/document-transformer"
@@ -21,7 +22,7 @@ export class Controller {
     }
     this.editor = window.activeTextEditor
     // one snapshot of the settings that apply to the edited document
-    this.settings = Settings.forDocument(this.editor.document)
+    this.settings = readSettings(this.editor.document)
     this.yamlutil = new YamlUtil(this.settings)
     this.jsyamladapter = new JsYamlAdapter(this.settings)
     this.vscodeadapter = new VsCodeAdapter(this.settings)

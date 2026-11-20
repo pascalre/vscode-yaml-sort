@@ -1,8 +1,8 @@
 import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from "vscode"
 
+import { readSettings } from "./configuration"
 import { ErrorUtil } from "./error-util"
 import { formatDocuments, sortDocuments } from "../core/document-transformer"
-import { Settings } from "../core/settings"
 import { YamlUtil } from "../core/yaml-util"
 
 /**
@@ -19,7 +19,7 @@ export class YamlFormattingProvider implements DocumentFormattingEditProvider {
    * @returns One edit replacing the whole document, or no edit if the document cannot be processed.
    */
   provideDocumentFormattingEdits(document: TextDocument): TextEdit[] {
-    const settings = Settings.forDocument(document)
+    const settings = readSettings(document)
     const yamlutil = new YamlUtil(settings)
     const text = document.getText()
     let newText: string | null

@@ -3,29 +3,7 @@ import { resolve } from "path"
 
 import { Position, Range, Selection, Uri, commands, window, workspace } from "vscode"
 
-import { Settings } from "../../core/settings"
 import { Controller } from "../../vscode/controller"
-
-suite("Test getCustomSortKeywords", () => {
-  test("should return values of `vscode-yaml-sort.customSortKeywords_1`", () => {
-    const settings = new Settings()
-    settings.getCustomSortKeywords = function () {
-      return ["apiVersion", "kind", "metadata", "spec", "data"]
-    }
-    deepEqual(settings.getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
-  })
-  test("should return `[]` for custom keywords 2 and 3", () => {
-    deepEqual(new Settings().getCustomSortKeywords(2), [])
-    deepEqual(new Settings().getCustomSortKeywords(3), [])
-  })
-
-  test("should return [] when parameter is not in [1, 2, 3]", () => {
-    deepEqual(new Settings().getCustomSortKeywords(0), [])
-    deepEqual(new Settings().getCustomSortKeywords(4), [])
-    deepEqual(new Settings().getCustomSortKeywords(-1), [])
-    deepEqual(new Settings().getCustomSortKeywords(1.5), [])
-  })
-})
 
 suite("Test validateYaml", () => {
   test("do not fail when executing command", async () => {

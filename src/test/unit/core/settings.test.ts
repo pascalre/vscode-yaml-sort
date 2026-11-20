@@ -3,9 +3,8 @@ import { deepEqual, equal } from "assert"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema} from "js-yaml"
-import { Uri, workspace } from "vscode"
 
-import { Settings } from "../../../core/settings"
+import { DEFAULT_CONFIGURATION, Settings } from "../../../core/settings"
 
 suite("Test Settings - getter", () => {
     const settings: Settings = new Settings()
@@ -84,6 +83,9 @@ suite("Test Settings - getCustomSortKeywords()", () => {
 
     test("when index is not in [1, 2, 3] return `[]`", () => {
         deepEqual(settings.getCustomSortKeywords(0), [])
+        deepEqual(settings.getCustomSortKeywords(4), [])
+        deepEqual(settings.getCustomSortKeywords(-1), [])
+        deepEqual(settings.getCustomSortKeywords(1.5), [])
     })
 })
 
@@ -129,17 +131,19 @@ suite("Test Settings - doSortOnSave()", () => {
     })
 })
 
-suite("Test Settings - forDocument()", () => {
-    test("should read the configuration for the given document", () => {
-        const document = { uri: Uri.file("/project/a.yaml"), languageId: "yaml" }
-        const calls: unknown[][] = []
-        const getConfiguration = (section?: string, scope?: unknown) => {
-            calls.push([section, scope])
-            return workspace.getConfiguration(section)
-        }
+suite("Test Settings - configuration", () => {
+    test("should use the configured values", () => {
+        const configuration = { indent: 4, customSortKeywords_2: ["b", "a"] } as Record<string, unknown>
+        const settings = new Settings({ get: <T>(key: string) => configuration[key] as T | undefined })
 
-        Settings.forDocument(document, getConfiguration)
+        equal(settings.indent, 4)
+        deepEqual(settings.getCustomSortKeywords(2), ["b", "a"])
+        equal(settings.lineWidth, DEFAULT_CONFIGURATION.lineWidth)
+    })
 
-        deepEqual(calls, [["vscode-yaml-sort", document]])
+    test("should not share lists between snapshots and the defaults", () => {
+        new Settings().getCustomSortKeywords(1).push("changed")
+
+        deepEqual(new Settings().getCustomSortKeywords(1), ["apiVersion", "kind", "metadata", "spec", "data"])
     })
 })
