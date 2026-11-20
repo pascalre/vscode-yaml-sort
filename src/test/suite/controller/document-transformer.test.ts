@@ -4,6 +4,7 @@ import { spy } from "sinon"
 import { window } from "vscode"
 
 import { YamlOperations, formatDocuments, sortDocuments } from "../../../controller/document-transformer"
+import { Settings } from "../../../settings"
 import { YamlUtil } from "../../../util/yaml-util"
 
 /**
@@ -134,5 +135,14 @@ suite("Test DocumentTransformer - formatDocuments()", () => {
     } finally {
       info.restore()
     }
+  })
+})
+
+suite("Test DocumentTransformer - injected settings", () => {
+  test("should validate with the schema of the injected settings", () => {
+    const settings = new Settings()
+    settings.schema = Settings.getJsYamlSchemaFromString("CLOUDFORMATION_SCHEMA")
+
+    equal(sortDocuments("b: !Ref x\na: 1", { customSort: 0, isSelection: false }, new YamlUtil(settings)), "---\na: 1\nb: !Ref x")
   })
 })
