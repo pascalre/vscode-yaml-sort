@@ -7,10 +7,22 @@ When opening an issue, describe your issue as clear as possible. If useful, prov
 ## Workflow
 This project uses the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow).
 
+### Architecture
+The sources are split into two layers:
+
+| Folder | Content | May use the VS Code API |
+| --- | --- | --- |
+| `src/core` | Sorting, formatting and validating yaml: settings, documents, processors, js-yaml | no |
+| `src/vscode` | Commands, formatter, notifications, reading the configuration | yes |
+
+`src/extension.ts` registers the commands and the formatter. The core reports problems by throwing errors, the
+vscode layer shows them to the user. `npm run code-analysis` fails if the core or a unit test imports VS Code.
+
 ### Testing & Linting
 The following commands support you at developing good code:
-* `npm run code-analysis`: Run the static code analysis
-* `npm run test`: Run the tests
+* `npm run code-analysis`: Run the static code analysis, including the layer rules above
+* `npm run test:unit`: Run the unit tests of the core in plain node, which takes a few seconds
+* `npm run test`: Run all tests, including the integration tests in `src/test/integration`, inside VS Code
 * `npm run lint`: Run the linter
 
 ### Commit changes

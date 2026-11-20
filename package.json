@@ -333,6 +333,8 @@
     "pretest": "npm run compile",
     "sonar": "node sonar-project.js",
     "test": "node ./out/test/runTest.js",
+    "pretest:unit": "npm run compile",
+    "test:unit": "mocha --ui tdd \"out/test/unit/**/*.test.js\"",
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
   },
