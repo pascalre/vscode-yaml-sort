@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Command `Recursively sort YAML files` skips the folders `node_modules` and `.git`, so it no longer rewrites the yaml files of installed dependencies. Files that are already sorted are no longer written, and a file is processed once even if its extension is configured twice
 * Sorting an indented selection no longer adds trailing whitespaces to its empty lines
 * Setting `emptyLinesUntilLevel` no longer adds empty lines inside block scalars (`key: |`), which changed their value, and no longer separates a comment from the key below it
 * Custom sort writes the keywords like every other key: a keyword that needs quotes is quoted (before, `'a: b': 1` became the invalid `a: b: 1`), a value containing a colon stays on the line of its keyword instead of moving to the next line, and the result no longer ends with an extra line break when every key is a keyword

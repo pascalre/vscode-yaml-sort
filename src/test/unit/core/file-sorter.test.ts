@@ -1,5 +1,5 @@
 import { doesNotThrow, equal, ok, throws } from "assert"
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs"
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs"
 import { tmpdir } from "os"
 import { join } from "path"
 
@@ -60,6 +60,20 @@ suite("Test FileSorter - sortFile()", () => {
       writeFileSync(file, "a: [")
       throws(() => sortFile(file))
       equal(readFileSync(file, "utf-8"), "a: [")
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test("should not write a file that is already sorted", () => {
+    const dir = mkdtempSync(join(tmpdir(), "yaml-sort-"))
+    const file = join(dir, "sorted.yaml")
+    try {
+      writeFileSync(file, "---\na: 1\nb: 2\n")
+      // a write to a read-only file would throw
+      chmodSync(file, 0o444)
+
+      doesNotThrow(() => sortFile(file))
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
