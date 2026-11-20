@@ -1,6 +1,16 @@
-import { equal, notEqual } from "assert"
+import { equal, notEqual, ok } from "assert"
 
 import { ProcessorPipeline } from "../../../../core/processor/processor-pipeline"
+import { Settings } from "../../../../core/settings"
+
+/**
+ * @returns Settings with all processors enabled, except the given one.
+ */
+const settingsWithout = (setting: "useArrayProcessor" | "useCommentProcessor" | "useHelmProcessor" | "useOctalProcessor" | "useBlockProcessor"): Settings => {
+  const settings = new Settings()
+  settings[setting] = false
+  return settings
+}
 
 suite("Test ProcessorPipeline - preprocess() & postprocess()", () => {
   test("text should be the same after pre- and postprocessing", () => {
@@ -23,108 +33,92 @@ suite("Test ProcessorPipeline - preprocess() & postprocess()", () => {
     equal(processor.text, text)
   })
 
-  test("test setting useArrayProcessor = true", () => {
-    const text = "test: [ \"CMD\", \"pg_isready\", \"-q\", \"-d\", \"DB_NAME\", \"-U\", \"DB_USER\" ]"
-    const processor = new ProcessorPipeline(text)
+  test("should replace tabs with spaces", () => {
+    const processor = new ProcessorPipeline("a:\n\tb: 1")
 
     processor.preprocess()
 
-    equal(processor.arrayprocessor.store.size, 1)
+    equal(processor.text, "a:\n  b: 1")
   })
-  test("test setting useArrayProcessor = false", () => {
-    let text = "test: [ \"CMD\", \"pg_isready\", \"-q\", \"-d\", \"DB_NAME\", \"-U\", \"DB_USER\" ]"
+
+  test("should hide and restore arrays when useArrayProcessor = true", () => {
+    const text = "test: [ \"CMD\", \"pg_isready\" ]"
     const processor = new ProcessorPipeline(text)
-    processor.settings.useArrayProcessor = false
 
     processor.preprocess()
 
-    equal(processor.arrayprocessor, undefined)
-
-    text = "test: vscode-yaml-sort.array.0"
-    processor.text = text
-
+    equal(processor.text, "test: vscode-yaml-sort.array.0")
     processor.postprocess()
+    equal(processor.text, text)
+  })
+
+  test("should leave arrays alone when useArrayProcessor = false", () => {
+    const text = "test: [ \"CMD\", \"pg_isready\" ]"
+    const processor = new ProcessorPipeline(text, settingsWithout("useArrayProcessor"))
+
+    processor.preprocess()
 
     equal(processor.text, text)
   })
 
-  test("test setting useCommentProcessor = true", () => {
-    const text =
-      "# comment\n" +
-      "bar: baz"
-    const processor = new ProcessorPipeline(text)
+  test("should restore comments when useCommentProcessor = true", () => {
+    const processor = new ProcessorPipeline("# comment\nbar: baz")
 
     processor.preprocess()
-
-    equal(processor.commentprocessor.store.length, 1)
-  })
-  test("test setting useCommentProcessor = false", () => {
-    const text =
-      "# comment\n" +
-      "bar: baz"
-    const processor = new ProcessorPipeline(text)
-    processor.settings.useCommentProcessor = false
-
-    processor.preprocess()
-
-    equal(processor.commentprocessor, undefined)
-
     processor.text = "bar: baz"
     processor.postprocess()
 
-    notEqual(processor.text, text)
+    equal(processor.text, "# comment\nbar: baz")
   })
 
-  test("test setting useHelmProcessor = true", () => {
-    const text =
-      "foo: {{ .Value }}\n" +
-      "bar: baz"
-    const processor = new ProcessorPipeline(text)
+  test("should drop comments when useCommentProcessor = false", () => {
+    const processor = new ProcessorPipeline("# comment\nbar: baz", settingsWithout("useCommentProcessor"))
 
     processor.preprocess()
-
-    equal(processor.helmProcessor.store.size, 1)
-  })
-  test("test setting useHelmProcessor = false", () => {
-    let text = "foo: {{ .Value }}"
-    const processor = new ProcessorPipeline(text)
-    processor.settings.useHelmProcessor = false
-
-    processor.preprocess()
-
-    equal(processor.helmProcessor, undefined)
-
-    text = "foo: vscode-yaml-sort.helm.0"
-    processor.text = text
-
+    processor.text = "bar: baz"
     processor.postprocess()
 
-    equal(processor.text, text)
+    equal(processor.text, "bar: baz")
   })
 
-  test("test setting useHelmProcessor = true", () => {
-    const text =
-      "foo: {{ .Value }}\n" +
-      "bar: baz"
-    const processor = new ProcessorPipeline(text)
+  test("should hide and restore helm values when useHelmProcessor = true", () => {
+    const processor = new ProcessorPipeline("foo: {{ .Value }}\nbar: baz")
 
     processor.preprocess()
 
-    equal(processor.helmProcessor.store.size, 1)
+    equal(processor.text, "foo: vscode-yaml-sort.helm.0\nbar: baz")
   })
 
-  test("test setting useOctalProcessor = false", () => {
-    let text = "foo: 0644"
-    const processor = new ProcessorPipeline(text)
-    processor.settings.useOctalProcessor = false
+  test("should leave helm values alone when useHelmProcessor = false", () => {
+    const processor = new ProcessorPipeline("foo: {{ .Value }}", settingsWithout("useHelmProcessor"))
 
     processor.preprocess()
 
-    equal(processor.octalprocessor, undefined)
+    equal(processor.text, "foo: {{ .Value }}")
+  })
 
-    text = "foo: vscode-yaml-sort.octal.0"
-    processor.text = text
+  test("should leave octal values alone when useOctalProcessor = false", () => {
+    const processor = new ProcessorPipeline("foo: 0644", settingsWithout("useOctalProcessor"))
 
+    processor.preprocess()
+
+    equal(processor.text, "foo: 0644")
+  })
+
+  test("should hide block scalars when useBlockProcessor = true", () => {
+    const processor = new ProcessorPipeline("a: |\n  text")
+
+    processor.preprocess()
+
+    ok(processor.text.startsWith("a: vscode-yaml-sort.block.0"))
+  })
+
+  test("should restore the values in reverse order, so nested substitutes are resolved", () => {
+    // the helm value is inside the array, which the array processor hides first
+    const text = "a: [ \"{{ .Value }}\", b ]"
+    const processor = new ProcessorPipeline(text)
+
+    processor.preprocess()
     processor.postprocess()
 
     equal(processor.text, text)
@@ -138,12 +132,11 @@ suite("Test ProcessorPipeline - preprocess() & postprocess()", () => {
       "    some command\n" +
       "    # comment 2\n" +
       "    some other command"
-      const processor = new ProcessorPipeline(text)
+    const processor = new ProcessorPipeline(text)
 
-      processor.preprocess()
-      processor.postprocess()
+    processor.preprocess()
+    processor.postprocess()
 
-      equal(processor.text, text)
-
-    })
+    equal(processor.text, text)
+  })
 })

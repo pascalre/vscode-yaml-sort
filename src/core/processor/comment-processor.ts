@@ -10,6 +10,13 @@ export class CommentProcessor {
   }
 
   /**
+   * Remembers the comments. The text itself stays unchanged, js-yaml drops the comments.
+   */
+  preprocess() {
+    this.findComments()
+  }
+
+  /**
    * Finds all comments in a given yaml. Stores full line comments with their following line
    * and inline comments with the code they belong to.
    * @param text Yaml document

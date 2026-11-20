@@ -586,3 +586,18 @@ suite("Test YamlSorter - sortYaml() with custom sort keeps the document intact",
     equal(yamlSorter.sortYaml("42", 1), "42")
   })
 })
+
+suite("Test YamlSorter - sortYaml() with emptyLinesUntilLevel", () => {
+  const settings = new Settings()
+  settings.emptyLinesUntilLevel = 2
+  const yamlSorter = new YamlSorter(settings)
+
+  test("should not add empty lines inside a block scalar, which would change its value", () => {
+    equal(yamlSorter.sortYaml("b: 1\na: |\n  foo: bar\n  baz: 1"), "a: |\n  foo: bar\n  baz: 1\n\nb: 1")
+  })
+
+  test("should add the empty line above the comment of a key, not between them", () => {
+    equal(yamlSorter.sortYaml("b: 1\n# note\na: 1"), "# note\na: 1\n\nb: 1")
+  })
+})
+

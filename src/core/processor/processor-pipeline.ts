@@ -7,91 +7,69 @@ import { SpacingProcessor } from "./spacing-processor"
 import { TabsToSpacesProcessor } from "./tabs-to-spaces-processor"
 import { Settings } from "../settings"
 
+/**
+ * A processor that hides parts of a document from js-yaml and restores them afterwards.
+ */
+interface ReversibleProcessor {
+  text: string
+  preprocess(): void
+  postprocess(): void
+}
+
+/**
+ * Runs the processors around loading and dumping a document with js-yaml.
+ *
+ * `preprocess()` applies the enabled processors in a fixed order, `postprocess()` restores their
+ * values in the reverse order, so a processor always sees the text the way it left it.
+ */
 export class ProcessorPipeline {
-  arrayprocessor!: ArrayProcessor
-  blockprocessor!: BlockProcessor
-  commentprocessor!: CommentProcessor
-  helmProcessor!: HelmProcessor
-  octalprocessor!: OctalProcessor
-  spacingprocessor!: SpacingProcessor
-  tabstospacespreprocessor!: TabsToSpacesProcessor
   text: string
   settings: Settings
+  private applied: ReversibleProcessor[] = []
 
   constructor(text: string, settings = new Settings()) {
     this.text = text
     this.settings = settings
   }
 
+  /**
+   * @returns Factories for the enabled processors, in the order of preprocessing.
+   */
+  private enabledProcessors(): ((text: string) => ReversibleProcessor)[] {
+    const processors: [boolean, (text: string) => ReversibleProcessor][] = [
+      [this.settings.useBlockProcessor, (text) => new BlockProcessor(text)],
+      [this.settings.useArrayProcessor, (text) => new ArrayProcessor(text)],
+      [this.settings.useHelmProcessor, (text) => new HelmProcessor(text)],
+      [this.settings.useOctalProcessor, (text) => new OctalProcessor(text)],
+      [this.settings.useCommentProcessor, (text) => new CommentProcessor(text)],
+    ]
+    return processors.filter(([enabled]) => enabled).map(([, create]) => create)
+  }
+
   preprocess() {
-    this.tabstospacespreprocessor = new TabsToSpacesProcessor(this.text, this.settings)
-    this.tabstospacespreprocessor.preprocess()
-    this.text = this.tabstospacespreprocessor.text
-
-    if (this.settings.useBlockProcessor) {
-      this.blockprocessor = new BlockProcessor(this.text)
-      this.blockprocessor.preprocess()
-      this.text = this.blockprocessor.text
-    }
-
-    if (this.settings.useArrayProcessor) {
-      this.arrayprocessor = new ArrayProcessor(this.text)
-      this.arrayprocessor.preprocess()
-      this.text = this.arrayprocessor.text
-    }
-
-    if (this.settings.useHelmProcessor) {
-      this.helmProcessor = new HelmProcessor(this.text)
-      this.helmProcessor.preprocess()
-      this.text = this.helmProcessor.text
-    }
-
-    if (this.settings.useOctalProcessor) {
-      this.octalprocessor = new OctalProcessor(this.text)
-      this.octalprocessor.preprocess()
-      this.text = this.octalprocessor.text
-    }
-
-    if (this.settings.useCommentProcessor) {
-      this.commentprocessor = new CommentProcessor(this.text)
-      this.commentprocessor.findComments()
-      this.text = this.commentprocessor.text
-    }
+    const tabsToSpaces = new TabsToSpacesProcessor(this.text, this.settings)
+    tabsToSpaces.preprocess()
+    this.text = tabsToSpaces.text
+    // each processor works on the text the previous one left
+    this.applied = this.enabledProcessors().map((create) => {
+      const processor = create(this.text)
+      processor.preprocess()
+      this.text = processor.text
+      return processor
+    })
   }
 
   postprocess() {
-    if (this.settings.useCommentProcessor) {
-      this.commentprocessor.text = this.text
-      this.commentprocessor.postprocess()
-      this.text = this.commentprocessor.text
-    }
+    // add empty lines first: the hidden values, e.g. the content of block scalars, must not get
+    // any, and comments are put directly above their key afterwards
+    const spacing = new SpacingProcessor(this.text, this.settings)
+    spacing.postprocess()
+    this.text = spacing.text
 
-    if (this.settings.useOctalProcessor) {
-      this.octalprocessor.text = this.text
-      this.octalprocessor.postprocess()
-      this.text = this.octalprocessor.text
+    for (const processor of [...this.applied].reverse()) {
+      processor.text = this.text
+      processor.postprocess()
+      this.text = processor.text
     }
-
-    if (this.settings.useHelmProcessor) {
-      this.helmProcessor.text = this.text
-      this.helmProcessor.postprocess()
-      this.text = this.helmProcessor.text
-    }
-
-    if (this.settings.useArrayProcessor) {
-      this.arrayprocessor.text = this.text
-      this.arrayprocessor.postprocess()
-      this.text = this.arrayprocessor.text
-    }
-
-    if (this.settings.useBlockProcessor) {
-      this.blockprocessor.text = this.text
-      this.blockprocessor.postprocess()
-      this.text = this.blockprocessor.text
-    }
-
-    this.spacingprocessor = new SpacingProcessor(this.text, this.settings)
-    this.spacingprocessor.postprocess()
-    this.text = this.spacingprocessor.text
   }
 }
