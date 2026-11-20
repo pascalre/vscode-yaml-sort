@@ -6,6 +6,13 @@ import { Settings } from "../settings"
 import { sortArraysRecursively } from "./sort-util"
 import { removeTrailingCharacters } from "./yaml-text"
 
+/**
+ * @param value Any loaded yaml value.
+ * @returns True for a mapping, i.e. an object that is no list.
+ */
+const isMapping = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+
 export class YamlUtil {
   settings: Settings
   jsyamladapter: JsYamlAdapter
@@ -49,35 +56,25 @@ export class YamlUtil {
       processor.preprocess()
       const unsortedYamlWithoutTabs = processor.text
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs) as any
+      const doc = this.jsyamladapter.load(unsortedYamlWithoutTabs)
 
       if (this.settings.sortArrays) {
         sortArraysRecursively(doc)
       }
 
       let sortedYaml = ""
-      if (customSort > 0 && !this.settings.useCustomSortRecursively) {
+      let remainder = doc
+      if (customSort > 0 && !this.settings.useCustomSortRecursively && isMapping(doc)) {
+        // check for the key itself, values like 0, false or null must be ordered too
         const keywords = this.settings.getCustomSortKeywords(customSort)
-
-        keywords.forEach(key => {
-          // check for the key itself, values like 0, false or null must be ordered too
-          if (Object.prototype.hasOwnProperty.call(doc, key)) {
-            let sortedSubYaml = this.jsyamladapter.dumpValue(doc[key], true, customSort)
-            if (YamlUtil.isValueMultiline(sortedSubYaml)) {
-              sortedSubYaml = this.transformMultilineValue(sortedSubYaml)
-              sortedYaml += `${key}:\n${sortedSubYaml}\n`
-            } else {
-              sortedYaml += `${key}: ${sortedSubYaml}\n`
-            }
-            // delete key from yaml
-            delete doc[key]
-          }
-        })
+          .filter((key) => Object.prototype.hasOwnProperty.call(doc, key))
+        sortedYaml = keywords.map((key) => this.dumpKeyword(key, doc[key], customSort)).join("")
+        // the remaining keys are sorted as usual; build them anew instead of deleting from the loaded document
+        remainder = Object.fromEntries(Object.entries(doc).filter(([key]) => !keywords.includes(key)))
       }
 
       // either sort whole yaml or sort the rest of the yaml (which can be empty) and add it to the sortedYaml
-      sortedYaml += this.jsyamladapter.dumpYaml(doc, true, customSort)
+      sortedYaml += this.jsyamladapter.dumpYaml(remainder, true, customSort)
 
       processor.text = sortedYaml
       processor.postprocess()
@@ -87,6 +84,21 @@ export class YamlUtil {
       this.errorutil.handleError(error)
       return null
     }
+  }
+
+  /**
+   * Dumps one top-level keyword of a custom sort together with its value.
+   * @param key        The keyword.
+   * @param value      Its value.
+   * @param customSort 1 to 3, the custom sort that is applied.
+   * @returns The yaml lines for the keyword, ending with a line break.
+   */
+  dumpKeyword(key: string, value: unknown, customSort: number): string {
+    const dumpedValue = this.jsyamladapter.dumpValue(value, true, customSort)
+    if (YamlUtil.isValueMultiline(dumpedValue)) {
+      return `${key}:\n${this.transformMultilineValue(dumpedValue)}\n`
+    }
+    return `${key}: ${dumpedValue}\n`
   }
 
   /**

@@ -1,4 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// a plain node script without a build step, so it uses require()
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const scanner = require("sonarqube-scanner")
 scanner(
   {

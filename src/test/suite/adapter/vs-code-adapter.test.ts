@@ -1,5 +1,5 @@
 import { equal, fail } from "assert"
-import path = require("path")
+import { resolve } from "path"
 
 import { spy } from "sinon"
 import { Uri, window, workspace } from "vscode"
@@ -8,7 +8,7 @@ import { Severity, VsCodeAdapter } from "../../../adapter/vs-code-adapter"
 
 suite("Test VsCodeAdapter - getActiveDocument()", () => {
   test("when text editor is active should open document", async () => {
-    const uri = Uri.parse(path.resolve("./src/test/files/testGetActiveDocument.yaml"))
+    const uri = Uri.parse(resolve("./src/test/files/testGetActiveDocument.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
 

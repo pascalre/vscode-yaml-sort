@@ -1,9 +1,10 @@
 import { join, resolve} from "path"
 
 import { sync } from "glob"
-import Mocha = require("mocha")
+import * as Mocha from "mocha"
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// nyc ships no type definitions, so it cannot be imported with an import statement
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const NYC = require("nyc")
 
 // Recommended modules, loading them here to speed up NYC init
