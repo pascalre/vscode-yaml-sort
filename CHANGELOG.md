@@ -25,6 +25,8 @@
 ✨ Feature
 * Settings can now be set per workspace folder in a multi-root workspace and per language (e.g. `"[yaml]": { "vscode-yaml-sort.indent": 4 }`). Every command and the formatter read the settings that apply to the processed document
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
+⚡ Performance
+* The extension is only activated when a yaml file is opened or one of its commands is run, instead of on every start of VS Code
 📦 Dependencies
 * Move `@types/js-yaml` and `@vscode/test-electron` to `devDependencies`, so they are no longer shipped with the extension
 

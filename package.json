@@ -28,7 +28,14 @@
     "Formatters"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onLanguage:yaml",
+    "onCommand:vscode-yaml-sort.customSortYaml_1",
+    "onCommand:vscode-yaml-sort.customSortYaml_2",
+    "onCommand:vscode-yaml-sort.customSortYaml_3",
+    "onCommand:vscode-yaml-sort.formatYaml",
+    "onCommand:vscode-yaml-sort.sortYaml",
+    "onCommand:vscode-yaml-sort.sortYamlFilesInDirectory",
+    "onCommand:vscode-yaml-sort.validateYaml"
   ],
   "main": "./out/extension.js",
   "contributes": {
