@@ -64,3 +64,32 @@ suite("Test OctalProcessor - matched occurrence", () => {
     equal(octalprocessor.text, text)
   })
 })
+
+suite("Test OctalProcessor - octal values in other positions", () => {
+  const cases: [string, string][] = [
+    ["with an inline comment", "mode: 0755 # rwxr-xr-x"],
+    ["as list item", "modes:\n  - 0755\n  - 0644"],
+  ]
+
+  cases.forEach(([name, text]) => {
+    test(`should keep the leading zero of an octal value ${name}`, () => {
+      const octalprocessor = new OctalProcessor(text)
+
+      octalprocessor.preprocess()
+
+      equal(/\b0[0-7]{3}\b/.test(octalprocessor.text), false)
+      octalprocessor.postprocess()
+      equal(octalprocessor.text, text)
+    })
+  })
+
+  test("should not touch a value that only starts with an octal number", () => {
+    const text = "id: 0755-1"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.text, text)
+  })
+})
+

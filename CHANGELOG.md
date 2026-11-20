@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Keep the leading zero of octal values like `0755` that are followed by a comment or are items of a list. Before, they became `755`
 * Command `Recursively sort YAML files` skips the folders `node_modules` and `.git`, so it no longer rewrites the yaml files of installed dependencies. Files that are already sorted are no longer written, and a file is processed once even if its extension is configured twice
 * Sorting an indented selection no longer adds trailing whitespaces to its empty lines
 * Setting `emptyLinesUntilLevel` no longer adds empty lines inside block scalars (`key: |`), which changed their value, and no longer separates a comment from the key below it
