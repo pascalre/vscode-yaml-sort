@@ -52,19 +52,6 @@ suite("Test sortArrays", () => {
   })
 })
 
-suite("Test YamlSorter - setLeadingDashes()", () => {
-  test("when setting useLeadingDashes is `true` should prepend `---\n` to text", () => {
-    const yamlSorter = new YamlSorter()
-    const text = "lorem ipsum"
-    yamlSorter.settings.useLeadingDashes = false
-    equal(yamlSorter.setLeadingDashes(text), text)
-
-    yamlSorter.settings.useLeadingDashes = true
-    const expected = "---\nlorem ipsum"
-    equal(yamlSorter.setLeadingDashes(text), expected)
-  })
-})
-
 suite("Test dumpYaml", () => {
   test("when useCustomSortRecursively is set to`true` should recursively use customSort", () => {
     const actual =
@@ -218,7 +205,7 @@ suite("Test sortYaml", () => {
   
     let expected =
       "spec: spec\n" +
-      "data: data\n"
+      "data: data"
   
     const yamlSorter = new YamlSorter()
     equal(yamlSorter.sortYaml(actual, 1), expected)
@@ -231,7 +218,7 @@ suite("Test sortYaml", () => {
     expected =
       "spec:\n" +
       "  - aa: b\n" +
-      "data: data\n"
+      "data: data"
   
     equal(yamlSorter.sortYaml(actual, 1), expected)
   
@@ -251,7 +238,7 @@ suite("Test sortYaml", () => {
       "data:\n" +
       "  job: Developer\n" +
       "  skills:\n" +
-      "    - pascal\n"
+      "    - pascal"
   
     equal(yamlSorter.sortYaml(actual, 1), expected)
   
@@ -265,7 +252,7 @@ suite("Test sortYaml", () => {
       "spec:\n" +
       "  - a\n" +
       "  - b\n" +
-      "data: data\n"
+      "data: data"
   
     equal(yamlSorter.sortYaml(actual, 1), expected)
   })
@@ -413,39 +400,6 @@ suite("Test YamlSorter - getNumberOfLeadingSpaces()", () => {
   })
 })
 
-suite("Test YamlSorter - isValueMultiline", () => {
-  test("when text starts with '-' should return true", () => {
-    const text =
-      "- foo: bar\n" +
-      "  bar: baz"
-    equal(YamlSorter.isValueMultiline(text), true)
-  })
-})
-
-suite("Test YamlSorter - transformMultilineValue()", () => {
-  const yamlSorter = new YamlSorter()
-  yamlSorter.settings.indent = 2
-  test("Should prepend spaces on each line", () => {
-    const text =
-      "- foo: bar\n" +
-      "  bar: baz"
-    const expected =
-      "  - foo: bar\n" +
-      "    bar: baz"
-    equal(yamlSorter.transformMultilineValue(text), expected)
-  })
-  test("When text ends with newline should remove trailing indent", () => {
-    const text =
-      "- foo: bar\n" +
-      "  bar: baz\n"
-    const expected =
-      "  - foo: bar\n" +
-      "    bar: baz\n"
-    equal(yamlSorter.transformMultilineValue(text), expected)
-  })
-})
-/*
-*/
 suite("Test YamlSorter - sortYaml() with quoted helm values", () => {
   test("GitHub issue #130: should not mangle a quoted helm value containing a dollar sign", () => {
     const yamlSorter = new YamlSorter()
@@ -524,17 +478,17 @@ suite("Test YamlSorter - sortYaml() with custom sort and scalar values", () => {
   const yamlSorter = new YamlSorter()
 
   test("should keep number and boolean values of custom sort keywords", () => {
-    equal(yamlSorter.sortYaml("spec: x\nkind: true\napiVersion: 3", 1), "apiVersion: 3\nkind: true\nspec: x\n")
+    equal(yamlSorter.sortYaml("spec: x\nkind: true\napiVersion: 3", 1), "apiVersion: 3\nkind: true\nspec: x")
   })
 
   test("should keep an empty mapping as value of a custom sort keyword", () => {
-    equal(yamlSorter.sortYaml("spec: x\nmetadata: {}", 1), "metadata: {}\nspec: x\n")
+    equal(yamlSorter.sortYaml("spec: x\nmetadata: {}", 1), "metadata: {}\nspec: x")
   })
 
   test("should order custom sort keywords even if their values are falsy", () => {
     const text = "spec: x\nmetadata: null\nkind: false\napiVersion: 0"
 
-    equal(yamlSorter.sortYaml(text, 1), "apiVersion: 0\nkind: false\nmetadata: null\nspec: x\n")
+    equal(yamlSorter.sortYaml(text, 1), "apiVersion: 0\nkind: false\nmetadata: null\nspec: x")
   })
 
   test("should not add a value to a document containing only a comment", () => {
@@ -543,6 +497,35 @@ suite("Test YamlSorter - sortYaml() with custom sort and scalar values", () => {
 
   test("should keep a document containing only a scalar", () => {
     equal(yamlSorter.sortYaml("42"), "42")
+  })
+
+  test("should keep a scalar value containing a colon on the line of its keyword", () => {
+    equal(yamlSorter.sortYaml("spec: x\nkind: http://example.com", 1), "kind: http://example.com\nspec: x")
+  })
+
+  test("should keep a block scalar value of a keyword", () => {
+    equal(yamlSorter.sortYaml("b: 1\nkind: |\n  line1\n  line2", 1), "kind: |\n  line1\n  line2\nb: 1")
+  })
+
+  test("should quote a keyword that needs quotes", () => {
+    const settings = new Settings()
+    settings.customSortKeywords1 = ["a: b"]
+
+    equal(new YamlSorter(settings).sortYaml("c: 2\n'a: b': 1", 1), "'a: b': 1\nc: 2")
+  })
+
+  test("should end without a line break when every key is a keyword, like the default sort", () => {
+    equal(yamlSorter.sortYaml("kind: x\napiVersion: v1", 1), "apiVersion: v1\nkind: x")
+  })
+})
+
+suite("Test YamlSorter - sortYaml() with an empty mapping", () => {
+  test("should keep a document containing only an empty mapping", () => {
+    equal(new YamlSorter().sortYaml("{}"), "{}")
+  })
+
+  test("should keep a document containing only an empty mapping when formatting", () => {
+    equal(new YamlSorter().formatYaml("{}", false), "{}")
   })
 })
 
@@ -592,7 +575,7 @@ suite("Test YamlSorter - sortYaml() with custom sort keeps the document intact",
   })
 
   test("should keep a document that only contains keywords", () => {
-    equal(yamlSorter.sortYaml("kind: x", 1), "kind: x\n")
+    equal(yamlSorter.sortYaml("kind: x", 1), "kind: x")
   })
 
   test("should leave a list document unchanged", () => {

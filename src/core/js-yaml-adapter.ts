@@ -4,13 +4,6 @@ import { Settings } from "./settings"
 import { SortOrder } from "./sort-order"
 import { removeTrailingCharacters, splitDocuments } from "./yaml-text"
 
-/**
- * @param value Any loaded yaml value.
- * @returns True for a mapping without keys, e.g. an empty document.
- */
-const isEmptyMapping = (value: unknown): boolean =>
-  typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 0
-
 export class JsYamlAdapter {
   settings: Settings
 
@@ -41,7 +34,7 @@ export class JsYamlAdapter {
 
   /**
    * Dumps a whole yaml document with the user specific settings.
-   * An empty document (no content or only comments) is dumped as an empty string.
+   * An empty document (no content or only comments) is dumped as an empty string, an empty mapping as `{}`.
    * @param   text     Loaded yaml document which should be dumped.
    * @param   sortKeys If set to true, the function will sort the keys in the document.
    * @param   custom   0 for the default sort, 1 to 3 for the custom sort keywords.
@@ -49,7 +42,7 @@ export class JsYamlAdapter {
    */
   dumpYaml(text: unknown, sortKeys: boolean, custom: number): string {
     // js-yaml loads an empty document or one with only comments as null or undefined
-    if (text === undefined || text === null || isEmptyMapping(text)) {
+    if (text === undefined || text === null) {
       return ""
     }
     return this.dumpValue(text, sortKeys, custom)

@@ -1,9 +1,7 @@
-import { prependWhitespacesOnEachLine } from "./indentation"
 import { JsYamlAdapter } from "./js-yaml-adapter"
 import { ProcessorPipeline } from "./processor/processor-pipeline"
 import { Settings } from "./settings"
 import { sortArraysRecursively } from "./sort-order"
-import { removeTrailingCharacters } from "./yaml-text"
 
 /**
  * @param value Any loaded yaml value.
@@ -27,25 +25,6 @@ export class YamlSorter {
     } else {
       return text.search(/\S/)
     }
-  }
-
-  static isValueMultiline(text: string) {
-    return (!text.startsWith("|") && text.includes(":")) || text.startsWith("-")
-  }
-
-  setLeadingDashes(text: string) {
-    if (this.settings.useLeadingDashes) {
-      return `---\n${text}`
-    }
-    return text
-  }
-
-  transformMultilineValue(text: string) {
-    let result = prependWhitespacesOnEachLine(text, this.settings.indent)
-    if (text.endsWith("\n")) {
-      result = removeTrailingCharacters(result, this.settings.indent)
-    }
-    return result
   }
 
   /**
@@ -85,23 +64,23 @@ export class YamlSorter {
       .filter((key) => Object.prototype.hasOwnProperty.call(doc, key))
     // build the remaining keys anew instead of deleting them from the loaded document
     const remainder = Object.fromEntries(Object.entries(doc).filter(([key]) => !keywords.includes(key)))
-    const dumpedKeywords = keywords.map((key) => this.dumpKeyword(key, doc[key], customSort)).join("")
-    return dumpedKeywords + this.jsYamlAdapter.dumpYaml(remainder, true, customSort)
+    const parts = keywords.map((key) => this.dumpKeyword(key, doc[key], customSort))
+    if (Object.keys(remainder).length > 0) {
+      parts.push(this.jsYamlAdapter.dumpYaml(remainder, true, customSort))
+    }
+    return parts.join("\n")
   }
 
   /**
-   * Dumps one top-level keyword of a custom sort together with its value.
+   * Dumps one top-level keyword of a custom sort together with its value. js-yaml dumps both, so
+   * the keyword is quoted if necessary and the value keeps its usual style.
    * @param key        The keyword.
    * @param value      Its value.
    * @param customSort 1 to 3, the custom sort that is applied.
-   * @returns The yaml lines for the keyword, ending with a line break.
+   * @returns The yaml lines for the keyword, without trailing line break.
    */
   dumpKeyword(key: string, value: unknown, customSort: number): string {
-    const dumpedValue = this.jsYamlAdapter.dumpValue(value, true, customSort)
-    if (YamlSorter.isValueMultiline(dumpedValue)) {
-      return `${key}:\n${this.transformMultilineValue(dumpedValue)}\n`
-    }
-    return `${key}: ${dumpedValue}\n`
+    return this.jsYamlAdapter.dumpValue({ [key]: value }, true, customSort)
   }
 
   /**
