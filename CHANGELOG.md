@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Command `Format YAML` with a selection formats the whole document. Before, it replaced the selected lines with the formatted document, so the rest of the document appeared twice. The editor commands apply their changes to the document they were run on and show the success message only after VS Code applied them. Running a command without an open editor shows a hint instead of an internal error
 * Keep a comment at its key when sorting changes the key's value, e.g. removes its quotes. Before, the comment could move to another key that contains the key's name, like `data` for `a`
 * Keep tabs inside values, e.g. in a quoted string. Only tabs in the indentation are replaced with spaces
 * Keep the leading zero of octal values like `0755` that are followed by a comment or are items of a list. Before, they became `755`
@@ -40,6 +41,8 @@
 * The extension is only activated when a yaml file is opened or one of its commands is run, instead of on every start of VS Code
 📦 Dependencies
 * Move `@types/js-yaml` and `@vscode/test-electron` to `devDependencies`, so they are no longer shipped with the extension
+🏗️ Internal
+* The sources are split into `src/core` (yaml logic, no VS Code API) and `src/vscode` (commands, formatter, notifications). The core reports problems by throwing errors, the vscode layer shows them. `npm run code-analysis` enforces the split, and `npm run test:unit` runs the core's tests in plain node within seconds
 
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies
