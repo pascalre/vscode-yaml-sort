@@ -22,16 +22,13 @@ export class YamlFormattingProvider implements DocumentFormattingEditProvider {
     const settings = readSettings(document)
     const yamlutil = new YamlUtil(settings)
     const text = document.getText()
-    let newText: string | null
+    let newText: string
     try {
       newText = settings.doSortOnSave()
         ? sortDocuments(text, { customSort: settings.sortOnSave, isSelection: false }, yamlutil)
         : formatDocuments(text, yamlutil)
     } catch (error) {
       this.errorutil.handleError(error)
-      return []
-    }
-    if (newText === null) {
       return []
     }
     const fullRange = document.validateRange(new Range(0, 0, document.lineCount, 0))

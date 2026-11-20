@@ -19,9 +19,6 @@ import { YamlUtil } from "../core/yaml-util"
 export const sortFile = (file: string, yaml: YamlOperations = new YamlUtil()): void => {
   const text = readFileSync(file, "utf-8")
   let sorted = sortDocuments(text, { customSort: 0, isSelection: false }, yaml)
-  if (sorted === null) {
-    throw new Error(`File ${file} could not be sorted`)
-  }
   if (text.endsWith("\n") && !sorted.endsWith("\n")) {
     sorted += "\n"
   }

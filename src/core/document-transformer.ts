@@ -16,9 +16,10 @@ export interface SortOptions {
 }
 
 /**
- * Transforms the content of a single, non-empty document. Returns null if that fails.
+ * Transforms the content of a single, non-empty document.
+ * @throws Error if the content cannot be transformed.
  */
-type ContentTransformation = (content: string) => string | null
+type ContentTransformation = (content: string) => string
 
 /**
  * Puts the transformed documents back together.
@@ -40,35 +41,27 @@ const joinDocuments = (stream: YamlStream, leadingDashes: boolean | undefined): 
 
 /**
  * Applies a transformation to every non-empty document. Empty documents are kept as they are.
- * @returns The transformed stream, or null if one document could not be transformed.
+ * The transformation throws for a document it cannot transform, so there never is a partial
+ * result that drops documents or empties a selection.
+ * @returns The transformed stream.
  */
-const transformDocuments = (stream: YamlStream, transform: ContentTransformation): YamlStream | null => {
-  const documents: YamlDocument[] = []
-  for (const document of stream.documents) {
-    if (document.content.trim() === "") {
-      documents.push({ delimiter: document.delimiter, content: "" })
-      continue
-    }
-    const content = transform(document.content)
-    if (!content) {
-      // never return a partial result: it would drop documents or empty the selection
-      return null
-    }
-    documents.push({ delimiter: document.delimiter, content })
-  }
-  return { directives: stream.directives, documents }
-}
+const transformDocuments = (stream: YamlStream, transform: ContentTransformation): YamlStream => ({
+  directives: stream.directives,
+  documents: stream.documents.map((document): YamlDocument => ({
+    delimiter: document.delimiter,
+    content: document.content.trim() === "" ? "" : transform(document.content),
+  })),
+})
 
 /**
  * Sorts every yaml document in a text.
  * @param text    Text containing one or more yaml documents.
  * @param options Sort options.
  * @param yaml    Yaml operations, injectable for tests.
- * @returns The sorted text, or null if a document could not be sorted
- *          (the error has already been reported to the user).
- * @throws  Error if the text is not valid yaml or the selection ends invalid.
+ * @returns The sorted text.
+ * @throws  Error if the text is not valid yaml, the selection ends invalid or a document cannot be sorted.
  */
-export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlUtil()): string | null => {
+export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlUtil()): string => {
   validateTextRange(text)
   new JsYamlAdapter(yaml.settings).validateYaml(text)
 
@@ -76,11 +69,8 @@ export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOper
     // an indented selection is sorted like a top-level document and indented again afterwards (see #53)
     const indentation = options.isSelection ? YamlUtil.getNumberOfLeadingSpaces(content) : 0
     const sortedContent = yaml.sortYaml(removeLeadingSpacesOnEachLine(content, indentation), options.customSort)
-    return sortedContent ? prependWhitespacesOnEachLine(sortedContent, indentation) : null
+    return prependWhitespacesOnEachLine(sortedContent, indentation)
   })
-  if (!sorted) {
-    return null
-  }
   return joinDocuments(sorted, options.isSelection ? undefined : yaml.settings.useLeadingDashes)
 }
 
@@ -88,13 +78,10 @@ export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOper
  * Formats every yaml document in a text without sorting it.
  * @param text Text containing one or more yaml documents.
  * @param yaml Yaml operations, injectable for tests.
- * @returns The formatted text, or null if a document could not be formatted
- *          (the error has already been reported to the user).
+ * @returns The formatted text.
+ * @throws  Error if a document is not valid yaml.
  */
-export const formatDocuments = (text: string, yaml: YamlOperations = new YamlUtil()): string | null => {
+export const formatDocuments = (text: string, yaml: YamlOperations = new YamlUtil()): string => {
   const formatted = transformDocuments(splitDocuments(text), (content) => yaml.formatYaml(content, false))
-  if (!formatted) {
-    return null
-  }
   return joinDocuments(formatted, yaml.settings.useLeadingDashes)
 }

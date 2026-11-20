@@ -1,4 +1,4 @@
-import { equal } from "assert"
+import { equal, throws } from "assert"
 
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { CORE_SCHEMA } from "js-yaml"
@@ -399,9 +399,9 @@ suite("Test formatYaml", () => {
     equal(yamlutil.formatYaml(actual, true), expected)
   })
 
-  test("should return `null` on invalid yaml", () => {
+  test("should throw on invalid yaml", () => {
     const yamlutil = new YamlUtil()
-    equal(yamlutil.formatYaml("key: 1\nkey: 1", true), null)
+    throws(() => yamlutil.formatYaml("key: 1\nkey: 1", true), /duplicated mapping key/)
   })
 })
 
@@ -470,7 +470,7 @@ suite("Test YamlUtil - sortYaml() with kustomize patches", () => {
 
     const sorted = util.sortYaml(kustomize)
 
-    equal(sorted !== null && sorted.includes("patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"), true)
+    equal(sorted.includes("patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"), true)
   })
 })
 

@@ -41,8 +41,11 @@ export class Controller {
   }
 
   formatYamlWrapper(): TextEdit[] {
-    const newText = formatDocuments(VsCodeAdapter.getActiveDocument(this.editor), this.yamlutil)
-    if (newText === null) {
+    let newText: string
+    try {
+      newText = formatDocuments(VsCodeAdapter.getActiveDocument(this.editor), this.yamlutil)
+    } catch (error) {
+      this.errorutil.handleError(error)
       return []
     }
     const edits = this.applyEdits(newText)
@@ -59,14 +62,11 @@ export class Controller {
 
   sortYamlWrapper(customSort = 0): TextEdit[] {
     const text = VsCodeAdapter.getText(this.editor, VsCodeAdapter.getRange(this.editor))
-    let newText: string | null
+    let newText: string
     try {
       newText = sortDocuments(text, { customSort, isSelection: !this.editor.selection.isEmpty }, this.yamlutil)
     } catch (error) {
       this.errorutil.handleError(error)
-      return []
-    }
-    if (newText === null) {
       return []
     }
     const edits = this.applyEdits(newText)

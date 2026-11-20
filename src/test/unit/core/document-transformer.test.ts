@@ -1,8 +1,5 @@
 import { equal, throws } from "assert"
 
-import { spy } from "sinon"
-import { window } from "vscode"
-
 import { YamlOperations, formatDocuments, sortDocuments } from "../../../core/document-transformer"
 import { Settings } from "../../../core/settings"
 import { YamlUtil } from "../../../core/yaml-util"
@@ -13,7 +10,12 @@ import { YamlUtil } from "../../../core/yaml-util"
 const failingSortFor = (marker: string): YamlOperations => {
   const yamlutil = new YamlUtil()
   const original = yamlutil.sortYaml.bind(yamlutil)
-  yamlutil.sortYaml = (text: string, customSort?: number) => (text.includes(marker) ? null : original(text, customSort))
+  yamlutil.sortYaml = (text: string, customSort?: number) => {
+    if (text.includes(marker)) {
+      throw new Error(`cannot sort ${marker}`)
+    }
+    return original(text, customSort)
+  }
   return yamlutil
 }
 
@@ -38,15 +40,15 @@ suite("Test DocumentTransformer - sortDocuments()", () => {
 })
 
 suite("Test DocumentTransformer - sortDocuments() when a document cannot be sorted", () => {
-  test("should return null instead of dropping the failing document", () => {
+  test("should throw instead of dropping the failing document", () => {
     const text = "---\nb: 1\na: 2\n---\nfail: 1\nc: 2\n---\ne: 1\nd: 2"
 
-    equal(sortDocuments(text, { customSort: 0, isSelection: false }, failingSortFor("fail")), null)
+    throws(() => sortDocuments(text, { customSort: 0, isSelection: false }, failingSortFor("fail")), /cannot sort fail/)
   })
 
-  test("should return null instead of an empty text for a selection", () => {
+  test("should throw instead of returning an empty text for a selection", () => {
     // an empty result would replace the selection with nothing
-    equal(sortDocuments("  fail: 1\n  a: 2", { customSort: 0, isSelection: true }, failingSortFor("fail")), null)
+    throws(() => sortDocuments("  fail: 1\n  a: 2", { customSort: 0, isSelection: true }, failingSortFor("fail")), /cannot sort fail/)
   })
 })
 
@@ -126,15 +128,8 @@ suite("Test DocumentTransformer - formatDocuments()", () => {
     equal(formatDocuments("---\nkey1:   value\n---\nkey2:   value"), "---\nkey1: value\n---\nkey2: value")
   })
 
-  test("should not show a message, so formatting on save stays silent (#65)", () => {
-    const info = spy(window, "showInformationMessage")
-    try {
-      formatDocuments("---\nkey1: value\n---\nkey2: value")
-
-      equal(info.callCount, 0)
-    } finally {
-      info.restore()
-    }
+  test("should throw on invalid yaml instead of dropping the document", () => {
+    throws(() => formatDocuments("---\nkey1: value\n---\nkey2: [value"))
   })
 })
 
