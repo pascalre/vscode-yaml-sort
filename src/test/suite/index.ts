@@ -1,7 +1,7 @@
 import { join, resolve} from "path"
 
 import { sync } from "glob"
-import * as Mocha from "mocha"
+import Mocha from "mocha"
 
 // nyc ships no type definitions, so it cannot be imported with an import statement
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
