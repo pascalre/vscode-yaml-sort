@@ -500,13 +500,31 @@ suite("Test CommentProcessor - getInlineComment()", () => {
     { line: "key: 'value # quoted'", expectedComment: undefined },
     { line: "key: value#noComment", expectedComment: undefined },
     { line: "key: \"a\" # comment", expectedComment: "# comment" },
-    { line: "# full line comment", expectedComment: undefined }
+    { line: "# full line comment", expectedComment: undefined },
+    // an apostrophe inside a plain value does not start a quoted value
+    { line: "key: it's fine # comment", expectedComment: "# comment" },
+    { line: "key: don't # comment 'quoted'", expectedComment: "# comment 'quoted'" },
+    // escaped quotes do not end a quoted value
+    { line: "key: \"a \\\" # b\" # comment", expectedComment: "# comment" },
+    { line: "key: 'a '' # b' # comment", expectedComment: "# comment" },
+    { line: "- 'a # b' # comment", expectedComment: "# comment" },
+    { line: "key: [\"a # b\", 'c # d'] # comment", expectedComment: "# comment" }
   ]
 
   detectionCases.forEach(({ line, expectedComment }) => {
-    test("should only detect comments outside of quotes", () => {
+    test(`should only detect comments outside of quotes: ${line}`, () => {
       equal(CommentProcessor.getInlineComment(line), expectedComment)
     })
+  })
+})
+
+suite("Test CommentProcessor - inline comments of values with apostrophes", () => {
+  test("should keep the inline comment of a value containing an apostrophe", () => {
+    const processor = new CommentProcessor("c: it's fine # note\nb: 1")
+    processor.findComments()
+    processor.text = "b: 1\nc: it's fine"
+
+    equal(processor.postprocess(), "b: 1\nc: it's fine # note")
   })
 })
 

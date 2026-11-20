@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Keep the inline comment of a value that contains an apostrophe (`key: it's # comment`) or an escaped quote (`key: "a \\" b" # comment`). Before, the comment was dropped while sorting
 * Sorting a whole document whose last key has no value (e.g. `key:`) no longer fails with "YAML selection is invalid". This check now only applies to selections
 * The editor commands (sort, custom sort, format, validate) are only offered in the command palette for yaml files. The condition was declared at a place VS Code ignores
 * (refs [#65](https://github.com/pascalre/vscode-yaml-sort/issues/65)) Formatting via "Format Document" or on save no longer shows "Yaml formatted successfully", once per document. The command `Format YAML` shows it once after the changes were applied
