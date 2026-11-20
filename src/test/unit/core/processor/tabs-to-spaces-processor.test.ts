@@ -24,3 +24,14 @@ suite("Test TabsToSpacesPreprocessor - preprocess()", () => {
     equal(tabstospacespreprocessor.text, expected)
   })
 })
+
+suite("Test TabsToSpacesPreprocessor - tabs inside values", () => {
+  test("should keep tabs that are not part of the indentation, e.g. inside a quoted string", () => {
+    const processor = new TabsToSpacesProcessor("a:\n\tb: \"x\ty\"")
+
+    processor.preprocess()
+
+    equal(processor.text, "a:\n  b: \"x\ty\"")
+  })
+})
+

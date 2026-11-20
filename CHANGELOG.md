@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Keep tabs inside values, e.g. in a quoted string. Only tabs in the indentation are replaced with spaces
 * Keep the leading zero of octal values like `0755` that are followed by a comment or are items of a list. Before, they became `755`
 * Command `Recursively sort YAML files` skips the folders `node_modules` and `.git`, so it no longer rewrites the yaml files of installed dependencies. Files that are already sorted are no longer written, and a file is processed once even if its extension is configured twice
 * Sorting an indented selection no longer adds trailing whitespaces to its empty lines
