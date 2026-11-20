@@ -51,11 +51,13 @@
       "properties": {
         "vscode-yaml-sort.emptyLinesUntilLevel": {
           "type": "number",
+          "scope": "language-overridable",
           "default": 0,
           "description": "When bigger than 0, will add a new line before each keyword on level n."
         },
         "vscode-yaml-sort.customSortKeywords_1": {
           "type": "array",
+          "scope": "language-overridable",
           "items": {
             "type": "string"
           },
@@ -70,6 +72,7 @@
         },
         "vscode-yaml-sort.customSortKeywords_2": {
           "type": "array",
+          "scope": "language-overridable",
           "items": {
             "type": "string"
           },
@@ -78,6 +81,7 @@
         },
         "vscode-yaml-sort.customSortKeywords_3": {
           "type": "array",
+          "scope": "language-overridable",
           "items": {
             "type": "string"
           },
@@ -86,6 +90,7 @@
         },
         "vscode-yaml-sort.extensions": {
           "type": "array",
+          "scope": "resource",
           "items": {
             "type": "string"
           },
@@ -97,26 +102,31 @@
         },
         "vscode-yaml-sort.forceQuotes": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": false,
           "description": "When true, all non-key strings will be quoted even if they normally don't need to."
         },
         "vscode-yaml-sort.indent": {
           "type": "integer",
+          "scope": "language-overridable",
           "default": 2,
           "description": "Indentation width in spaces."
         },
         "vscode-yaml-sort.lineWidth": {
           "type": "integer",
+          "scope": "language-overridable",
           "default": 500,
           "description": "Maximum line width for YAML files."
         },
         "vscode-yaml-sort.locale": {
           "type": "string",
+          "scope": "language-overridable",
           "default": "en",
           "description": "Language whose sort order should be used."
         },
         "vscode-yaml-sort.nullStyle": {
           "type": "string",
+          "scope": "language-overridable",
           "default": "lowercase",
           "enum": [
             "lowercase",
@@ -136,11 +146,13 @@
         },
         "vscode-yaml-sort.noArrayIndent": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": false,
           "description": "When true, will not add an indentation level to array elements."
         },
         "vscode-yaml-sort.noCompatMode": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": false,
           "description": "When true, don't try to be compatible with older yaml versions. Currently: don't quote 'yes', 'no' and so on, as required for YAML 1.1"
         },
@@ -151,6 +163,7 @@
         },
         "vscode-yaml-sort.quotingType": {
           "type": "string",
+          "scope": "language-overridable",
           "default": "'",
           "enum": [
             "'",
@@ -160,6 +173,7 @@
         },
         "vscode-yaml-sort.schema": {
           "type": "string",
+          "scope": "language-overridable",
           "default": "DEFAULT_SCHEMA",
           "enum": [
             "HOMEASSISTANT_SCHEMA",
@@ -173,51 +187,61 @@
         },
         "vscode-yaml-sort.sortArrays": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": false,
           "description": "When `true`, will sort arrays"
         },
         "vscode-yaml-sort.sortOrderReverse": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": false,
           "description": "When `true`, will sort in reverse order"
         },
         "vscode-yaml-sort.sortOnSave": {
           "type": "number",
+          "scope": "language-overridable",
           "default": 0,
           "description": "When `0`, will sort files when saving. When `1`, `2` or `3`, will use customSortKeywords. Set to negative value to disable sortOnSave."
         },
         "vscode-yaml-sort.useCustomSortRecursively": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": false,
           "description": "When true, will use the custom sort keywords recursively on a file, when using custom sort"
         },
         "vscode-yaml-sort.useLeadingDashes": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": true,
           "description": "Define if sorted YAML files should begin with leading dashes."
         },
         "vscode-yaml-sort.useArrayProcessor": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": true,
           "description": "When `true`, will activate ArrayProcessor"
         },
         "vscode-yaml-sort.useBlockProcessor": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": true,
           "description": "When `true`, will activate BlockProcessor"
         },
         "vscode-yaml-sort.useCommentProcessor": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": true,
           "description": "When `true`, will activate CommentProcessor"
         },
         "vscode-yaml-sort.useHelmProcessor": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": true,
           "description": "When `true`, will activate HelmProcessor"
         },
         "vscode-yaml-sort.useOctalProcessor": {
           "type": "boolean",
+          "scope": "language-overridable",
           "default": true,
           "description": "When `true`, will activate OctalProcessor"
         }

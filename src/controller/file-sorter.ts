@@ -4,6 +4,7 @@ import { Uri } from "vscode"
 
 import { YamlOperations, sortDocuments } from "./document-transformer"
 import { Severity, VsCodeAdapter } from "../adapter/vs-code-adapter"
+import { Settings } from "../settings"
 import { ErrorUtil } from "../util/error-util"
 import { FileUtil } from "../util/file-util"
 import { YamlUtil } from "../util/yaml-util"
@@ -38,9 +39,10 @@ export const sortYamlFilesInDirectory = (uri: Uri | undefined): void => {
     new VsCodeAdapter().showMessage(Severity.ERROR, "Please run this command from the context menu of a folder in the explorer.")
     return
   }
-  for (const file of new FileUtil().getFiles(uri.fsPath)) {
+  const settingsFor = (resource: Uri) => Settings.forDocument({ uri: resource, languageId: "yaml" })
+  for (const file of new FileUtil(settingsFor(uri)).getFiles(uri.fsPath)) {
     try {
-      sortFile(file)
+      sortFile(file, new YamlUtil(settingsFor(Uri.file(file))))
     } catch (error) {
       errorutil.handleError(error)
     }

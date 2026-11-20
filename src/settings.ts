@@ -1,7 +1,7 @@
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema } from "js-yaml"
-import { WorkspaceConfiguration, workspace } from "vscode"
+import { ConfigurationScope, WorkspaceConfiguration, workspace } from "vscode"
 
 type QuotingType = "'" | "\""
 
@@ -73,6 +73,20 @@ export class Settings {
     this.useCommentProcessor = read<boolean>("useCommentProcessor")
     this.useHelmProcessor = read<boolean>("useHelmProcessor")
     this.useOctalProcessor = read<boolean>("useOctalProcessor")
+  }
+
+  /**
+   * Reads the settings that apply to a document: workspace folder settings in a multi-root
+   * workspace and language specific settings like `"[yaml]": { "vscode-yaml-sort.indent": 4 }`.
+   * @param document         The document, or its uri and language id.
+   * @param getConfiguration Injectable for tests.
+   * @returns The settings for the document.
+   */
+  static forDocument(
+    document: ConfigurationScope,
+    getConfiguration: (section?: string, scope?: ConfigurationScope) => WorkspaceConfiguration = workspace.getConfiguration
+  ): Settings {
+    return new Settings(getConfiguration(Settings.SECTION, document))
   }
 
   /**
