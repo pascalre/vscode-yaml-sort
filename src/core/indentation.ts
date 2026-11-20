@@ -1,6 +1,6 @@
 /**
  * Prepends a given count of whitespaces to every single line in a text.
- * Lines with yaml seperators (---) will not be indented
+ * Lines with yaml separators (---) and empty lines will not be indented
  * @param   {string} text  Text which should get some leading whitespaces on each line.
  * @param   {number} count The number of whitesspaces to prepend on each line of the returned string.
  * @returns {string} Input Text, which has the given count of whitespaces prepended on each single line.
@@ -11,7 +11,8 @@ export function prependWhitespacesOnEachLine(text: string, count: number): strin
   }
 
   const spaces = " ".repeat(count)
-  return text.replace(/^(?!---)/mg, spaces)
+  // empty lines stay empty instead of getting trailing whitespaces
+  return text.replace(/^(?!---|$)/mg, spaces)
 }
 
 /**

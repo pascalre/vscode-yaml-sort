@@ -47,8 +47,11 @@ suite("Test prependWhitespacesOnEachLine", () => {
     throws(() => prependWhitespacesOnEachLine(actual, -1))
   })
   const actual2 = "text\n"
-  test("should return `  text\\n  ` when `text\\n` and 2 are passed", () => {
-    equal(prependWhitespacesOnEachLine(actual2, 2), "  text\n  ")
+  test("should not indent the empty line after a trailing line break", () => {
+    equal(prependWhitespacesOnEachLine(actual2, 2), "  text\n")
+  })
+  test("should not add trailing whitespaces to empty lines", () => {
+    equal(prependWhitespacesOnEachLine("a: |\n  line1\n\n  line2", 2), "  a: |\n    line1\n\n    line2")
   })
 })
 
