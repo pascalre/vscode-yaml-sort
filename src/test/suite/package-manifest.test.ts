@@ -4,7 +4,10 @@ import { join } from "path"
 
 interface Manifest {
   activationEvents: string[]
-  contributes: { commands: { command: string }[] }
+  contributes: {
+    commands: { command: string }[]
+    menus: { commandPalette: { command: string, when: string }[] }
+  }
 }
 
 // out/test/suite -> project root
@@ -23,5 +26,19 @@ suite("Test package.json - activation events", () => {
 
   test("should not activate on startup in every workspace", () => {
     ok(!manifest.activationEvents.includes("onStartupFinished") && !manifest.activationEvents.includes("*"))
+  })
+})
+
+suite("Test package.json - command palette", () => {
+  const palette = manifest.contributes.menus.commandPalette
+
+  test("should offer the editor commands in the command palette only for yaml files", () => {
+    const editorCommands = manifest.contributes.commands
+      .map((contribution) => contribution.command)
+      .filter((command) => command !== "vscode-yaml-sort.sortYamlFilesInDirectory")
+
+    for (const command of editorCommands) {
+      ok(palette.some((entry) => entry.command === command && entry.when === "editorLangId == yaml"), command)
+    }
   })
 })

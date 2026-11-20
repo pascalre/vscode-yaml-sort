@@ -257,28 +257,23 @@
     "commands": [
       {
         "command": "vscode-yaml-sort.customSortYaml_1",
-        "title": "YAML Sort: Custom sort 1",
-        "when": "editorLangId == yaml"
+        "title": "YAML Sort: Custom sort 1"
       },
       {
         "command": "vscode-yaml-sort.customSortYaml_2",
-        "title": "YAML Sort: Custom sort 2",
-        "when": "editorLangId == yaml"
+        "title": "YAML Sort: Custom sort 2"
       },
       {
         "command": "vscode-yaml-sort.customSortYaml_3",
-        "title": "YAML Sort: Custom sort 3",
-        "when": "editorLangId == yaml"
+        "title": "YAML Sort: Custom sort 3"
       },
       {
         "command": "vscode-yaml-sort.formatYaml",
-        "title": "YAML Sort: Format YAML",
-        "when": "editorLangId == yaml"
+        "title": "YAML Sort: Format YAML"
       },
       {
         "command": "vscode-yaml-sort.sortYaml",
-        "title": "YAML Sort: Sort YAML",
-        "when": "editorLangId == yaml"
+        "title": "YAML Sort: Sort YAML"
       },
       {
         "command": "vscode-yaml-sort.sortYamlFilesInDirectory",
@@ -286,8 +281,7 @@
       },
       {
         "command": "vscode-yaml-sort.validateYaml",
-        "title": "YAML Sort: Validate YAML",
-        "when": "editorLangId == yaml"
+        "title": "YAML Sort: Validate YAML"
       }
     ],
     "menus": {
@@ -295,6 +289,30 @@
         {
           "command": "vscode-yaml-sort.sortYamlFilesInDirectory",
           "when": "false"
+        },
+        {
+          "command": "vscode-yaml-sort.customSortYaml_1",
+          "when": "editorLangId == yaml"
+        },
+        {
+          "command": "vscode-yaml-sort.customSortYaml_2",
+          "when": "editorLangId == yaml"
+        },
+        {
+          "command": "vscode-yaml-sort.customSortYaml_3",
+          "when": "editorLangId == yaml"
+        },
+        {
+          "command": "vscode-yaml-sort.formatYaml",
+          "when": "editorLangId == yaml"
+        },
+        {
+          "command": "vscode-yaml-sort.sortYaml",
+          "when": "editorLangId == yaml"
+        },
+        {
+          "command": "vscode-yaml-sort.validateYaml",
+          "when": "editorLangId == yaml"
         }
       ],
       "explorer/context": [
