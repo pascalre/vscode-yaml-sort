@@ -559,3 +559,27 @@ suite("Test YamlUtil - sortYaml() with sortOrderReverse", () => {
     equal(yamlutil.sortYaml("a: 1\nkind: x\nb: 2", 1), "kind: x\nb: 2\na: 1")
   })
 })
+
+suite("Test YamlUtil - injected settings reach every processing step", () => {
+  test("should use emptyLinesUntilLevel of the injected settings", () => {
+    const settings = new Settings()
+    settings.emptyLinesUntilLevel = 1
+
+    equal(new YamlUtil(settings).sortYaml("b: 1\na: 2"), "a: 2\n\nb: 1")
+  })
+
+  test("should use the processor switches of the injected settings", () => {
+    const settings = new Settings()
+    settings.useCommentProcessor = false
+
+    // without the comment processor js-yaml drops the comment
+    equal(new YamlUtil(settings).sortYaml("b: 1\n# comment\na: 2"), "a: 2\nb: 1")
+  })
+
+  test("should format with the indentation of the injected settings", () => {
+    const settings = new Settings()
+    settings.indent = 4
+
+    equal(new YamlUtil(settings).formatYaml("a:\n  b: 1", false), "a:\n    b: 1")
+  })
+})

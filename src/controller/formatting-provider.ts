@@ -3,6 +3,7 @@ import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from "v
 import { formatDocuments, sortDocuments } from "./document-transformer"
 import { Settings } from "../settings"
 import { ErrorUtil } from "../util/error-util"
+import { YamlUtil } from "../util/yaml-util"
 
 /**
  * Formats (or, depending on `sortOnSave`, sorts) a whole yaml document.
@@ -18,13 +19,14 @@ export class YamlFormattingProvider implements DocumentFormattingEditProvider {
    * @returns One edit replacing the whole document, or no edit if the document cannot be processed.
    */
   provideDocumentFormattingEdits(document: TextDocument): TextEdit[] {
-    const settings = new Settings()
+    const settings = Settings.forDocument(document)
+    const yamlutil = new YamlUtil(settings)
     const text = document.getText()
     let newText: string | null
     try {
       newText = settings.doSortOnSave()
-        ? sortDocuments(text, { customSort: settings.sortOnSave, isSelection: false })
-        : formatDocuments(text)
+        ? sortDocuments(text, { customSort: settings.sortOnSave, isSelection: false }, yamlutil)
+        : formatDocuments(text, yamlutil)
     } catch (error) {
       this.errorutil.handleError(error)
       return []

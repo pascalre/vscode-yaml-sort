@@ -45,7 +45,7 @@ export class YamlUtil {
 
   sortYaml(unsortedYaml: string, customSort = 0): string | null {
     try {
-      const processor = new ProcessorController(unsortedYaml)
+      const processor = new ProcessorController(unsortedYaml, this.settings)
       processor.preprocess()
       const unsortedYamlWithoutTabs = processor.text
 
@@ -96,9 +96,9 @@ export class YamlUtil {
    */
   formatYaml(yaml: string, useLeadingDashes: boolean): string | null {
     try {
-      const processor = new ProcessorController(yaml)
+      const processor = new ProcessorController(yaml, this.settings)
       processor.preprocess()
-      let doc = new JsYamlAdapter().dumpYaml(this.jsyamladapter.load(processor.text), false, 0)
+      let doc = this.jsyamladapter.dumpYaml(this.jsyamladapter.load(processor.text), false, 0)
       processor.text = doc
       processor.postprocess()
       doc = processor.text

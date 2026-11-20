@@ -2,10 +2,11 @@ import { Settings } from "../settings"
 
 export class SpacingProcessor {
   text: string
-  settings = new Settings()
+  settings: Settings
 
-  constructor(text: string) {
+  constructor(text: string, settings = new Settings()) {
     this.text = text
+    this.settings = settings
   }
 
   postprocess() {

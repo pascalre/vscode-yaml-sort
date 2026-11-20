@@ -3,6 +3,7 @@ import { deepEqual, equal } from "assert"
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema} from "js-yaml"
+import { Uri, workspace } from "vscode"
 
 import { Settings } from "../../settings"
 
@@ -125,5 +126,20 @@ suite("Test Settings - doSortOnSave()", () => {
         equal(settings.doSortOnSave(), false)
         settings.sortOnSave = 4
         equal(settings.doSortOnSave(), false)
+    })
+})
+
+suite("Test Settings - forDocument()", () => {
+    test("should read the configuration for the given document", () => {
+        const document = { uri: Uri.file("/project/a.yaml"), languageId: "yaml" }
+        const calls: unknown[][] = []
+        const getConfiguration = (section?: string, scope?: unknown) => {
+            calls.push([section, scope])
+            return workspace.getConfiguration(section)
+        }
+
+        Settings.forDocument(document, getConfiguration)
+
+        deepEqual(calls, [["vscode-yaml-sort", document]])
     })
 })

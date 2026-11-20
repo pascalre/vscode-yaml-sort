@@ -2,6 +2,7 @@
 
 ## Unreleased
 🐛 Bugfixes
+* The editor commands (sort, custom sort, format, validate) are only offered in the command palette for yaml files. The condition was declared at a place VS Code ignores
 * (refs [#65](https://github.com/pascalre/vscode-yaml-sort/issues/65)) Formatting via "Format Document" or on save no longer shows "Yaml formatted successfully", once per document. The command `Format YAML` shows it once after the changes were applied
 * Command `Recursively sort YAML files` now sorts files with several documents, works without an open editor and is only offered for folders in the explorer. A file that cannot be sorted is reported and left unchanged. Files are now also found on Windows paths
 * Keep every document delimiter (`---`, including a comment behind it) in front of its own document. Before, several documents without a leading `---` got a duplicated `---` (an additional empty document), and with a leading `--- # comment` the comments moved to the next document or got lost
@@ -23,7 +24,10 @@
 * (closes [#221](https://github.com/pascalre/vscode-yaml-sort/issues/221)) Keep comments above their anchor while sorting, even when a deeper indented line contains the anchor as a substring
 
 ✨ Feature
+* Settings can now be set per workspace folder in a multi-root workspace and per language (e.g. `"[yaml]": { "vscode-yaml-sort.indent": 4 }`). Every command and the formatter read the settings that apply to the processed document
 * (closes [#204](https://github.com/pascalre/vscode-yaml-sort/issues/204)) Add setting `nullStyle` to define how null values are printed (`null`, `Null`, `NULL`, `~` or empty)
+⚡ Performance
+* The extension is only activated when a yaml file is opened or one of its commands is run, instead of on every start of VS Code
 📦 Dependencies
 * Move `@types/js-yaml` and `@vscode/test-electron` to `devDependencies`, so they are no longer shipped with the extension
 

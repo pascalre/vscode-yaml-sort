@@ -9,18 +9,22 @@ import { YamlUtil } from "../util/yaml-util"
 
 export class Controller {
   editor: TextEditor
-  yamlutil = new YamlUtil()
-  jsyamladapter = new JsYamlAdapter()
-  vscodeadapter = new VsCodeAdapter()
+  settings: Settings
+  yamlutil: YamlUtil
+  jsyamladapter: JsYamlAdapter
+  vscodeadapter: VsCodeAdapter
   errorutil = new ErrorUtil()
-  settings = new Settings()
 
   constructor() {
-    if (window.activeTextEditor) {
-      this.editor = window.activeTextEditor
-    } else {
+    if (!window.activeTextEditor) {
       throw new Error("No texteditor is active")
     }
+    this.editor = window.activeTextEditor
+    // one snapshot of the settings that apply to the edited document
+    this.settings = Settings.forDocument(this.editor.document)
+    this.yamlutil = new YamlUtil(this.settings)
+    this.jsyamladapter = new JsYamlAdapter(this.settings)
+    this.vscodeadapter = new VsCodeAdapter(this.settings)
   }
 
   validateYamlWrapper(): boolean {

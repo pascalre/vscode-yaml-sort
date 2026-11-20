@@ -52,6 +52,17 @@ This extension contributes the following settings:
 | `useHelmProcessor`         | When `true`, will activate HelmProcessor.                                                                                                                        | `true`           |
 | `useOctalProcessor`        | When `true`, will activate OctalProcessor.                                                                                                                       | `true`           |
 
+All settings except `notifySuccess` can also be set per workspace folder in a multi-root workspace and, except `extensions`, per language:
+
+#### **`.vscode/settings.json`**
+```json
+{
+    "[yaml]": {
+        "vscode-yaml-sort.indent": 4
+    }
+}
+```
+
 # ❓ FAQ
 ## How to sort on save?
 Register this extension as VS Code formatter. Also configure VS Code to format files on save. Caution: This setting will apply for all files. Changes will require a restart of VS Code. If you wish to also sort (not only format) the file on saving, set `sortOnSave` to `0`. Use `1`, `2` or `3` for custom sort.

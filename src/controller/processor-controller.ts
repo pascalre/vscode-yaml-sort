@@ -24,7 +24,7 @@ export class ProcessorController {
   }
 
   preprocess() {
-    this.tabstospacespreprocessor = new TabsToSpacesProcessor(this.text)
+    this.tabstospacespreprocessor = new TabsToSpacesProcessor(this.text, this.settings)
     this.tabstospacespreprocessor.preprocess()
     this.text = this.tabstospacespreprocessor.text
 
@@ -90,7 +90,7 @@ export class ProcessorController {
       this.text = this.blockprocessor.text
     }
 
-    this.spacingprocessor = new SpacingProcessor(this.text)
+    this.spacingprocessor = new SpacingProcessor(this.text, this.settings)
     this.spacingprocessor.postprocess()
     this.text = this.spacingprocessor.text
   }

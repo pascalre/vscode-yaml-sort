@@ -70,7 +70,7 @@ const transformDocuments = (stream: YamlStream, transform: ContentTransformation
  */
 export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlUtil()): string | null => {
   validateTextRange(text)
-  new JsYamlAdapter().validateYaml(text)
+  new JsYamlAdapter(yaml.settings).validateYaml(text)
 
   const sorted = transformDocuments(splitDocuments(text), (content) => {
     // an indented selection is sorted like a top-level document and indented again afterwards (see #53)
