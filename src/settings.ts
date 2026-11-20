@@ -1,89 +1,131 @@
 import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
 import { HOMEASSISTANT_SCHEMA } from "homeassistant-js-yaml-schema"
 import { CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema } from "js-yaml"
-import { workspace } from "vscode"
+import { WorkspaceConfiguration, workspace } from "vscode"
 
+type QuotingType = "'" | "\""
+
+// js-yaml only supports these styles for the !!null tag
+const NULL_STYLES = ["lowercase", "uppercase", "camelcase", "canonical", "empty"]
+
+/**
+ * A snapshot of the extension's settings.
+ *
+ * All values are read once, when the snapshot is created. Afterwards they can be changed on the
+ * instance, e.g. in tests, and every getter reflects the change.
+ */
 export class Settings {
-    filter = "vscode-yaml-sort"
-    workspace = workspace
+  static readonly SECTION = "vscode-yaml-sort"
 
-    getBoolean(name: string) {
-        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as boolean
-    }
+  customSortKeywords1: string[]
+  customSortKeywords2: string[]
+  customSortKeywords3: string[]
+  emptyLinesUntilLevel: number
+  extensions: string[]
+  forceQuotes: boolean
+  indent: number
+  lineWidth: number
+  locale: string
+  nullStyle: string
+  noArrayIndent: boolean
+  noCompatMode: boolean
+  notifySuccess: boolean
+  quotingType: QuotingType
+  schema: Schema
+  sortArrays: boolean
+  sortOnSave: number
+  sortOrderReverse: boolean
+  useCustomSortRecursively: boolean
+  useLeadingDashes: boolean
+  useArrayProcessor: boolean
+  useBlockProcessor: boolean
+  useCommentProcessor: boolean
+  useHelmProcessor: boolean
+  useOctalProcessor: boolean
 
-    getNumber(name: string) {
-        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as number
-    }
+  /**
+   * @param configuration The extension's configuration section. Defaults to the global and workspace settings.
+   */
+  constructor(configuration: WorkspaceConfiguration = workspace.getConfiguration(Settings.SECTION)) {
+    const read = <T>(name: string) => configuration.get(name) as T
+    this.customSortKeywords1 = read<string[]>("customSortKeywords_1")
+    this.customSortKeywords2 = read<string[]>("customSortKeywords_2")
+    this.customSortKeywords3 = read<string[]>("customSortKeywords_3")
+    this.emptyLinesUntilLevel = read<number>("emptyLinesUntilLevel")
+    this.extensions = read<string[]>("extensions")
+    this.forceQuotes = read<boolean>("forceQuotes")
+    this.indent = read<number>("indent")
+    this.lineWidth = read<number>("lineWidth")
+    this.locale = read<string>("locale")
+    this.nullStyle = read<string>("nullStyle")
+    this.noArrayIndent = read<boolean>("noArrayIndent")
+    this.noCompatMode = read<boolean>("noCompatMode")
+    this.notifySuccess = read<boolean>("notifySuccess")
+    this.quotingType = read<QuotingType>("quotingType")
+    this.schema = Settings.getJsYamlSchemaFromString(read<string>("schema"))
+    this.sortArrays = read<boolean>("sortArrays")
+    this.sortOnSave = read<number>("sortOnSave")
+    this.sortOrderReverse = read<boolean>("sortOrderReverse")
+    this.useCustomSortRecursively = read<boolean>("useCustomSortRecursively")
+    this.useLeadingDashes = read<boolean>("useLeadingDashes")
+    this.useArrayProcessor = read<boolean>("useArrayProcessor")
+    this.useBlockProcessor = read<boolean>("useBlockProcessor")
+    this.useCommentProcessor = read<boolean>("useCommentProcessor")
+    this.useHelmProcessor = read<boolean>("useHelmProcessor")
+    this.useOctalProcessor = read<boolean>("useOctalProcessor")
+  }
 
-    getString(name: string) {
-        return this.workspace.getConfiguration().get(`${this.filter}.${name}`) as string
-    }
-
-    getCustomSortKeywords(index: number): string[] {
-        if ([1, 2, 3].includes(index))
-            return this.workspace.getConfiguration().get(`${this.filter}.customSortKeywords_${index}`) as string[]
+  /**
+   * @param index 1, 2 or 3.
+   * @returns The keywords of the custom sort, or an empty list for any other index.
+   */
+  getCustomSortKeywords(index: number): string[] {
+    switch (index) {
+      case 1:
+        return this.customSortKeywords1
+      case 2:
+        return this.customSortKeywords2
+      case 3:
+        return this.customSortKeywords3
+      default:
         return []
     }
-    getExtensions(): string[] {
-        return this.workspace.getConfiguration().get(`${this.filter}.extensions`) as string[]
-    }
-    getQuotingType(): "'" | "\"" {
-        return this.workspace.getConfiguration().get(`${this.filter}.quotingType`) as "'" | "\""
-    }
-    getSchema(): Schema {
-        const schema = this.workspace.getConfiguration().get(`${this.filter}.schema`) as string
-        return Settings.getJsYamlSchemaFromString(schema)
-    }
+  }
 
-    getNullStyle(): string {
-        // js-yaml only supports these styles for the !!null tag
-        const validStyles = ["lowercase", "uppercase", "camelcase", "canonical", "empty"]
-        return validStyles.includes(this.nullStyle) ? this.nullStyle : "lowercase"
-    }
+  getExtensions(): string[] {
+    return this.extensions
+  }
 
-    customSortKeywords1 = this.getCustomSortKeywords(1)
-    customSortKeywords2 = this.getCustomSortKeywords(2)
-    customSortKeywords3 = this.getCustomSortKeywords(3)
-    emptyLinesUntilLevel = this.getNumber("emptyLinesUntilLevel")
-    forceQuotes = this.getBoolean("forceQuotes")
-    indent = this.getNumber("indent")
-    lineWidth = this.getNumber("lineWidth")
-    locale = this.getString("locale")
-    nullStyle = this.getString("nullStyle")
-    noArrayIndent = this.getBoolean("noArrayIndent")
-    noCompatMode = this.getBoolean("noCompatMode")
-    notifySuccess = this.getBoolean("notifySuccess")
-    quotingType = this.getQuotingType()
-    schema = this.getSchema()
-    sortArrays = this.getBoolean("sortArrays")
-    sortOnSave = this.getNumber("sortOnSave")
-    sortOrderReverse = this.getBoolean("sortOrderReverse")
-    useCustomSortRecursively = this.getBoolean("useCustomSortRecursively")
-    useLeadingDashes = this.getBoolean("useLeadingDashes")
-    useArrayProcessor = this.getBoolean("useArrayProcessor")
-    useBlockProcessor = this.getBoolean("useBlockProcessor")
-    useCommentProcessor = this.getBoolean("useCommentProcessor")
-    useHelmProcessor = this.getBoolean("useHelmProcessor")
-    useOctalProcessor = this.getBoolean("useOctalProcessor")
+  getQuotingType(): QuotingType {
+    return this.quotingType
+  }
 
-    static getJsYamlSchemaFromString(schema: string): Schema {
-        switch (schema) {
-            case "HOMEASSISTANT_SCHEMA":
-                return HOMEASSISTANT_SCHEMA as Schema
-            case "CLOUDFORMATION_SCHEMA":
-                return CLOUDFORMATION_SCHEMA as Schema
-            case "CORE_SCHEMA":
-                return CORE_SCHEMA
-            case "FAILSAFE_SCHEMA":
-                return FAILSAFE_SCHEMA
-            case "JSON_SCHEMA":
-                return JSON_SCHEMA
-            default:
-                return DEFAULT_SCHEMA
-        }
-    }
+  getSchema(): Schema {
+    return this.schema
+  }
 
-    doSortOnSave(): boolean {
-        return (this.sortOnSave >= 0 && this.sortOnSave <= 3)
+  getNullStyle(): string {
+    return NULL_STYLES.includes(this.nullStyle) ? this.nullStyle : "lowercase"
+  }
+
+  static getJsYamlSchemaFromString(schema: string): Schema {
+    switch (schema) {
+      case "HOMEASSISTANT_SCHEMA":
+        return HOMEASSISTANT_SCHEMA as Schema
+      case "CLOUDFORMATION_SCHEMA":
+        return CLOUDFORMATION_SCHEMA as Schema
+      case "CORE_SCHEMA":
+        return CORE_SCHEMA
+      case "FAILSAFE_SCHEMA":
+        return FAILSAFE_SCHEMA
+      case "JSON_SCHEMA":
+        return JSON_SCHEMA
+      default:
+        return DEFAULT_SCHEMA
     }
+  }
+
+  doSortOnSave(): boolean {
+    return (this.sortOnSave >= 0 && this.sortOnSave <= 3)
+  }
 }

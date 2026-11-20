@@ -7,15 +7,10 @@ export enum Severity {
 }
 
 export class VsCodeAdapter {
-  section = "vscode-yaml-sort"
   settings: Settings
 
   constructor(settings = new Settings()) {
     this.settings = settings
-  }
-
-  getProperty(property: string) {
-    return workspace.getConfiguration().get(`${this.section}.${property}`)
   }
 
   showMessage(severity: Severity, message: string) {

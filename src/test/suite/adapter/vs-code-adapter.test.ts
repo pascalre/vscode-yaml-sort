@@ -6,28 +6,6 @@ import { Uri, window, workspace } from "vscode"
 
 import { Severity, VsCodeAdapter } from "../../../adapter/vs-code-adapter"
 
-suite("Test VsCodeAdapter - getProperty()", () => {
-  const vscodeadapter = new VsCodeAdapter()
-
-  test("when property is locale should return en", () => {
-    equal(vscodeadapter.getProperty("locale"), "en")
-  })
-})
-/*
-suite("Test VsCodeAdapter - applyEdits()", () => {
-  const vscodeadapter = new VsCodeAdapter()
-  const textEditor = window.activeTextEditor
-  if (textEditor) {
-    const edits = vscodeadapter.getEdits(textEditor, 'foobar')
-    window.activeTextEditor = undefined
-    throws(() => vscodeadapter.applyEdits([edits]))
-  
-    test("when property is locale should return en", () => {
-      strictEqual(vscodeadapter.getProperty("locale"), "en")
-    })
-  }
-})*/
-
 suite("Test VsCodeAdapter - getActiveDocument()", () => {
   test("when text editor is active should open document", async () => {
     const uri = Uri.parse(path.resolve("./src/test/files/testGetActiveDocument.yaml"))
