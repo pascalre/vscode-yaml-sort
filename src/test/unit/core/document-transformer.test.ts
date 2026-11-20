@@ -37,6 +37,11 @@ suite("Test DocumentTransformer - sortDocuments()", () => {
   test("should throw when a selection ends with a colon", () => {
     throws(() => sortDocuments("key:", { customSort: 0, isSelection: true }), /YAML selection is invalid/)
   })
+
+  test("should sort a whole document whose last key has no value", () => {
+    // only a selection can be cut off in the middle of a value, a whole document ending with a colon is valid
+    equal(sortDocuments("b: 1\na:", { customSort: 0, isSelection: false }), "---\na: null\nb: 1")
+  })
 })
 
 suite("Test DocumentTransformer - sortDocuments() when a document cannot be sorted", () => {

@@ -59,10 +59,12 @@ const transformDocuments = (stream: YamlStream, transform: ContentTransformation
  * @param options Sort options.
  * @param yaml    Yaml operations, injectable for tests.
  * @returns The sorted text.
- * @throws  Error if the text is not valid yaml, the selection ends invalid or a document cannot be sorted.
+ * @throws  Error if the text is not valid yaml, a selection ends invalid or a document cannot be sorted.
  */
 export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlSorter()): string => {
-  validateTextRange(text)
+  if (options.isSelection) {
+    validateTextRange(text)
+  }
   new JsYamlAdapter(yaml.settings).validateYaml(text)
 
   const sorted = transformDocuments(splitDocuments(text), (content) => {
