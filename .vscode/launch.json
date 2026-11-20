@@ -20,7 +20,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test"
+        "--extensionTestsPath=${workspaceFolder}/out/test/integration/index"
       ],
       "outFiles": [
         "${workspaceFolder}/out/test/**/*.js"

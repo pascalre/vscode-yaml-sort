@@ -1,9 +1,9 @@
 import { ExtensionContext, Uri, commands } from "vscode"
 
-import { VsCodeAdapter } from "./adapter/vs-code-adapter"
-import { Controller } from "./controller/controller"
-import { sortYamlFilesInDirectory } from "./controller/file-sorter"
-import { YamlFormattingProvider } from "./controller/formatting-provider"
+import { Controller } from "./vscode/controller"
+import { sortYamlFilesInDirectory } from "./vscode/file-sorter"
+import { YamlFormattingProvider } from "./vscode/formatting-provider"
+import { VsCodeAdapter } from "./vscode/vs-code-adapter"
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(

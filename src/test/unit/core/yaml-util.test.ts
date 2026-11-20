@@ -1,0 +1,605 @@
+import { equal } from "assert"
+
+import { CLOUDFORMATION_SCHEMA } from "cloudformation-js-yaml-schema"
+import { CORE_SCHEMA } from "js-yaml"
+
+import { Settings } from "../../../core/settings"
+import { YamlUtil } from "../../../core/yaml-util"
+
+suite("Test sortArrays", () => {
+  const yamlutil = new YamlUtil()
+  const text = 
+    "array:\n" +
+    "  - python\n" +
+    "  - perl"
+
+  test("when sortArrays is set to false, should not sort arrays", () => {
+    const actual = yamlutil.sortYaml(text)
+    equal(actual, text)
+  })
+
+  test("when sortArrays is set to true, should sort arrays", () => {
+    yamlutil.settings.sortArrays = true
+    const actual = yamlutil.sortYaml("foo")
+    const expected = "foo"
+    equal(actual, expected)
+  })
+
+  test("when sortArrays is set to true, should sort arrays", () => {
+    yamlutil.settings.sortArrays = true
+    const actual = yamlutil.sortYaml(text)
+    const expected = 
+      "array:\n" +
+      "  - perl\n" +
+      "  - python"
+    equal(actual, expected)
+  })
+
+  test("when sortArrays is set to true, should sort nested arrays", () => {
+    yamlutil.settings.sortArrays = true
+    const text = 
+      "foo:\n" +
+      "  array:\n" +
+      "    - python\n" +
+      "    - perl"
+    const actual = yamlutil.sortYaml(text)
+    const expected = 
+      "foo:\n" +
+      "  array:\n" +
+      "    - perl\n" +
+      "    - python"
+    equal(actual, expected)
+  })
+})
+
+suite("Test YamlUtil - setLeadingDashes()", () => {
+  test("when setting useLeadingDashes is `true` should prepend `---\n` to text", () => {
+    const yamlutil = new YamlUtil()
+    const text = "lorem ipsum"
+    yamlutil.settings.useLeadingDashes = false
+    equal(yamlutil.setLeadingDashes(text), text)
+
+    yamlutil.settings.useLeadingDashes = true
+    const expected = "---\nlorem ipsum"
+    equal(yamlutil.setLeadingDashes(text), expected)
+  })
+})
+
+suite("Test dumpYaml", () => {
+  test("when useCustomSortRecursively is set to`true` should recursively use customSort", () => {
+    const actual =
+      "keyword1: value\n" +
+      "keyword: value\n" +
+      "keyword2: value\n" +
+      "data:\n" +
+      "  apiVersion: value\n" +
+      "  keyword: value\n" +
+      "  data: value\n" +
+      "  kind: value\n" +
+      "kind: value"
+
+    const expected =
+      "kind: value\n" +
+      "data:\n" +
+      "  apiVersion: value\n" +
+      "  kind: value\n" +
+      "  data: value\n" +
+      "  keyword: value\n" +
+      "keyword: value\n" +
+      "keyword1: value\n" +
+      "keyword2: value"
+
+    const settings = new Settings()
+    settings.useCustomSortRecursively = true
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+
+  test("when locale is `en` should sort character `ä` over `z`", () => {
+    const actual =
+      "ä: value\n" +
+      "z: value"
+
+    const expected =
+      "ä: value\n" +
+      "z: value"
+
+    const settings = new Settings()
+    settings.locale = "en"
+    settings.useCustomSortRecursively = true
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+
+  test("when locale is `sv` should sort character `z` over `ä`", () => {
+    const actual =
+      "ä: value\n" +
+      "z: value"
+
+    const expected =
+      "z: value\n" +
+      "ä: value"
+
+    const settings = new Settings()
+    settings.locale = "sv"
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+
+  test("should ignore case when sorting", () => {
+    const actual =
+      "completedDate: value\n" +
+      "completeTask: value"
+
+    const expected =
+      "completedDate: value\n" +
+      "completeTask: value"
+
+    const settings = new Settings()
+    settings.useCustomSortRecursively = true
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+
+})
+
+suite("Test dumpYaml", () => {
+  test("should recursively use customSort", () => {
+    const actual =
+      "keyword1: value\n" +
+      "keyword: value\n" +
+      "keyword2: value\n" +
+      "data:\n" +
+      "  apiVersion: value\n" +
+      "  keyword: value\n" +
+      "  data: value\n" +
+      "  kind: value\n" +
+      "kind: value"
+  
+    const expected =
+      "kind: value\n" +
+      "data:\n" +
+      "  apiVersion: value\n" +
+      "  kind: value\n" +
+      "  data: value\n" +
+      "  keyword: value\n" +
+      "keyword: value\n" +
+      "keyword1: value\n" +
+      "keyword2: value"
+  
+    const settings = new Settings()
+    settings.useCustomSortRecursively = true
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+  test("should sort with by locale behaviour", () => {
+    const actual =
+      "ä: value\n" +
+      "z: value"
+  
+    let expected =
+      "ä: value\n" +
+      "z: value"
+  
+    const settings = new Settings()
+    settings.useCustomSortRecursively = true
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  
+    expected =
+      "z: value\n" +
+      "ä: value"
+  
+    yamlutil.settings.locale = "sv"
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+  test("should ignore case when sorting", () => {
+    const actual =
+      "completedDate: value\n" +
+      "completeTask: value"
+  
+    const expected =
+      "completedDate: value\n" +
+      "completeTask: value"
+  
+    const settings = new Settings()
+    settings.useCustomSortRecursively = true
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+})
+
+
+suite("Test sortYaml", () => {
+  test("should put top level keyword `spec` before `data` when passing customsort=1", () => {
+    let actual =
+      "data: data\n" +
+      "spec: spec"
+  
+    let expected =
+      "spec: spec\n" +
+      "data: data\n"
+  
+    const yamlutil = new YamlUtil()
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  
+    actual =
+      "data: data\n" +
+      "spec:\n" +
+      "  - aa: b"
+  
+    expected =
+      "spec:\n" +
+      "  - aa: b\n" +
+      "data: data\n"
+  
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  
+    actual =
+      "data:\n" +
+      "  job: Developer\n" +
+      "  skills:\n" +
+      "    - pascal\n" +
+      "spec:\n" +
+      "  job: Boss\n" +
+      "  name: Stuart"
+  
+    expected =
+      "spec:\n" +
+      "  job: Boss\n" +
+      "  name: Stuart\n" +
+      "data:\n" +
+      "  job: Developer\n" +
+      "  skills:\n" +
+      "    - pascal\n"
+  
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  
+    actual =
+      "data: data\n" +
+      "spec:\n" +
+      "  - a\n" +
+      "  - b"
+  
+    expected =
+      "spec:\n" +
+      "  - a\n" +
+      "  - b\n" +
+      "data: data\n"
+  
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+  
+  test("should wrap words after 500 characters (`vscode-yaml-sort.lineWidth`)", () => {
+    const actual =
+      "- lorem ipsum:\n" +
+      "    text: \"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut " +
+      "labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea " +
+      "rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor " +
+      "sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna " +
+      "aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et e\""
+  
+    const expected =
+      "- lorem ipsum:\n" +
+      "    text: >-\n" +
+      "      Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut " +
+      "labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et " +
+      "ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor " +
+      "sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna " +
+      "aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo\n" +
+      "      dolores et e"
+  
+    const yamlutil = new YamlUtil()
+    equal(yamlutil.sortYaml(actual, 1), expected)
+  })
+  test("should not format a date in CORE_SCHEMA", () => {
+    const actual = "AWSTemplateFormatVersion: 2010-09-09"
+    let expected = "AWSTemplateFormatVersion: 2010-09-09T00:00:00.000Z"
+    let yamlutil = new YamlUtil()
+    equal(yamlutil.sortYaml(actual, 0), expected)
+  
+    expected = actual
+  
+    const settings = new Settings()
+    settings.getSchema = function () {
+      return CORE_SCHEMA
+    }
+    yamlutil = new YamlUtil(settings)
+
+    equal(yamlutil.sortYaml(actual, 0), expected)
+  })
+  test("should sort a yaml with CLOUDFORMATION_SCHEMA", () => {
+    const actual =
+      "LoggingBucketKMSKeyAlias:\n" +
+      "  Properties:\n" +
+      "    TargetKeyId: !Sub \"LoggingBucketKMSKey\"\n" +
+      "    AliasName: !Sub \"alias/AppName/Environment/s3-logging-kms\""
+  
+    const expected =
+      "LoggingBucketKMSKeyAlias:\n" +
+      "  Properties:\n" +
+      "    AliasName: !Sub \"alias/AppName/Environment/s3-logging-kms\"\n" +
+      "    TargetKeyId: !Sub \"LoggingBucketKMSKey\""
+  
+    const settings = new Settings()
+    settings.getSchema = function () {
+      return CLOUDFORMATION_SCHEMA
+    }
+    settings.forceQuotes = true
+    settings.getQuotingType = function () {
+      return "\""
+    }
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 0), expected)
+  })
+  test("compatibility with older yaml versions should be configurable", () => {
+    const actual =
+      "key:\n" +
+      "  on: foo\n" +
+      "  off: egg"
+  
+    let expected =
+      "key:\n" +
+      "  \"off\": egg\n" +
+      "  \"on\": foo"
+  
+    const settings = new Settings()
+    settings.noCompatMode = false
+    settings.getQuotingType = function () {
+      return "\""
+    }
+    const yamlutil = new YamlUtil(settings)
+    equal(yamlutil.sortYaml(actual, 0), expected)
+  
+    expected =
+      "key:\n" +
+      "  off: egg\n" +
+      "  on: foo"
+    yamlutil.settings.noCompatMode = true
+    equal(yamlutil.sortYaml(actual, 0), expected)
+  })
+})
+
+suite("Test formatYaml", () => {
+  test("should sort all yaml files in directory", () => {
+    const actual =
+      "persons:\n" +
+      "  bob:\n" +
+      "    place: \"Germany\"\n" +
+      "    age: 23\n" +
+      "\"animals\":\n" +
+      "  kitty:\n" +
+      "    age: 3"
+
+    let expected =
+      "persons:\n" +
+      "  bob:\n" +
+      "    place: Germany\n" +
+      "    age: 23\n" +
+      "animals:\n" +
+      "  kitty:\n" +
+      "    age: 3"
+
+    const settings = new Settings()
+    settings.useLeadingDashes = false
+    let yamlutil = new YamlUtil(settings)
+    equal(yamlutil.formatYaml(actual, false), expected)
+
+    expected =
+      "---\n" +
+      "persons:\n" +
+      "  bob:\n" +
+      "    place: Germany\n" +
+      "    age: 23\n" +
+      "animals:\n" +
+      "  kitty:\n" +
+      "    age: 3"
+
+    yamlutil = new YamlUtil()
+    equal(yamlutil.formatYaml(actual, true), expected)
+  })
+
+  test("should return `null` on invalid yaml", () => {
+    const yamlutil = new YamlUtil()
+    equal(yamlutil.formatYaml("key: 1\nkey: 1", true), null)
+  })
+})
+
+suite("Test YamlUtil - getNumberOfLeadingSpaces()", () => {
+  test("should return the number of leading spaces of 'text'", () => {
+    equal(YamlUtil.getNumberOfLeadingSpaces("  foo"), 2)
+    equal(YamlUtil.getNumberOfLeadingSpaces("foo"), 0)
+    equal(YamlUtil.getNumberOfLeadingSpaces("foo  "), 0)
+  })
+})
+
+suite("Test YamlUtil - isValueMultiline", () => {
+  test("when text starts with '-' should return true", () => {
+    const text =
+      "- foo: bar\n" +
+      "  bar: baz"
+    equal(YamlUtil.isValueMultiline(text), true)
+  })
+})
+
+suite("Test YamlUtil - transformMultilineValue()", () => {
+  const yamlutil = new YamlUtil()
+  yamlutil.settings.indent = 2
+  test("Should prepend spaces on each line", () => {
+    const text =
+      "- foo: bar\n" +
+      "  bar: baz"
+    const expected =
+      "  - foo: bar\n" +
+      "    bar: baz"
+    equal(yamlutil.transformMultilineValue(text), expected)
+  })
+  test("When text ends with newline should remove trailing indent", () => {
+    const text =
+      "- foo: bar\n" +
+      "  bar: baz\n"
+    const expected =
+      "  - foo: bar\n" +
+      "    bar: baz\n"
+    equal(yamlutil.transformMultilineValue(text), expected)
+  })
+})
+/*
+*/
+suite("Test YamlUtil - sortYaml() with quoted helm values", () => {
+  test("GitHub issue #130: should not mangle a quoted helm value containing a dollar sign", () => {
+    const yamlutil = new YamlUtil()
+    const text = "section:\n  label: '{{''$''}}'"
+
+    equal(yamlutil.sortYaml(text), text)
+  })
+})
+suite("Test YamlUtil - sortYaml() with double-quoted helm values", () => {
+  test("GitHub issue #283: should keep double quotes around a helm value", () => {
+    const yamlutil = new YamlUtil()
+    const text = "foo: \"{{ .Fighters}}\""
+
+    equal(yamlutil.sortYaml(text), text)
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with kustomize patches", () => {
+  test("GitHub issue #188: should keep a block scalar containing colons intact while sorting", () => {
+    const util = new YamlUtil()
+    const kustomize = "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: monitor\nresources:\n  - bundle.yaml\n\npatches:\n  - target:\n      kind: ClusterRoleBinding\n      name: prometheus-operator\n    patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"
+
+    const sorted = util.sortYaml(kustomize)
+
+    equal(sorted !== null && sorted.includes("patch: |-\n      - op: replace\n        path: /subjects/0/namespace\n        value: monitor"), true)
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with inline comments", () => {
+  test("GitHub issue #222: should keep an inline comment while sorting", () => {
+    const instance = new YamlUtil()
+    const game = "game:\n  core:\n    serviceRpcTimeoutMillis: 6900000 # Extra-long for debugging locally"
+
+    equal(instance.sortYaml(game), game)
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with docker-compose files", () => {
+  test("GitHub issue #221: should keep a comment above a service while sorting with forceQuotes", () => {
+    const composeSettings = new Settings()
+    composeSettings.forceQuotes = true
+    composeSettings.getQuotingType = function () {
+      return "\""
+    }
+    const composeUtil = new YamlUtil(composeSettings)
+    const composeYaml =
+      "services:\n" +
+      "  # https://hub.docker.com/_/mysql\n" +
+      "  mysql5:\n" +
+      "    depends_on:\n" +
+      "      mysql5:\n" +
+      "        condition: \"service_healthy\"\n" +
+      "    image: \"mysql:5.7\""
+
+    equal(composeUtil.sortYaml(composeYaml), composeYaml)
+  })
+})
+
+suite("Test YamlUtil - sortYaml() keeps substituted values intact", () => {
+  const yamlutil = new YamlUtil()
+
+  test("should keep more than ten helm values at their keys", () => {
+    const lines = Array.from({ length: 12 }, (_, i) => `key${String(i).padStart(2, "0")}: "{{ .Values.value${i} }}"`)
+
+    equal(yamlutil.sortYaml([...lines].reverse().join("\n")), lines.join("\n"))
+  })
+
+  test("should keep an octal value when the same digits appear quoted earlier", () => {
+    const text = "a: '0755'\nz: 0755"
+
+    equal(yamlutil.sortYaml(text), text)
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with custom sort and scalar values", () => {
+  const yamlutil = new YamlUtil()
+
+  test("should keep number and boolean values of custom sort keywords", () => {
+    equal(yamlutil.sortYaml("spec: x\nkind: true\napiVersion: 3", 1), "apiVersion: 3\nkind: true\nspec: x\n")
+  })
+
+  test("should keep an empty mapping as value of a custom sort keyword", () => {
+    equal(yamlutil.sortYaml("spec: x\nmetadata: {}", 1), "metadata: {}\nspec: x\n")
+  })
+
+  test("should order custom sort keywords even if their values are falsy", () => {
+    const text = "spec: x\nmetadata: null\nkind: false\napiVersion: 0"
+
+    equal(yamlutil.sortYaml(text, 1), "apiVersion: 0\nkind: false\nmetadata: null\nspec: x\n")
+  })
+
+  test("should not add a value to a document containing only a comment", () => {
+    equal(yamlutil.sortYaml("# only a comment"), "\n# only a comment")
+  })
+
+  test("should keep a document containing only a scalar", () => {
+    equal(yamlutil.sortYaml("42"), "42")
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with sortOrderReverse", () => {
+  const settings = new Settings()
+  settings.sortOrderReverse = true
+  const yamlutil = new YamlUtil(settings)
+
+  test("should sort keys in reverse order on every level", () => {
+    equal(yamlutil.sortYaml("a: 1\nc:\n  x: 1\n  z: 2\nb: 2"), "c:\n  z: 2\n  x: 1\nb: 2\na: 1")
+  })
+
+  test("should sort the remaining keys of a custom sort in reverse order", () => {
+    equal(yamlutil.sortYaml("a: 1\nkind: x\nb: 2", 1), "kind: x\nb: 2\na: 1")
+  })
+})
+
+suite("Test YamlUtil - injected settings reach every processing step", () => {
+  test("should use emptyLinesUntilLevel of the injected settings", () => {
+    const settings = new Settings()
+    settings.emptyLinesUntilLevel = 1
+
+    equal(new YamlUtil(settings).sortYaml("b: 1\na: 2"), "a: 2\n\nb: 1")
+  })
+
+  test("should use the processor switches of the injected settings", () => {
+    const settings = new Settings()
+    settings.useCommentProcessor = false
+
+    // without the comment processor js-yaml drops the comment
+    equal(new YamlUtil(settings).sortYaml("b: 1\n# comment\na: 2"), "a: 2\nb: 1")
+  })
+
+  test("should format with the indentation of the injected settings", () => {
+    const settings = new Settings()
+    settings.indent = 4
+
+    equal(new YamlUtil(settings).formatYaml("a:\n  b: 1", false), "a:\n    b: 1")
+  })
+})
+
+suite("Test YamlUtil - sortYaml() with custom sort keeps the document intact", () => {
+  const yamlutil = new YamlUtil()
+
+  test("should put the keywords in their order before the remaining keys", () => {
+    equal(yamlutil.sortYaml("data: 1\nkind: x\nb:\n  c: 1", 1), "kind: x\ndata: 1\nb:\n  c: 1")
+  })
+
+  test("should keep a document that only contains keywords", () => {
+    equal(yamlutil.sortYaml("kind: x", 1), "kind: x\n")
+  })
+
+  test("should leave a list document unchanged", () => {
+    equal(yamlutil.sortYaml("- kind: x\n- a: 1", 1), "- kind: x\n- a: 1")
+  })
+
+  test("should leave a scalar document unchanged", () => {
+    equal(yamlutil.sortYaml("42", 1), "42")
+  })
+})
