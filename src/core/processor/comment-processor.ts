@@ -1,3 +1,8 @@
+import { getInlineComment, isLineComment } from "./yaml-comment"
+
+/** Anchor of a comment in the last line, which has no following line to stay above. */
+export const LAST_LINE = "vscode-yaml-sort.lastLine"
+
 export class CommentProcessor {
   store: string[][] = []
   inlineStore: string[][] = []
@@ -23,7 +28,7 @@ export class CommentProcessor {
    */
   findComments() {
     this.lines.forEach((line, index) => {
-      if (CommentProcessor.isLineComment(line)) {
+      if (isLineComment(line)) {
         this.addLineToComments(index)
       } else {
         this.addInlineCommentToStore(line)
@@ -31,62 +36,20 @@ export class CommentProcessor {
     })
   }
 
-  static isLineComment(line: string) {
-    return /^ *#/.test(line)
-  }
-
   addLineToComments(index: number) {
     if (index < this.lines.length-1) {
       this.store.push([this.lines[index], this.lines[index+1]])
     } else {
-      this.store.push([this.lines[index], "vscode-yaml-sort.lastLine"])
+      this.store.push([this.lines[index], LAST_LINE])
     }
   }
 
   addInlineCommentToStore(line: string) {
-    const comment = CommentProcessor.getInlineComment(line)
+    const comment = getInlineComment(line)
 
     if (comment !== undefined) {
       this.inlineStore.push([` ${comment}`, line.slice(0, line.length - comment.length).trimEnd()])
     }
-  }
-
-  /**
-   * Finds the comment at the end of a line, ignoring `#` inside quoted values.
-   * @param line A line of yaml.
-   * @returns The comment starting with `#`, or undefined if the line has none.
-   */
-  static getInlineComment(line: string): string | undefined {
-    let quote: string | undefined
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i]
-      if (quote !== undefined) {
-        if (quote === "\"" && char === "\\") {
-          // skip the escaped character, e.g. \"
-          i++
-        } else if (quote === "'" && char === "'" && line[i + 1] === "'") {
-          // '' is an escaped single quote
-          i++
-        } else if (char === quote) {
-          quote = undefined
-        }
-      } else if ((char === "\"" || char === "'") && CommentProcessor.startsValue(line, i)) {
-        quote = char
-      } else if (char === "#" && i > 0 && (line[i - 1] === " " || line[i - 1] === "\t")) {
-        return line.slice(i)
-      }
-    }
-
-    return undefined
-  }
-
-  /**
-   * A quote only starts a quoted value at the beginning of a value, e.g. after `key: `, `- ` or `[`.
-   * Elsewhere it is part of a plain value, like the apostrophe in `key: it's`.
-   */
-  static startsValue(line: string, index: number): boolean {
-    return index === 0 || /[\s[{,]/.test(line[index - 1])
   }
 
   postprocess(): string {
@@ -134,7 +97,7 @@ export class CommentProcessor {
   }
 
   applyComment(comment: string[]) {
-    if (comment[1] === "vscode-yaml-sort.lastLine") {
+    if (comment[1] === LAST_LINE) {
       this.append(comment[0])
     } else {
       this.insert(comment)
@@ -167,7 +130,7 @@ export class CommentProcessor {
   }
 
   getIndexOfString(text: string): number {
-    if (text === "vscode-yaml-sort.lastLine") {
+    if (text === LAST_LINE) {
       return this.text.length
     } else {
       return this.search(text)
