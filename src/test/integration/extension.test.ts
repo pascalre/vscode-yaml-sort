@@ -61,7 +61,7 @@ suite("Test sortYamlWrapper", () => {
           new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      notDeepEqual(new EditorCommands().sortYamlWrapper(), [])
+      notDeepEqual(await new EditorCommands().sortYamlWrapper(), [])
     } else {
       equal(true, false)
     }
@@ -85,7 +85,7 @@ suite("Test sortYamlWrapper", () => {
         actual))
 
       activeEditor.selection = new Selection(0, 0, 0, 4)
-      deepEqual(new EditorCommands().sortYamlWrapper(), [])
+      deepEqual(await new EditorCommands().sortYamlWrapper(), [])
     } else {
       equal(true, false)
     }

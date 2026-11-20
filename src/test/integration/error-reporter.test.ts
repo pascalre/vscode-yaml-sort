@@ -1,18 +1,26 @@
-import { equal } from "assert"
+import { deepEqual } from "assert"
 
 import { spy } from "sinon"
 
 import { ErrorReporter } from "../../vscode/error-reporter"
+import { Severity } from "../../vscode/vs-code-adapter"
 
 suite("Test ErrorReporter - handleError()", () => {
-  test("when input is of type error, should execute showMessage function", () => {
+  test("should show the message of an error", () => {
     const errorReporter = new ErrorReporter()
-    const spyObject = spy(errorReporter.vsCodeAdapter, "showMessage")
+    const showMessage = spy(errorReporter.vsCodeAdapter, "showMessage")
+
+    errorReporter.handleError(new Error("broken"))
+
+    deepEqual(showMessage.args, [[Severity.ERROR, "broken"]])
+  })
+
+  test("should show a thrown value that is no error instead of swallowing it", () => {
+    const errorReporter = new ErrorReporter()
+    const showMessage = spy(errorReporter.vsCodeAdapter, "showMessage")
 
     errorReporter.handleError("no error")
-    equal(spyObject.called, false)
 
-    errorReporter.handleError(new Error())
-    equal(spyObject.called, true)
+    deepEqual(showMessage.args, [[Severity.ERROR, "no error"]])
   })
 })

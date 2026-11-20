@@ -1,4 +1,4 @@
-import { Disposable, DocumentFormattingEditProvider, Position, Range, Selection, TextEdit, TextEditor, WorkspaceEdit, languages, window, workspace }  from "vscode"
+import { Disposable, DocumentFormattingEditProvider, Range, Selection, TextDocument, TextEditor, languages, window } from "vscode"
 
 import { Settings } from "../core/settings"
 
@@ -31,57 +31,37 @@ export class VsCodeAdapter {
     return languages.registerDocumentFormattingEditProvider("yaml", formatter)
   }
 
-  static getText(textEditor: TextEditor, range: Range) {
-    return textEditor.document.getText(range)
+  /**
+   * @param document A text document.
+   * @returns The range from the beginning to the end of the document.
+   */
+  static getFullDocumentRange(document: TextDocument): Range {
+    return document.validateRange(new Range(0, 0, document.lineCount, 0))
   }
 
-  static getFullDocumentRange(textEditor: TextEditor) {
-    return new Range(
-      new Position(0, 0),
-      new Position(textEditor.document.lineCount + 1, 0))
-  }
-
-  static getSelectedRange(textEditor: TextEditor) {
+  /**
+   * @param textEditor An editor with a non-empty selection.
+   * @returns The selection, extended to whole lines. A selection that ends on the first character
+   *          of a line does not include that line.
+   */
+  static getSelectedRange(textEditor: TextEditor): Selection {
     let endLine = textEditor.selection.end.line
-    // if selection ends on the first character on a new line ignore this line
     if (textEditor.selection.end.character === 0) {
       endLine--
     }
-
-    // ensure selection covers whole start and end line
     return new Selection(
       textEditor.selection.start.line, 0,
       endLine, textEditor.document.lineAt(endLine).range.end.character)
   }
 
   /**
-  * Applys edits to a text editor
-  * @param activeEditor Editor to apply the changes
-  * @param edits Changes to apply
-  */
-  static applyEdits(edit: [TextEdit]) {
-    if (window.activeTextEditor) {
-      const workspaceEdit = new WorkspaceEdit()
-      workspaceEdit.set(window.activeTextEditor.document.uri, edit)
-      workspace.applyEdit(workspaceEdit)
-    }
-  }
-
-  static getActiveDocument(textEditor: TextEditor) {
-    return textEditor.document.getText()
-  }
-
-  static getRange(textEditor: TextEditor) {
+   * @param textEditor An editor.
+   * @returns The selected lines, or the whole document if nothing is selected.
+   */
+  static getRange(textEditor: TextEditor): Range {
     if (textEditor.selection.isEmpty) {
-      return VsCodeAdapter.getFullDocumentRange(textEditor)
-    } else {
-      return VsCodeAdapter.getSelectedRange(textEditor)
+      return VsCodeAdapter.getFullDocumentRange(textEditor.document)
     }
+    return VsCodeAdapter.getSelectedRange(textEditor)
   }
-
-  static getEdits(textEditor: TextEditor, text: string) {
-    const range = VsCodeAdapter.getRange(textEditor)
-    return TextEdit.replace(range, text)
-  }
-
 }

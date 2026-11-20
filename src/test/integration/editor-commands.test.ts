@@ -2,7 +2,7 @@ import { equal } from "assert"
 import { readFileSync, writeFileSync } from "fs"
 import { resolve } from "path"
 
-import { Uri, commands, window, workspace } from "vscode"
+import { Selection, Uri, commands, window, workspace } from "vscode"
 
 import { EditorCommands } from "../../vscode/editor-commands"
 
@@ -47,7 +47,7 @@ suite("Test formatYamlWrapper", () => {
         "key:\n" +
         "  key2: value"
 
-      equal(new EditorCommands().formatYamlWrapper()[0].newText, expected)
+      equal((await new EditorCommands().formatYamlWrapper())[0].newText, expected)
     } else {
       equal(true, false)
     }
@@ -65,7 +65,7 @@ suite("Test formatYamlWrapper", () => {
         "---\n" +
         "key2: value"
 
-      equal(new EditorCommands().formatYamlWrapper()[0].newText, expected)
+      equal((await new EditorCommands().formatYamlWrapper())[0].newText, expected)
     } else {
       equal(true, false)
     }
@@ -81,5 +81,27 @@ suite("Test formatYamlWrapper", () => {
     } else {
       equal(true, false)
     }
+  })
+})
+
+suite("Test formatYamlWrapper with a selection", () => {
+  test("should format the whole document instead of replacing the selection with it", async () => {
+    const document = await workspace.openTextDocument({ language: "yaml", content: "b:   1\na:   2" })
+    const editor = await window.showTextDocument(document, { preview: false })
+    editor.selection = new Selection(0, 0, 0, 5)
+
+    await new EditorCommands(editor).formatYamlWrapper()
+
+    equal(document.getText(), "---\nb: 1\na: 2")
+  })
+})
+
+suite("Test editor commands without an active editor", () => {
+  test("should not fail when no editor is open", async () => {
+    await commands.executeCommand("workbench.action.closeAllEditors")
+
+    await commands.executeCommand("vscode-yaml-sort.sortYaml")
+    await commands.executeCommand("vscode-yaml-sort.formatYaml")
+    await commands.executeCommand("vscode-yaml-sort.validateYaml")
   })
 })

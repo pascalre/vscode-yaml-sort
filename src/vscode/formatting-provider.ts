@@ -1,7 +1,8 @@
-import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from "vscode"
+import { DocumentFormattingEditProvider, TextDocument, TextEdit } from "vscode"
 
 import { readSettings } from "./configuration"
 import { ErrorReporter } from "./error-reporter"
+import { VsCodeAdapter } from "./vs-code-adapter"
 import { formatDocuments, sortDocuments } from "../core/document-transformer"
 import { YamlSorter } from "../core/yaml-sorter"
 
@@ -31,7 +32,6 @@ export class YamlFormattingProvider implements DocumentFormattingEditProvider {
       this.errorReporter.handleError(error)
       return []
     }
-    const fullRange = document.validateRange(new Range(0, 0, document.lineCount, 0))
-    return [TextEdit.replace(fullRange, newText)]
+    return [TextEdit.replace(VsCodeAdapter.getFullDocumentRange(document), newText)]
   }
 }

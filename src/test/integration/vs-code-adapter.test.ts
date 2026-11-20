@@ -1,26 +1,15 @@
-import { equal, fail } from "assert"
-import { resolve } from "path"
+import { equal } from "assert"
 
 import { spy } from "sinon"
-import { Uri, window, workspace } from "vscode"
+import { window, workspace } from "vscode"
 
 import { Severity, VsCodeAdapter } from "../../vscode/vs-code-adapter"
 
-suite("Test VsCodeAdapter - getActiveDocument()", () => {
-  test("when text editor is active should open document", async () => {
-    const uri = Uri.parse(resolve("./src/test/files/testGetActiveDocument.yaml"))
-    const doc = await workspace.openTextDocument(uri)
-    await window.showTextDocument(doc, { preview: false })
+suite("Test VsCodeAdapter - getFullDocumentRange()", () => {
+  test("should cover the whole document", async () => {
+    const document = await workspace.openTextDocument({ language: "yaml", content: "a: 1\nb: 2\n" })
 
-    if (window.activeTextEditor) {
-      const expected =
-        "key:\n" +
-        "  key2: value"
-
-      equal(VsCodeAdapter.getActiveDocument(window.activeTextEditor), expected)
-    } else {
-      fail("window.activeTextEditor is not set")
-    }
+    equal(document.getText(VsCodeAdapter.getFullDocumentRange(document)), "a: 1\nb: 2\n")
   })
 })
 
