@@ -1,8 +1,16 @@
 {
-    "reporter": [
-      "html",
-      "text-lcov",
-      "text-summary",
-      "lcov"
+  "include": [
+    "out/**/*.js",
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "out/test/**",
+    "src/test/**"
+  ],
+  "reporter": [
+    "html",
+    "text",
+    "text-summary",
+    "lcov"
   ]
 }
