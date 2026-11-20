@@ -2,6 +2,17 @@
 
 ## Unreleased
 🐛 Bugfixes
+* Command `Format YAML` with a selection formats the whole document. Before, it replaced the selected lines with the formatted document, so the rest of the document appeared twice. The editor commands apply their changes to the document they were run on and show the success message only after VS Code applied them. Running a command without an open editor shows a hint instead of an internal error
+* Keep a comment at its key when sorting changes the key's value, e.g. removes its quotes. Before, the comment could move to another key that contains the key's name, like `data` for `a`
+* Keep tabs inside values, e.g. in a quoted string. Only tabs in the indentation are replaced with spaces
+* Keep the leading zero of octal values like `0755` that are followed by a comment or are items of a list. Before, they became `755`
+* Command `Recursively sort YAML files` skips the folders `node_modules` and `.git`, so it no longer rewrites the yaml files of installed dependencies. Files that are already sorted are no longer written, and a file is processed once even if its extension is configured twice
+* Sorting an indented selection no longer adds trailing whitespaces to its empty lines
+* Setting `emptyLinesUntilLevel` no longer adds empty lines inside block scalars (`key: |`), which changed their value, and no longer separates a comment from the key below it
+* Custom sort writes the keywords like every other key: a keyword that needs quotes is quoted (before, `'a: b': 1` became the invalid `a: b: 1`), a value containing a colon stays on the line of its keyword instead of moving to the next line, and the result no longer ends with an extra line break when every key is a keyword
+* Keep a document that only contains an empty mapping (`{}`) when sorting or formatting. Before, it became an empty document
+* Keep the inline comment of a value that contains an apostrophe (`key: it's # comment`) or an escaped quote (`key: "a \" b" # comment`). Before, the comment was dropped while sorting
+* Sorting a whole document whose last key has no value (e.g. `key:`) no longer fails with "YAML selection is invalid". This check now only applies to selections
 * The editor commands (sort, custom sort, format, validate) are only offered in the command palette for yaml files. The condition was declared at a place VS Code ignores
 * (refs [#65](https://github.com/pascalre/vscode-yaml-sort/issues/65)) Formatting via "Format Document" or on save no longer shows "Yaml formatted successfully", once per document. The command `Format YAML` shows it once after the changes were applied
 * Command `Recursively sort YAML files` now sorts files with several documents, works without an open editor and is only offered for folders in the explorer. A file that cannot be sorted is reported and left unchanged. Files are now also found on Windows paths
@@ -30,6 +41,8 @@
 * The extension is only activated when a yaml file is opened or one of its commands is run, instead of on every start of VS Code
 📦 Dependencies
 * Move `@types/js-yaml` and `@vscode/test-electron` to `devDependencies`, so they are no longer shipped with the extension
+🏗️ Internal
+* The sources are split into `src/core` (yaml logic, no VS Code API) and `src/vscode` (commands, formatter, notifications). The core reports problems by throwing errors, the vscode layer shows them. `npm run code-analysis` enforces the split, and `npm run test:unit` runs the core's tests in plain node within seconds
 
 # 6.6.4 - Feb 9, 2026
 📦 Dependencies

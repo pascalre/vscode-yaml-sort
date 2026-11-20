@@ -1,6 +1,24 @@
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
+    /* architecture of this extension: */
+    {
+      name: 'core-independent-of-vscode',
+      severity: 'error',
+      comment:
+        'The core contains the yaml logic and must run without VS Code, so it can be unit tested in plain node ' +
+        'and reused. Talk to VS Code from src/vscode instead and pass the values into the core.',
+      from: { path: '^src/core' },
+      to: { path: '^node_modules/@types/vscode/|^src/vscode/|^src/extension' }
+    },
+    {
+      name: 'unit-tests-independent-of-vscode',
+      severity: 'error',
+      comment:
+        'Unit tests run in plain node (npm run test:unit). Tests that need VS Code belong to src/test/integration.',
+      from: { path: '^src/test/unit' },
+      to: { path: '^node_modules/@types/vscode/|^src/vscode/|^src/extension' }
+    },
     /* rules from the 'recommended' preset: */
     {
       name: 'no-circular',

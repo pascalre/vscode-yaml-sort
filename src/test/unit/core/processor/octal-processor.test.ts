@@ -1,0 +1,95 @@
+import { equal } from "assert"
+
+import { OctalProcessor } from "../../../../core/processor/octal-processor"
+
+suite("Test OctalProcessor - preprocess()", () => {
+  test("should find one octal values", () => {
+    const text = "key: 0644"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.store.size, 1)
+    equal(octalprocessor.store.get("vscode-yaml-sort.octal.0"), "0644")
+  })
+
+  test("should find multiple octal values", () => {
+    const text =
+      "key: 0644\n" +
+      "key2:\n" +
+      "  x: 0655\n" +
+      "  y: 065574\n" +
+      "  z: 0123"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.store.size, 3)
+    equal(octalprocessor.store.get("vscode-yaml-sort.octal.0"), "0644")
+    equal(octalprocessor.store.get("vscode-yaml-sort.octal.1"), "0655")
+    equal(octalprocessor.store.get("vscode-yaml-sort.octal.2"), "0123")
+  })
+
+
+
+  test("GitHub issue #159: Sort YAML converts 00000000-0000-0000-0000-000000000001 to vscode-yaml-sort.octal.00000-0000-0000-0000-000000000001", () => {
+    const text =
+      "game:\n" +
+      "  core:\n" +
+      "    shardId: 00000000-0000-0000-0000-000000000001"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.store.size, 0)
+  })
+})
+suite("Test OctalProcessor - matched occurrence", () => {
+  test("preprocess substitutes the matched octal value, not an earlier identical string", () => {
+    const text = "a: \"0755\"\nz: 0755"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.text, "a: \"0755\"\nz: vscode-yaml-sort.octal.0")
+  })
+
+  test("text should be the same before preprocessing and after postprocessing", () => {
+    const text = "a: \"0755\"\nz: 0755"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+    octalprocessor.postprocess()
+
+    equal(octalprocessor.text, text)
+  })
+})
+
+suite("Test OctalProcessor - octal values in other positions", () => {
+  const cases: [string, string][] = [
+    ["with an inline comment", "mode: 0755 # rwxr-xr-x"],
+    ["as list item", "modes:\n  - 0755\n  - 0644"],
+  ]
+
+  cases.forEach(([name, text]) => {
+    test(`should keep the leading zero of an octal value ${name}`, () => {
+      const octalprocessor = new OctalProcessor(text)
+
+      octalprocessor.preprocess()
+
+      equal(/\b0[0-7]{3}\b/.test(octalprocessor.text), false)
+      octalprocessor.postprocess()
+      equal(octalprocessor.text, text)
+    })
+  })
+
+  test("should not touch a value that only starts with an octal number", () => {
+    const text = "id: 0755-1"
+    const octalprocessor = new OctalProcessor(text)
+
+    octalprocessor.preprocess()
+
+    equal(octalprocessor.text, text)
+  })
+})
+

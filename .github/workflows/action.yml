@@ -25,16 +25,16 @@ jobs:
           node-version: ${{env.NODE_VERSION}}
 
       - name: install
-        run: |
-             npm install
-             npm install -g yarn
-             npm install -g vsce
+        run: npm ci
 
       - name: lint
         run: npm run lint
 
       - name: static code analysis
         run: npm run code-analysis
+
+      - name: unit tests
+        run: npm run test:unit
 
       - name: test
         uses: GabrielBB/xvfb-action@v1
