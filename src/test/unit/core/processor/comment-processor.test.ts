@@ -250,6 +250,36 @@ suite("Test CommentProcessor - searchFuzzyForKeyword()", () => {
 
     equal(commentprocessor.searchFuzzyForKeyword(line), 17)
   })
+
+  test("should find the line of the key, not the key as part of another key", () => {
+    const commentprocessor = new CommentProcessor("a: x\ndata: 2")
+
+    equal(commentprocessor.searchFuzzyForKeyword("a: \"x\""), 0)
+  })
+
+  test("should find the key with a different indentation", () => {
+    const commentprocessor = new CommentProcessor("b:\n    a: x\n    data: 2")
+
+    equal(commentprocessor.searchFuzzyForKeyword("  a: \"x\""), 3)
+  })
+})
+
+suite("Test CommentProcessor - comments of values that change while sorting", () => {
+  test("should keep a comment above its key when the quotes of the value are removed", () => {
+    const processor = new CommentProcessor("# about a\na: \"x\"\ndata: 2")
+    processor.findComments()
+    processor.text = "a: x\ndata: 2"
+
+    equal(processor.postprocess(), "# about a\na: x\ndata: 2")
+  })
+
+  test("should keep an inline comment at its key when the quotes of the value are removed", () => {
+    const processor = new CommentProcessor("a: \"x\" # about a\ndata: 2")
+    processor.findComments()
+    processor.text = "a: x\ndata: 2"
+
+    equal(processor.postprocess(), "a: x # about a\ndata: 2")
+  })
 })
 
 suite("Test CommentProcessor - isCommentFound()", () => {

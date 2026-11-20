@@ -188,6 +188,22 @@ export class CommentProcessor {
     return this.searchFuzzyForKeyword(text)
   }
 
+  /**
+   * @param matches Condition for a line.
+   * @returns The offset of the last line of the text that meets the condition, or -1.
+   */
+  findLastLine(matches: (line: string) => boolean): number {
+    let result = -1
+    let offset = 0
+    for (const line of this.text.split("\n")) {
+      if (matches(line)) {
+        result = offset
+      }
+      offset += line.length + 1
+    }
+    return result
+  }
+
   searchExactMatch(text: string): number {
     // an empty anchor keeps its previous behavior
     if (text === "") {
@@ -196,36 +212,30 @@ export class CommentProcessor {
     // comments must be inserted above the exact matching line (see #221).
     // a substring search would also find `mysql5:` inside a deeper indented
     // line like `      mysql5:` of a `depends_on` block
-    let result = -1
-    let offset = 0
-    for (const line of this.text.split("\n")) {
-      if (line === text) {
-        result = offset
-      }
-      offset += line.length + 1
-    }
-    return result
+    return this.findLastLine((line) => line === text)
   }
 
   searchFuzzyForTrimmedText(text: string): number {
     // like searchExactMatch(), but the line may have more or less
     // surrounding whitespaces than the anchor (see #139)
     const trimmedText = text.trim()
-    let result = -1
-    let offset = 0
-    for (const line of this.text.split("\n")) {
-      if (line.trim() === trimmedText) {
-        result = offset
-      }
-      offset += line.length + 1
-    }
-    return result
+    return this.findLastLine((line) => line.trim() === trimmedText)
   }
 
   searchFuzzyForKeyword(text: string): number {
-    // the value of a line may change while sorting,
-    // so only search for the keyword in front of the first colon
-    return this.text.lastIndexOf(text.split(":")[0])
+    // the value of a line may change while sorting, e.g. quotes are removed,
+    // so search for the line with the same key in front of the first colon
+    const key = text.split(":")[0]
+    const sameKey = this.findLastLine((line) => line.startsWith(`${key}:`))
+    if (CommentProcessor.isCommentFound(sameKey)) {
+      return sameKey
+    }
+    const sameKeyIndented = this.findLastLine((line) => line.trim().startsWith(`${key.trim()}:`))
+    if (CommentProcessor.isCommentFound(sameKeyIndented)) {
+      return sameKeyIndented
+    }
+    // last resort, e.g. for a key that js-yaml quotes: rather misplace a comment than lose it
+    return this.text.lastIndexOf(key)
   }
 
   static isCommentFound(index: number): boolean {
