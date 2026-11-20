@@ -7,11 +7,11 @@ import { SpacingProcessor } from "./spacing-processor"
 import { TabsToSpacesProcessor } from "./tabs-to-spaces-processor"
 import { Settings } from "../settings"
 
-export class ProcessorController {
+export class ProcessorPipeline {
   arrayprocessor!: ArrayProcessor
   blockprocessor!: BlockProcessor
   commentprocessor!: CommentProcessor
-  helmprocessor!: HelmProcessor
+  helmProcessor!: HelmProcessor
   octalprocessor!: OctalProcessor
   spacingprocessor!: SpacingProcessor
   tabstospacespreprocessor!: TabsToSpacesProcessor
@@ -41,9 +41,9 @@ export class ProcessorController {
     }
 
     if (this.settings.useHelmProcessor) {
-      this.helmprocessor = new HelmProcessor(this.text)
-      this.helmprocessor.preprocess()
-      this.text = this.helmprocessor.text
+      this.helmProcessor = new HelmProcessor(this.text)
+      this.helmProcessor.preprocess()
+      this.text = this.helmProcessor.text
     }
 
     if (this.settings.useOctalProcessor) {
@@ -73,9 +73,9 @@ export class ProcessorController {
     }
 
     if (this.settings.useHelmProcessor) {
-      this.helmprocessor.text = this.text
-      this.helmprocessor.postprocess()
-      this.text = this.helmprocessor.text
+      this.helmProcessor.text = this.text
+      this.helmProcessor.postprocess()
+      this.text = this.helmProcessor.text
     }
 
     if (this.settings.useArrayProcessor) {

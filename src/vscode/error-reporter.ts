@@ -1,11 +1,11 @@
 import { Severity, VsCodeAdapter } from "./vs-code-adapter"
 
-export class ErrorUtil {
-  vscodeadapter = new VsCodeAdapter()
+export class ErrorReporter {
+  vsCodeAdapter = new VsCodeAdapter()
 
   handleError(error: unknown) {
     if (error instanceof Error) {
-      this.vscodeadapter.showMessage(Severity.ERROR, error.message)
+      this.vsCodeAdapter.showMessage(Severity.ERROR, error.message)
     }
   }
 }

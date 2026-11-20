@@ -1,7 +1,7 @@
 import { ExtensionContext, Uri, commands } from "vscode"
 
-import { Controller } from "./vscode/controller"
-import { sortYamlFilesInDirectory } from "./vscode/file-sorter"
+import { sortYamlFilesInDirectory } from "./vscode/directory-sorter"
+import { EditorCommands } from "./vscode/editor-commands"
 import { YamlFormattingProvider } from "./vscode/formatting-provider"
 import { VsCodeAdapter } from "./vscode/vs-code-adapter"
 
@@ -9,13 +9,13 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     VsCodeAdapter.registerFormatter(new YamlFormattingProvider()),
     commands.registerCommand("vscode-yaml-sort.sortYaml", () => {
-      new Controller().sortYamlWrapper()
+      new EditorCommands().sortYamlWrapper()
     }),
     commands.registerCommand("vscode-yaml-sort.validateYaml", () => {
-      new Controller().validateYamlWrapper()
+      new EditorCommands().validateYamlWrapper()
     }),
     commands.registerCommand("vscode-yaml-sort.formatYaml", () => {
-      new Controller().formatYamlWrapper()
+      new EditorCommands().formatYamlWrapper()
     }),
     commands.registerCommand("vscode-yaml-sort.sortYamlFilesInDirectory", (uri?: Uri) => {
       sortYamlFilesInDirectory(uri)
@@ -24,7 +24,7 @@ export function activate(context: ExtensionContext) {
   for (const index of [1, 2, 3]) {
     context.subscriptions.push(
       commands.registerCommand(`vscode-yaml-sort.customSortYaml_${index}`, () => {
-        new Controller().sortYamlWrapper(index)
+        new EditorCommands().sortYamlWrapper(index)
       })
     )
   }

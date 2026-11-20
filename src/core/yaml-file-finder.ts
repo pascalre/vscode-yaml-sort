@@ -4,7 +4,7 @@ import { sync } from "glob"
 
 import { Settings } from "./settings"
 
-export class FileUtil {
+export class YamlFileFinder {
   settings: Settings
 
   constructor(settings = new Settings()) {

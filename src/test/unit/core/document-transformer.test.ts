@@ -2,21 +2,21 @@ import { equal, throws } from "assert"
 
 import { YamlOperations, formatDocuments, sortDocuments } from "../../../core/document-transformer"
 import { Settings } from "../../../core/settings"
-import { YamlUtil } from "../../../core/yaml-util"
+import { YamlSorter } from "../../../core/yaml-sorter"
 
 /**
  * Real yaml operations, except that sorting fails for every document containing the marker.
  */
 const failingSortFor = (marker: string): YamlOperations => {
-  const yamlutil = new YamlUtil()
-  const original = yamlutil.sortYaml.bind(yamlutil)
-  yamlutil.sortYaml = (text: string, customSort?: number) => {
+  const yamlSorter = new YamlSorter()
+  const original = yamlSorter.sortYaml.bind(yamlSorter)
+  yamlSorter.sortYaml = (text: string, customSort?: number) => {
     if (text.includes(marker)) {
       throw new Error(`cannot sort ${marker}`)
     }
     return original(text, customSort)
   }
-  return yamlutil
+  return yamlSorter
 }
 
 suite("Test DocumentTransformer - sortDocuments()", () => {
@@ -93,10 +93,10 @@ suite("Test DocumentTransformer - delimiters and directives", () => {
   })
 
   test("should drop only the leading delimiter when useLeadingDashes is false", () => {
-    const yamlutil = new YamlUtil()
-    yamlutil.settings.useLeadingDashes = false
+    const yamlSorter = new YamlSorter()
+    yamlSorter.settings.useLeadingDashes = false
 
-    equal(sort("--- # first\nb: 1\n--- # second\nd: 1\nc: 2", yamlutil), "b: 1\n--- # second\nc: 2\nd: 1")
+    equal(sort("--- # first\nb: 1\n--- # second\nd: 1\nc: 2", yamlSorter), "b: 1\n--- # second\nc: 2\nd: 1")
   })
 
   test("should keep an empty document", () => {
@@ -108,10 +108,10 @@ suite("Test DocumentTransformer - delimiters and directives", () => {
   })
 
   test("should keep yaml directives when useLeadingDashes is false, because they require a delimiter", () => {
-    const yamlutil = new YamlUtil()
-    yamlutil.settings.useLeadingDashes = false
+    const yamlSorter = new YamlSorter()
+    yamlSorter.settings.useLeadingDashes = false
 
-    equal(sort("%YAML 1.2\n---\nb: 1\n---\nd: 1\nc: 2", yamlutil), "%YAML 1.2\n---\nb: 1\n---\nc: 2\nd: 1")
+    equal(sort("%YAML 1.2\n---\nb: 1\n---\nd: 1\nc: 2", yamlSorter), "%YAML 1.2\n---\nb: 1\n---\nc: 2\nd: 1")
   })
 
   test("should keep the delimiters of a selection as they are", () => {
@@ -138,6 +138,6 @@ suite("Test DocumentTransformer - injected settings", () => {
     const settings = new Settings()
     settings.schema = Settings.getJsYamlSchemaFromString("CLOUDFORMATION_SCHEMA")
 
-    equal(sortDocuments("b: !Ref x\na: 1", { customSort: 0, isSelection: false }, new YamlUtil(settings)), "---\na: 1\nb: !Ref x")
+    equal(sortDocuments("b: !Ref x\na: 1", { customSort: 0, isSelection: false }, new YamlSorter(settings)), "---\na: 1\nb: !Ref x")
   })
 })

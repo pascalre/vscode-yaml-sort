@@ -1,14 +1,14 @@
 import { equal, notEqual } from "assert"
 
-import { ProcessorController } from "../../../../core/processor/processor-controller"
+import { ProcessorPipeline } from "../../../../core/processor/processor-pipeline"
 
-suite("Test ProcessorController - preprocess() & postprocess()", () => {
+suite("Test ProcessorPipeline - preprocess() & postprocess()", () => {
   test("text should be the same after pre- and postprocessing", () => {
     const text =
       "foo: {{ .Value }}\n" +
       "# comment\n" +
       "bar: baz"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
 
     processor.preprocess()
 
@@ -25,7 +25,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
 
   test("test setting useArrayProcessor = true", () => {
     const text = "test: [ \"CMD\", \"pg_isready\", \"-q\", \"-d\", \"DB_NAME\", \"-U\", \"DB_USER\" ]"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
 
     processor.preprocess()
 
@@ -33,7 +33,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
   })
   test("test setting useArrayProcessor = false", () => {
     let text = "test: [ \"CMD\", \"pg_isready\", \"-q\", \"-d\", \"DB_NAME\", \"-U\", \"DB_USER\" ]"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
     processor.settings.useArrayProcessor = false
 
     processor.preprocess()
@@ -52,7 +52,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
     const text =
       "# comment\n" +
       "bar: baz"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
 
     processor.preprocess()
 
@@ -62,7 +62,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
     const text =
       "# comment\n" +
       "bar: baz"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
     processor.settings.useCommentProcessor = false
 
     processor.preprocess()
@@ -79,20 +79,20 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
     const text =
       "foo: {{ .Value }}\n" +
       "bar: baz"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
 
     processor.preprocess()
 
-    equal(processor.helmprocessor.store.size, 1)
+    equal(processor.helmProcessor.store.size, 1)
   })
   test("test setting useHelmProcessor = false", () => {
     let text = "foo: {{ .Value }}"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
     processor.settings.useHelmProcessor = false
 
     processor.preprocess()
 
-    equal(processor.helmprocessor, undefined)
+    equal(processor.helmProcessor, undefined)
 
     text = "foo: vscode-yaml-sort.helm.0"
     processor.text = text
@@ -106,16 +106,16 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
     const text =
       "foo: {{ .Value }}\n" +
       "bar: baz"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
 
     processor.preprocess()
 
-    equal(processor.helmprocessor.store.size, 1)
+    equal(processor.helmProcessor.store.size, 1)
   })
 
   test("test setting useOctalProcessor = false", () => {
     let text = "foo: 0644"
-    const processor = new ProcessorController(text)
+    const processor = new ProcessorPipeline(text)
     processor.settings.useOctalProcessor = false
 
     processor.preprocess()
@@ -138,7 +138,7 @@ suite("Test ProcessorController - preprocess() & postprocess()", () => {
       "    some command\n" +
       "    # comment 2\n" +
       "    some other command"
-      const processor = new ProcessorController(text)
+      const processor = new ProcessorPipeline(text)
 
       processor.preprocess()
       processor.postprocess()

@@ -1,8 +1,8 @@
 import { prependWhitespacesOnEachLine } from "./indentation"
 import { JsYamlAdapter } from "./js-yaml-adapter"
-import { ProcessorController } from "./processor/processor-controller"
+import { ProcessorPipeline } from "./processor/processor-pipeline"
 import { Settings } from "./settings"
-import { sortArraysRecursively } from "./sort-util"
+import { sortArraysRecursively } from "./sort-order"
 import { removeTrailingCharacters } from "./yaml-text"
 
 /**
@@ -12,13 +12,13 @@ import { removeTrailingCharacters } from "./yaml-text"
 const isMapping = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value)
 
-export class YamlUtil {
+export class YamlSorter {
   settings: Settings
-  jsyamladapter: JsYamlAdapter
+  jsYamlAdapter: JsYamlAdapter
 
   constructor(settings = new Settings()) {
     this.settings = settings
-    this.jsyamladapter = new JsYamlAdapter(settings)
+    this.jsYamlAdapter = new JsYamlAdapter(settings)
   }
 
   static getNumberOfLeadingSpaces(text: string): number {
@@ -56,10 +56,10 @@ export class YamlUtil {
    * @throws  YAMLException if the document is not valid yaml.
    */
   sortYaml(unsortedYaml: string, customSort = 0): string {
-    const processor = new ProcessorController(unsortedYaml, this.settings)
+    const processor = new ProcessorPipeline(unsortedYaml, this.settings)
     processor.preprocess()
 
-    const doc = this.jsyamladapter.load(processor.text)
+    const doc = this.jsYamlAdapter.load(processor.text)
     if (this.settings.sortArrays) {
       sortArraysRecursively(doc)
     }
@@ -78,7 +78,7 @@ export class YamlUtil {
    */
   dumpSorted(doc: unknown, customSort: number): string {
     if (customSort === 0 || this.settings.useCustomSortRecursively || !isMapping(doc)) {
-      return this.jsyamladapter.dumpYaml(doc, true, customSort)
+      return this.jsYamlAdapter.dumpYaml(doc, true, customSort)
     }
     // check for the key itself, values like 0, false or null must be ordered too
     const keywords = this.settings.getCustomSortKeywords(customSort)
@@ -86,7 +86,7 @@ export class YamlUtil {
     // build the remaining keys anew instead of deleting them from the loaded document
     const remainder = Object.fromEntries(Object.entries(doc).filter(([key]) => !keywords.includes(key)))
     const dumpedKeywords = keywords.map((key) => this.dumpKeyword(key, doc[key], customSort)).join("")
-    return dumpedKeywords + this.jsyamladapter.dumpYaml(remainder, true, customSort)
+    return dumpedKeywords + this.jsYamlAdapter.dumpYaml(remainder, true, customSort)
   }
 
   /**
@@ -97,8 +97,8 @@ export class YamlUtil {
    * @returns The yaml lines for the keyword, ending with a line break.
    */
   dumpKeyword(key: string, value: unknown, customSort: number): string {
-    const dumpedValue = this.jsyamladapter.dumpValue(value, true, customSort)
-    if (YamlUtil.isValueMultiline(dumpedValue)) {
+    const dumpedValue = this.jsYamlAdapter.dumpValue(value, true, customSort)
+    if (YamlSorter.isValueMultiline(dumpedValue)) {
       return `${key}:\n${this.transformMultilineValue(dumpedValue)}\n`
     }
     return `${key}: ${dumpedValue}\n`
@@ -112,9 +112,9 @@ export class YamlUtil {
    * @throws  YAMLException if the document is not valid yaml.
    */
   formatYaml(yaml: string, useLeadingDashes: boolean): string {
-    const processor = new ProcessorController(yaml, this.settings)
+    const processor = new ProcessorPipeline(yaml, this.settings)
     processor.preprocess()
-    processor.text = this.jsyamladapter.dumpYaml(this.jsyamladapter.load(processor.text), false, 0)
+    processor.text = this.jsYamlAdapter.dumpYaml(this.jsYamlAdapter.load(processor.text), false, 0)
     processor.postprocess()
     return useLeadingDashes ? `---\n${processor.text}` : processor.text
   }

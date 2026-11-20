@@ -1,20 +1,20 @@
 import { deepEqual, equal } from "assert"
 
 import { Settings } from "../../../core/settings"
-import { SortUtil, sortArraysRecursively } from "../../../core/sort-util"
+import { SortOrder, sortArraysRecursively } from "../../../core/sort-order"
 
 suite("Test Sort - localeSort()", () => {
   test("when `locale` is `sv` and a is `ä` and b is `z` should return 1", () => {
     const settings = new Settings()
     settings.locale = "sv"
-    const sort = new SortUtil(settings)
+    const sort = new SortOrder(settings)
     equal(sort.localeSort("ä", "z"), 1)
   })
 
   test("when `locale` is `en` and a is `ä` and b is `z` should return -1", () => {
     const settings = new Settings()
     settings.locale = "en"
-    const sort = new SortUtil(settings)
+    const sort = new SortOrder(settings)
     equal(sort.localeSort("ä", "z"), -1)
   })
 })
@@ -24,7 +24,7 @@ suite("Test Sort - customSort()", () => {
   settings.getCustomSortKeywords = function () {
     return ["kind", "data"]
   }
-  const sort = new SortUtil(settings)
+  const sort = new SortOrder(settings)
   sort.custom = 1
 
   test("when `custom` is `1` and keywords are `['kind', 'data']` and a is `data` and b is `kind` should return 1", () => {

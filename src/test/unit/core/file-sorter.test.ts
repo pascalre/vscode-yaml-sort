@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs"
 import { tmpdir } from "os"
 import { join } from "path"
 
-import { sortFile } from "../../../vscode/file-sorter"
+import { sortFile } from "../../../core/file-sorter"
 
 suite("Test FileSorter - sortFile()", () => {
 

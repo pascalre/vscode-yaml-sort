@@ -25,33 +25,33 @@ suite("Test VsCodeAdapter - getActiveDocument()", () => {
 })
 
 suite("Test VsCodeAdapter - showMessage()", () => {
-  const vscodeadapter = new VsCodeAdapter()
+  const vsCodeAdapter = new VsCodeAdapter()
   test("when Severity.ERROR should show error message", () => {
     const spyError = spy(window, "showErrorMessage")
     equal(spyError.called, false)
-    vscodeadapter.showMessage(Severity.ERROR, "Test message")
+    vsCodeAdapter.showMessage(Severity.ERROR, "Test message")
     equal(spyError.called, true)
   })
 
   test("when Severity.INFO should show info message", () => {
-    const spyNotify = spy(vscodeadapter, "notify")
+    const spyNotify = spy(vsCodeAdapter, "notify")
     equal(spyNotify.called, false)
-    vscodeadapter.showMessage(Severity.INFO, "Test message")
+    vsCodeAdapter.showMessage(Severity.INFO, "Test message")
     equal(spyNotify.called, true)
   })
 })
 
 suite("Test VsCodeAdapter - notify()", () => {
   test("when notifySuccess should show info message", () => {
-    const vscodeadapter = new VsCodeAdapter()
+    const vsCodeAdapter = new VsCodeAdapter()
     const spyObject = spy(window, "showInformationMessage")
 
-    vscodeadapter.settings.notifySuccess = false
-    vscodeadapter.notify("Test message")
+    vsCodeAdapter.settings.notifySuccess = false
+    vsCodeAdapter.notify("Test message")
     equal(spyObject.called, false)
 
-    vscodeadapter.settings.notifySuccess = true
-    vscodeadapter.notify("Test message")
+    vsCodeAdapter.settings.notifySuccess = true
+    vsCodeAdapter.notify("Test message")
     equal(spyObject.called, true)
   })
 })

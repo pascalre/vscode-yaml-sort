@@ -1,7 +1,7 @@
 import { dump, load } from "js-yaml"
 
 import { Settings } from "./settings"
-import { SortUtil } from "./sort-util"
+import { SortOrder } from "./sort-order"
 import { removeTrailingCharacters, splitDocuments } from "./yaml-text"
 
 /**
@@ -87,12 +87,12 @@ export class JsYamlAdapter {
    */
   getKeyComparator(sortKeys: boolean, custom: number): boolean | ((a: string, b: string) => number) {
     if (custom > 0 && this.settings.useCustomSortRecursively) {
-      const sort = new SortUtil(this.settings, custom)
+      const sort = new SortOrder(this.settings, custom)
       return (a: string, b: string) => sort.customSort(a, b)
     }
     if (sortKeys && this.settings.sortOrderReverse) {
       // mirror js-yaml's default order, which compares by code point
-      return (a: string, b: string) => SortUtil.compare(b, a)
+      return (a: string, b: string) => SortOrder.compare(b, a)
     }
     return sortKeys
   }

@@ -1,9 +1,9 @@
 import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from "vscode"
 
 import { readSettings } from "./configuration"
-import { ErrorUtil } from "./error-util"
+import { ErrorReporter } from "./error-reporter"
 import { formatDocuments, sortDocuments } from "../core/document-transformer"
-import { YamlUtil } from "../core/yaml-util"
+import { YamlSorter } from "../core/yaml-sorter"
 
 /**
  * Formats (or, depending on `sortOnSave`, sorts) a whole yaml document.
@@ -12,7 +12,7 @@ import { YamlUtil } from "../core/yaml-util"
  * so this provider must never apply them on its own (see #180).
  */
 export class YamlFormattingProvider implements DocumentFormattingEditProvider {
-  errorutil = new ErrorUtil()
+  errorReporter = new ErrorReporter()
 
   /**
    * @param document The document VS Code asks to format. It may differ from the active editor.
@@ -20,15 +20,15 @@ export class YamlFormattingProvider implements DocumentFormattingEditProvider {
    */
   provideDocumentFormattingEdits(document: TextDocument): TextEdit[] {
     const settings = readSettings(document)
-    const yamlutil = new YamlUtil(settings)
+    const yamlSorter = new YamlSorter(settings)
     const text = document.getText()
     let newText: string
     try {
       newText = settings.doSortOnSave()
-        ? sortDocuments(text, { customSort: settings.sortOnSave, isSelection: false }, yamlutil)
-        : formatDocuments(text, yamlutil)
+        ? sortDocuments(text, { customSort: settings.sortOnSave, isSelection: false }, yamlSorter)
+        : formatDocuments(text, yamlSorter)
     } catch (error) {
-      this.errorutil.handleError(error)
+      this.errorReporter.handleError(error)
       return []
     }
     const fullRange = document.validateRange(new Range(0, 0, document.lineCount, 0))

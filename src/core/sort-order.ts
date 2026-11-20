@@ -1,6 +1,6 @@
 import { Settings } from "./settings"
 
-export class SortUtil {
+export class SortOrder {
   settings: Settings
   custom = 0
 
@@ -16,7 +16,7 @@ export class SortUtil {
     const indexB = sortOrder.indexOf(b)
 
     if (indexA > -1 && indexB > -1) {
-      return SortUtil.compare(indexA, indexB)
+      return SortOrder.compare(indexA, indexB)
     }
     if (indexA !== -1 && indexB === -1) {
       return -1
@@ -76,7 +76,7 @@ const compareArrayItems = (a: unknown, b: unknown): number => {
     // Array.prototype.sort is stable, so these items keep their order
     return 0
   }
-  return SortUtil.compare(a as number | string, b as number | string)
+  return SortOrder.compare(a as number | string, b as number | string)
 }
 
 /**

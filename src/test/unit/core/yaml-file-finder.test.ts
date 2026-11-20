@@ -1,14 +1,14 @@
 import { deepEqual } from "assert"
 
-import { FileUtil } from "../../../core/file-util"
 import { Settings } from "../../../core/settings"
+import { YamlFileFinder } from "../../../core/yaml-file-finder"
 
-suite("Test FileUtil - getFiles()", () => {
+suite("Test YamlFileFinder - getFiles()", () => {
   const settings = new Settings()
   settings.getExtensions = function () {
     return ["yaml", "yml", "customyaml"]
   }
-  const fileutil = new FileUtil(settings)
+  const fileFinder = new YamlFileFinder(settings)
 
   test("should return all files", () => {
     const expected = [
@@ -17,7 +17,7 @@ suite("Test FileUtil - getFiles()", () => {
       "src/test/files/file-finder/bar.yml",
       "src/test/files/file-finder/subfolder/.customyaml"
     ]
-    deepEqual(fileutil.getFiles("./src/test/files/file-finder"), expected)
+    deepEqual(fileFinder.getFiles("./src/test/files/file-finder"), expected)
   })
 
   test("should list all files with extension *.yaml or *.yml in a directory and all its subdirectories", () => {
@@ -29,6 +29,6 @@ suite("Test FileUtil - getFiles()", () => {
       "src/test/files/getYamlFilesInDirectory/folder1/file.yaml",
       "src/test/files/getYamlFilesInDirectory/file.yml"
     ]
-    deepEqual(fileutil.getFiles("./src/test/files/getYamlFilesInDirectory"), expected)
+    deepEqual(fileFinder.getFiles("./src/test/files/getYamlFilesInDirectory"), expected)
   })
 })

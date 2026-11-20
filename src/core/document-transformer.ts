@@ -1,12 +1,12 @@
 import { prependWhitespacesOnEachLine, removeLeadingSpacesOnEachLine } from "./indentation"
 import { JsYamlAdapter } from "./js-yaml-adapter"
+import { YamlSorter } from "./yaml-sorter"
 import { YamlDocument, YamlStream, splitDocuments, validateTextRange } from "./yaml-text"
-import { YamlUtil } from "./yaml-util"
 
 /**
- * The parts of YamlUtil a transformation depends on. Kept narrow so tests can pass a stub.
+ * The parts of YamlSorter a transformation depends on. Kept narrow so tests can pass a stub.
  */
-export type YamlOperations = Pick<YamlUtil, "formatYaml" | "settings" | "sortYaml">
+export type YamlOperations = Pick<YamlSorter, "formatYaml" | "settings" | "sortYaml">
 
 export interface SortOptions {
   /** 0 for the default sort, 1 to 3 for the custom sort keywords. */
@@ -61,13 +61,13 @@ const transformDocuments = (stream: YamlStream, transform: ContentTransformation
  * @returns The sorted text.
  * @throws  Error if the text is not valid yaml, the selection ends invalid or a document cannot be sorted.
  */
-export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlUtil()): string => {
+export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOperations = new YamlSorter()): string => {
   validateTextRange(text)
   new JsYamlAdapter(yaml.settings).validateYaml(text)
 
   const sorted = transformDocuments(splitDocuments(text), (content) => {
     // an indented selection is sorted like a top-level document and indented again afterwards (see #53)
-    const indentation = options.isSelection ? YamlUtil.getNumberOfLeadingSpaces(content) : 0
+    const indentation = options.isSelection ? YamlSorter.getNumberOfLeadingSpaces(content) : 0
     const sortedContent = yaml.sortYaml(removeLeadingSpacesOnEachLine(content, indentation), options.customSort)
     return prependWhitespacesOnEachLine(sortedContent, indentation)
   })
@@ -81,7 +81,7 @@ export const sortDocuments = (text: string, options: SortOptions, yaml: YamlOper
  * @returns The formatted text.
  * @throws  Error if a document is not valid yaml.
  */
-export const formatDocuments = (text: string, yaml: YamlOperations = new YamlUtil()): string => {
+export const formatDocuments = (text: string, yaml: YamlOperations = new YamlSorter()): string => {
   const formatted = transformDocuments(splitDocuments(text), (content) => yaml.formatYaml(content, false))
   return joinDocuments(formatted, yaml.settings.useLeadingDashes)
 }

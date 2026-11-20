@@ -4,7 +4,7 @@ import { resolve } from "path"
 
 import { Uri, commands, window, workspace } from "vscode"
 
-import { Controller } from "../../vscode/controller"
+import { EditorCommands } from "../../vscode/editor-commands"
 
 
 suite("Test sortYamlFiles", () => {
@@ -30,7 +30,7 @@ suite("Test validateYamlWrapper", () => {
     const uri = Uri.parse(resolve("./src/test/files/testValidateYamlWrapper.yaml"))
     const doc = await workspace.openTextDocument(uri)
     await window.showTextDocument(doc, { preview: false })
-    equal(new Controller().validateYamlWrapper(), true)
+    equal(new EditorCommands().validateYamlWrapper(), true)
   })
 })
 
@@ -47,7 +47,7 @@ suite("Test formatYamlWrapper", () => {
         "key:\n" +
         "  key2: value"
 
-      equal(new Controller().formatYamlWrapper()[0].newText, expected)
+      equal(new EditorCommands().formatYamlWrapper()[0].newText, expected)
     } else {
       equal(true, false)
     }
@@ -65,7 +65,7 @@ suite("Test formatYamlWrapper", () => {
         "---\n" +
         "key2: value"
 
-      equal(new Controller().formatYamlWrapper()[0].newText, expected)
+      equal(new EditorCommands().formatYamlWrapper()[0].newText, expected)
     } else {
       equal(true, false)
     }

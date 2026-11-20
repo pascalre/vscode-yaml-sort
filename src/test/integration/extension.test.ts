@@ -3,7 +3,7 @@ import { resolve } from "path"
 
 import { Position, Range, Selection, Uri, commands, window, workspace } from "vscode"
 
-import { Controller } from "../../vscode/controller"
+import { EditorCommands } from "../../vscode/editor-commands"
 
 suite("Test validateYaml", () => {
   test("do not fail when executing command", async () => {
@@ -61,7 +61,7 @@ suite("Test sortYamlWrapper", () => {
           new Position(activeEditor.document.lineCount + 1, 0)),
         actual))
 
-      notDeepEqual(new Controller().sortYamlWrapper(), [])
+      notDeepEqual(new EditorCommands().sortYamlWrapper(), [])
     } else {
       equal(true, false)
     }
@@ -85,7 +85,7 @@ suite("Test sortYamlWrapper", () => {
         actual))
 
       activeEditor.selection = new Selection(0, 0, 0, 4)
-      deepEqual(new Controller().sortYamlWrapper(), [])
+      deepEqual(new EditorCommands().sortYamlWrapper(), [])
     } else {
       equal(true, false)
     }
