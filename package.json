@@ -361,7 +361,7 @@
     "typescript-require": "0.3.0"
   },
   "dependencies": {
-    "@types/vscode": "^1.98.0",
+    "@types/vscode": "^1.146.0",
     "cloudformation-js-yaml-schema": "^0.4.2",
     "glob": "^14.0.3",
     "homeassistant-js-yaml-schema": "^1.1.0",
