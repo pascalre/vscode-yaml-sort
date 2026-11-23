@@ -347,7 +347,7 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@vscode/test-electron": "^2.1.5",
     "coveralls": "3.1.1",
-    "dependency-cruiser": "^17.0.1",
+    "dependency-cruiser": "^18.8.0",
     "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.27.5",
